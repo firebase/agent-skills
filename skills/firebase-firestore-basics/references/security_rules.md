@@ -229,7 +229,7 @@ Before writing rules, scan your codebase to identify:
 ### Phase 2: Security Rules Generation
 
 Write your rules following these core principles:
-*   **Default Deny**: Start with `allow read, write: if false;` and whitelist specific operations.
+*   **Default Deny**: Start with `allow read, write: if false;` and allow list specific operations.
 *   **Least Privilege**: Grant only the minimum permissions required.
 *   **Validate Data**: Check types (e.g., `is string`), required fields, and values on `create` and `update`.
 *   **UID Protection**: Ensure users cannot create documents with another user's UID or change ownership.
