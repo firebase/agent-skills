@@ -1,0 +1,16 @@
+{
+  "name": "firebase",
+  "owner": {
+    "name": "Firebase",
+    "email": "firebase-support@google.com"
+  },
+  "plugins": [
+    {
+      "name": "firebase",
+      "description": "Official Claude plugin for Firebase. Manage projects, add backend services, develop AI features, deploy & host apps, and more",
+      "category": "development",
+      "tags": ["firebase", "backend", "database", "cloud-services"],
+      "source": "./claude-plugins/firebase"
+    }
+  ]
+}
