@@ -27,7 +27,7 @@ gemini extensions install https://github.com/firebase/skills
 1. Add the Firebase marketplace for Claude plugins:
 
 ```bash
-claude plugin marketplace add firebase/firebase-tools
+claude plugin marketplace add firebase/skills
 ```
 
 Install the Claude plugin for Firebase:
