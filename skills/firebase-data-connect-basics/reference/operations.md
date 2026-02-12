@@ -15,9 +15,8 @@ Data Connect auto-generates fields for each `@table` type:
 
 | Generated Field | Purpose | Example |
 |-----------------|---------|---------|
-| `movie(id: UUID!)` | Get single record by ID | `movie(id: $id) { title }` |
-| `movie(key: Movie_Key!)` | Get by key scalar | `movie(key: $key) { title }` |
-| `movies(...)` | List/filter records | `movies(where: {...}) { ... }` |
+| `movie(id: UUID, key: Key, first: Row)` | Get single record | `movie(id: $id)` or `movie(first: {where: ...})` |
+| `movies(where: ..., orderBy: ..., limit: ..., offset: ..., distinct: ..., having: ...)` | List/filter records | `movies(where: {...})` |
 | `movie_insert(data: ...)` | Create record | Returns key |
 | `movie_insertMany(data: [...])` | Bulk create | Returns keys |
 | `movie_update(id: ..., data: ...)` | Update by ID | Returns key or null |

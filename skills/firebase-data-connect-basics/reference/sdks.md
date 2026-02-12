@@ -5,7 +5,6 @@
 - [Web SDK](#web-sdk)
 - [Android SDK](#android-sdk)
 - [iOS SDK](#ios-sdk)
-- [Flutter SDK](#flutter-sdk)
 - [Admin SDK](#admin-sdk)
 
 ---
@@ -25,9 +24,6 @@ generate:
     package: "com.example.dataconnect"
   swiftSdk:
     outputDir: "../ios-app/DataConnect"
-  dartSdk:
-    outputDir: "../flutter-app/lib/dataconnect"
-    package: movie_app_dataconnect
 ```
 
 Generate SDKs:
@@ -233,62 +229,7 @@ connector.listMovies.publisher
 
 ---
 
-## Flutter SDK
 
-### Dependencies (pubspec.yaml)
-
-```yaml
-dependencies:
-  firebase_core: ^3.0.0
-  firebase_data_connect: ^0.1.0
-  movie_app_dataconnect:
-    path: ./lib/dataconnect
-```
-
-### Initialization
-
-```dart
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_data_connect/firebase_data_connect.dart';
-import 'package:movie_app_dataconnect/movie_app_dataconnect.dart';
-
-await Firebase.initializeApp();
-final connector = MyConnector.instance;
-
-// For emulator
-connector.dataConnect.useDataConnectEmulator('localhost', 9399);
-```
-
-### Calling Operations
-
-```dart
-// Query
-final result = await connector.listMovies.execute();
-for (final movie in result.data.movies) {
-  print(movie.title);
-}
-
-// Query with variables  
-final movie = await connector.getMovie(id: 'uuid-here').execute();
-
-// Mutation
-final newMovie = await connector.createMovie(
-  title: 'New Movie',
-  genre: 'Action',
-).execute();
-```
-
-### Stream Subscription
-
-```dart
-connector.listMovies.subscribe().listen((result) {
-  setState(() {
-    movies = result.data.movies;
-  });
-});
-```
-
----
 
 ## Admin SDK
 

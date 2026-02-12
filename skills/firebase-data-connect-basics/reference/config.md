@@ -35,6 +35,7 @@ Main Data Connect service configuration:
 specVersion: "v1"
 serviceId: "my-service"
 location: "us-central1"
+schemaValidation: "STRICT" # or "COMPATIBLE"
 schema:
   source: "./schema"
   datasource:
@@ -50,6 +51,7 @@ connectorDirs: ["./connector"]
 | `specVersion` | Always `"v1"` |
 | `serviceId` | Unique identifier for the service |
 | `location` | GCP region (us-central1, us-east4, europe-west1, etc.) |
+| `schemaValidation` | Deployment mode: `"STRICT"` (must match exactly) or `"COMPATIBLE"` (backward compatible) |
 | `schema.source` | Path to schema directory |
 | `schema.datasource` | PostgreSQL connection config |
 | `connectorDirs` | List of connector directories |
@@ -82,9 +84,6 @@ generate:
     package: "com.myapp.dataconnect"
   swiftSdk:
     outputDir: "../ios/MyApp/DataConnect"
-  dartSdk:
-    outputDir: "../flutter/lib/dataconnect"
-    package: myapp_dataconnect
 ```
 
 ### SDK Generation Options
@@ -94,7 +93,6 @@ generate:
 | `javascriptSdk` | `outputDir`, `package` |
 | `kotlinSdk` | `outputDir`, `package` |
 | `swiftSdk` | `outputDir` |
-| `dartSdk` | `outputDir`, `package` |
 | `nodeAdminSdk` | `outputDir`, `package` (for Admin SDK) |
 
 ---
@@ -133,8 +131,6 @@ firebase dataconnect:sdk:generate --watch
 # Compare local schema to production
 firebase dataconnect:sql:diff
 
-# Generate SQL migration script
-firebase dataconnect:sql:migrate --preview
 
 # Apply migration
 firebase dataconnect:sql:migrate
@@ -192,8 +188,7 @@ connector.dataConnect.useEmulator("10.0.2.2", 9399)
 // iOS
 connector.useEmulator(host: "localhost", port: 9399)
 
-// Flutter
-connector.dataConnect.useDataConnectEmulator('localhost', 9399);
+
 ```
 
 ### Seed Data
@@ -225,7 +220,7 @@ Data Connect auto-generates PostgreSQL migrations:
 
 ```bash
 # Preview migration
-firebase dataconnect:sql:migrate --preview
+firebase dataconnect:sql:diff
 
 # Apply migration (interactive)
 firebase dataconnect:sql:migrate

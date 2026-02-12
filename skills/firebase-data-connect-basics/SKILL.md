@@ -37,7 +37,8 @@ dataconnect/
 │   └── schema.gql        # Data model (types with @table)
 └── connector/
     ├── connector.yaml    # Connector config + SDK generation
-    └── queries.gql       # Queries and mutations
+    ├── queries.gql       # Queries
+    └── mutations.gql     # Mutations
 ```
 
 ## Core Concepts
