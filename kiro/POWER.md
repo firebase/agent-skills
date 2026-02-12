@@ -80,3 +80,9 @@ The Firebase MCP server provides tools for:
 - Firebase Documentation: https://firebase.google.com/docs
 - Firebase YouTube Channel: https://www.youtube.com/firebase
 - Firebase MCP Server: https://firebase.google.com/docs/ai-assistance/mcp-server
+
+## License and support
+
+This power integrates with the Firebase MCP Server (Apache-2.0).
+- [Privacy Policy](https://firebase.google.com/support/privacy)
+- [Support](https://firebase.google.com/support)
