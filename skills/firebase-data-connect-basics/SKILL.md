@@ -90,6 +90,13 @@ npx -y firebase-tools@latest dataconnect:sdk:generate
 npx -y firebase-tools@latest deploy --only dataconnect
 ```
 
+## MCP Tools Available
+
+- `firebase_init` - Initialize Data Connect with `dataconnect` feature
+- `firebase_get_sdk_config` - Get Firebase configuration for client apps
+- `firebase_get_project` - Get current project information
+- `firebase_update_environment` - Set project directory and active project
+
 ## Examples
 
 For complete, working code examples of schemas and operations, see **[examples.md](examples.md)**.
