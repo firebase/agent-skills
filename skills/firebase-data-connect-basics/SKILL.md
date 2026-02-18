@@ -7,27 +7,6 @@ description: Build and deploy Firebase Data Connect backends with PostgreSQL. Us
 
 Firebase Data Connect is a relational database service using Cloud SQL for PostgreSQL with GraphQL schema, auto-generated queries/mutations, and type-safe SDKs.
 
-## Quick Start
-
-```graphql
-# schema.gql - Define your data model
-type Movie @table {
-  id: UUID! @default(expr: "uuidV4()")
-  title: String!
-  releaseYear: Int
-  genre: String
-}
-
-# queries.gql - Define operations
-query ListMovies @auth(level: PUBLIC) {
-  movies { id title genre }
-}
-
-mutation CreateMovie($title: String!, $genre: String) @auth(level: USER) {
-  movie_insert(data: { title: $title, genre: $genre })
-}
-```
-
 ## Project Structure
 
 ```
@@ -41,144 +20,76 @@ dataconnect/
     └── mutations.gql     # Mutations
 ```
 
-## Core Concepts
+## Development Workflow
 
-| Concept | Description |
-|---------|-------------|
-| **Schema** | GraphQL types with `@table` → PostgreSQL tables |
-| **Connector** | Collection of queries/mutations as API endpoints |
-| **Generated Fields** | Auto-generated `movie`, `movies`, `movie_insert`, `movie_update`, `movie_delete` |
-| **Key Scalars** | `Movie_Key` type for record identification |
-| **@auth** | Authorization directive: `PUBLIC`, `USER`, `USER_EMAIL_VERIFIED`, `NO_ACCESS` |
+Follow this strict workflow to build your application. You **must** read the linked reference files for each step to understand the syntax and available features.
 
-## Detailed References
+### 1. Define Data Model (`schema/schema.gql`)
+Define your GraphQL types, tables, and relationships.
+> **Read [reference/schema.md](reference/schema.md)** for:
+> *   `@table`, `@col`, `@default`
+> *   Relationships (`@ref`, one-to-many, many-to-many)
+> *   Data types (UUID, Vector, JSON, etc.)
 
-**Design your data model** → See [schema.md](reference/schema.md)
-- Types, @table, @col, @default directives
-- Relationships with @ref (one-to-one, one-to-many, many-to-many)
-- Data types: UUID, String, Int, Int64, Float, Boolean, Date, Timestamp, Vector
+### 2. Define Operations (`connector/queries.gql`, `connector/mutations.gql`)
+Write the queries and mutations your client will use. Data Connect generates the underlying SQL.
+> **Read [reference/operations.md](reference/operations.md)** for:
+> *   **Queries**: Filtering (`where`), Ordering (`orderBy`), Pagination (`limit`/`offset`).
+> *   **Mutations**: Create (`_insert`), Update (`_update`), Delete (`_delete`).
+> *   **Upserts**: Use `_upsert` to "insert or update" records (CRITICAL for user profiles).
+> *   **Transactions**: use `@transaction` for multi-step atomic operations.
 
-**Build queries and mutations** → See [operations.md](reference/operations.md)
-- Generated fields and key scalars
-- Filtering with `where`, `orderBy`, `limit`
-- Relational queries with `_on_` and `_via_` syntax
-- Multi-step mutations with `@transaction`
+### 3. Secure Your App (`connector/` files)
+Add authorization logic closely with your operations.
+> **Read [reference/security.md](reference/security.md)** for:
+> *   `@auth(level: ...)` for PUBLIC, USER, or NO_ACCESS.
+> *   `@check` and `@redact` for row-level security and validation.
 
-**Secure your operations** → See [security.md](reference/security.md)
-- @auth directive and access levels
-- CEL expressions for custom authorization
-- @check and @redact for data lookup authorization
-- Common authorization patterns and anti-patterns
+### 4. Generate & Use SDKs
+Generate type-safe code for your client platform.
+> **Read [reference/sdks.md](reference/sdks.md)** for:
+> *   Android (Kotlin), iOS (Swift), Web (TypeScript), Flutter (Dart).
+> *   How to initialize and call your queries/mutations.
+> *   **Nested Data**: See how to access related fields (e.g., `movie.reviews`).
 
-**Integrate with client apps** → See [sdks.md](reference/sdks.md)
-- Web, Android, iOS, Flutter SDK usage
-- SDK generation with Firebase CLI
-- Calling queries/mutations from client code
+---
 
-**Configure and deploy** → See [config.md](reference/config.md)
-- dataconnect.yaml and connector.yaml structure
-- Firebase CLI commands
-- Local emulator setup
-- Deployment workflow
+## Feature Capability Map
 
-**Advanced features** → See [advanced.md](reference/advanced.md)
-- Vector similarity search with Vertex AI embeddings
-- Full-text search with @searchable directive
-- Cloud Functions integration (mutation triggers)
-- Data seeding and bulk operations
+If you need to implement a specific feature, consult the mapped reference file:
 
-## Common Patterns
+| Feature | Reference File | Key Concepts |
+| :--- | :--- | :--- |
+| **Data Modeling** | [reference/schema.md](reference/schema.md) | `@table`, `@unique`, `@index`, Relations |
+| **Vector Search** | [reference/advanced.md](reference/advanced.md) | `Vector`, `@col(dataType: "vector")` |
+| **Full-Text Search** | [reference/advanced.md](reference/advanced.md) | `@searchable` |
+| **Upserting Data** | [reference/operations.md](reference/operations.md) | `_upsert` mutations |
+| **Complex Filters** | [reference/operations.md](reference/operations.md) | `_or`, `_and`, `_not`, `eq`, `contains` |
+| **Transactions** | [reference/operations.md](reference/operations.md) | `@transaction`, `response` binding |
+| **Environment Config** | [reference/config.md](reference/config.md) | `dataconnect.yaml`, `connector.yaml` |
 
-### User-Owned Resources
+---
 
-```graphql
-type Post @table {
-  id: UUID! @default(expr: "uuidV4()")
-  authorUid: String! @default(expr: "auth.uid")
-  content: String!
-}
+## Deployment & CLI
 
-mutation CreatePost($content: String!) @auth(level: USER) {
-  post_insert(data: { authorUid_expr: "auth.uid", content: $content })
-}
+> **Read [reference/config.md](reference/config.md)** for deep dive on configuration.
 
-query MyPosts @auth(level: USER) {
-  posts(where: { authorUid: { eq_expr: "auth.uid" }}) { id content }
-}
-```
-
-### Many-to-Many Relationship
-
-```graphql
-type Movie @table {
-  id: UUID! @default(expr: "uuidV4()")
-  title: String!
-}
-
-type Actor @table {
-  id: UUID! @default(expr: "uuidV4()")
-  name: String!
-}
-
-type MovieActor @table(key: ["movie", "actor"]) {
-  movie: Movie!
-  actor: Actor!
-  role: String!
-}
-```
-
-### Filtered Queries
-
-```graphql
-query MoviesByGenre($genre: String!, $minRating: Int) @auth(level: PUBLIC) {
-  movies(
-    where: { genre: { eq: $genre }, rating: { ge: $minRating }},
-    orderBy: [{ rating: DESC }],
-    limit: 10
-  ) { id title rating }
-}
-```
-
-## Examples & Templates
-
-**Complete working examples** → See [examples.md](examples.md)
-**Ready-to-use templates** → See [templates.md](templates.md)
-
-## MCP Tools Available
-
-- `firebase_init` - Initialize Data Connect with `dataconnect` feature
-- `firebase_get_sdk_config` - Get Firebase configuration for client apps
-- `firebase_get_project` - Get current project information
-- `firebase_update_environment` - Set project directory and active project
-
-## CLI Commands
+Common commands (run from project root):
 
 ```bash
 # Initialize Data Connect
 firebase init dataconnect
 
-# Start emulator for local development
+# Start local emulator
 firebase emulators:start --only dataconnect
 
-# Generate SDKs
+# Generate SDK code
 firebase dataconnect:sdk:generate
 
-# Deploy to Firebase
+# Deploy to production
 firebase deploy --only dataconnect
 ```
 
-## Key Directives Quick Reference
+## Examples
 
-| Directive | Purpose | Example |
-|-----------|---------|---------|
-| `@table` | Define PostgreSQL table | `type Movie @table { ... }` |
-| `@col` | Customize column name/type | `@col(name: "movie_id", dataType: "serial")` |
-| `@default` | Set default value | `@default(expr: "uuidV4()")` |
-| `@ref` | Foreign key reference | `author: User!` (implicit) or `@ref(fields: "authorId")` |
-| `@unique` | Unique constraint | `email: String! @unique` |
-| `@index` | Database index | `title: String! @index` |
-| `@searchable` | Enable full-text search | `title: String! @searchable` |
-| `@auth` | Authorization level | `@auth(level: USER)` or `@auth(expr: "auth.uid != nil")` |
-| `@check` | Validate field in mutation | `@check(expr: "this != null", message: "Not found")` |
-| `@redact` | Hide field from response | Used with @check for auth lookups |
-| `@transaction` | Atomic multi-step mutation | `mutation Multi @transaction { ... }` |
+For complete, working code examples of schemas and operations, see **[examples.md](examples.md)**.
