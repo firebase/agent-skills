@@ -12,6 +12,7 @@ This avoids permission issues when installing global packages.
 
 1.  **Install nvm:**
     - Mac/Linux: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash`
+        - If Homebrew is available, prefer `brew install nvm`
     - Windows: Download [nvm-windows](https://github.com/coreybutler/nvm-windows/releases)
 
 2.  **Install Node.js:**
