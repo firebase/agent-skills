@@ -1,0 +1,13 @@
+{
+  "name": "skill-token-counter",
+  "version": "1.0.0",
+  "description": "Calculates the token footprint of an agent skill using the Gemini API.",
+  "main": "index.js",
+  "scripts": {
+    "count": "node index.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  },
+  "type": "module"
+}
