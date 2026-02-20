@@ -75,7 +75,6 @@ If you need to implement a specific feature, consult the mapped reference file:
 > **Read [reference/config.md](reference/config.md)** for deep dive on configuration.
 
 Common commands (run from project root):
-
 ```bash
 # Initialize Data Connect
 npx -y firebase-tools@latest init dataconnect
