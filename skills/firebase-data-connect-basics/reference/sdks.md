@@ -63,6 +63,12 @@ if (import.meta.env.DEV) {
 // Generated SDK provides typed functions
 import { listMovies, createMovie, getMovie } from '@movie-app/dataconnect';
 
+// Accessing Nested Fields
+const movie = await getMovie({ id: '...' });
+// Relations are just properties on the object
+const director = movie.data.movie.metadata.director; 
+const firstActor = movie.data.movie.actors[0].name;
+
 // Query
 const result = await listMovies();
 console.log(result.data.movies);
@@ -142,6 +148,9 @@ connector.dataConnect.useEmulator("10.0.2.2", 9399)
 val result = connector.listMovies.execute()
 result.data.movies.forEach { movie ->
     println(movie.title)
+    // Access nested fields directly
+    println(movie.metadata?.director)
+    println(movie.actors.firstOrNull()?.name)
 }
 
 // Query with variables
@@ -198,6 +207,9 @@ connector.useEmulator(host: "localhost", port: 9399)
 let result = try await connector.listMovies.execute()
 for movie in result.data.movies {
     print(movie.title)
+    // Access nested fields directly
+    print(movie.metadata?.director ?? "Unknown")
+    print(movie.actors.first?.name ?? "No actors")
 }
 
 // Query with variables
