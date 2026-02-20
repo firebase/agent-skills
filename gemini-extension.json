@@ -11,5 +11,39 @@
         "IS_GEMINI_CLI_EXTENSION": "true"
       }
     }
-  }
+  },
+  "themes": [
+    {
+      "name": "firebase-default-dark",
+      "type": "custom",
+      "background": {
+        "primary": "#212121",
+        "diff": {
+          "added": "green",
+          "removed": "red"
+        }
+      },
+      "text": {
+        "primary": "#E8E8E8",
+        "secondary": "#A6A6A6",
+        "link": "#7CACF8",
+        "accent": "#0B57D0",
+        "response": "#7CACF8"
+      },
+      "status": {
+        "success": "#6DD58C",
+        "warning": "#FFB300",
+        "error": "#E46962"
+      },
+      "border": {
+        "default": "#2F3032",
+        "focused": "#2F3032"
+      },
+      "ui": {
+        "comment": "#DD2C00",
+        "symbol": "#2F3032",
+        "gradient": ["#FFC400", "#FF9100", "#DD2C00"]
+      }
+    }
+  ]
 }
