@@ -1,5 +1,5 @@
 ---
-name: firebase-cloud-functions
+name: firebase-functions-basics
 description: Guide for setting up and using Cloud Functions for Firebase. Use this skill when the user's app requires server-side logic, integrating with third-party APIs, or responding to Firebase events.
 compatibility: This skill requires the Firebase CLI. Install it by running `npm install -g firebase-tools`.
 ---
