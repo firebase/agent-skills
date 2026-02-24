@@ -38,20 +38,20 @@ To interact with Firebase services like Firestore, Auth, or RTDB from within you
 
 Functions can be initialized using the CLI or manually. Ensure you have initialized the Firebase Admin SDK to interact with other Firebase services.
 
-1.  **Install the Admin SDK:**
+1.  Install the Admin SDK:
 
     ```bash
     npm i firebase-admin
     ```
 
-2.  **Initialize in your code:**
+2.  Initialize in your code:
 
     ```typescript
-    import * as admin from "firebase-admin";
+    import { initializeApp } from "firebase-admin/app";
     import { onInit } from "firebase-functions";
 
     onInit(() => {
-      admin.initializeApp();
+      initializeApp();
     });
     ```
 
