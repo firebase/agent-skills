@@ -90,46 +90,60 @@ export const hellopubsub = onMessagePublished("topic-name", (event) => {
 
 ## 5. Use Parameterized Configuration
 
-Migrate from `functions.config()` to the new `params` module for environment configuration.
+The `functions.config` API is deprecated and will be decommissioned in March 2027. 2nd gen functions drop support for `functions.config` in favor of a more secure interface for defining configuration parameters declaratively inside your codebase. 
 
-**Before (`.runtimeconfig.json`):**
+To migrate your configuration to Cloud Secret Manager, use the Firebase CLI:
 
-```json
-{
-  "someservice": {
-    "key": "somesecret"
-  }
-}
+### 1. Export configuration with the Firebase CLI
+
+Use the config export command to interactively export your existing environment config to a new secret in Cloud Secret Manager:
+
+```bash
+firebase functions:config:export
 ```
 
-**And in code (1st Gen):**
+### 2. Update function code to bind secrets
+
+To use configuration stored in the new secret in Cloud Secret Manager, use the `defineJsonSecret` API in your function source. Make sure that secrets are bound to all functions that need them.
+
+**Before (1st Gen):**
 
 ```typescript
-const SKEY = functions.config().someservice.key;
+import * as functions from "firebase-functions";
+
+export const myFunction = functions.https.onRequest((req, res) => {
+  const apiKey = functions.config().someapi.key;
+  // ...
+});
 ```
 
 **After (2nd Gen):**
-Define params in your code and set their values during deployment.
-
-**In `index.ts`:**
 
 ```typescript
-import { defineString } from "firebase-functions/params";
+import { onRequest } from "firebase-functions/v2/https";
+import { defineJsonSecret } from "firebase-functions/params";
 
-const SOMESERVICE_KEY = defineString("SOMESERVICE_KEY");
+// RUNTIME_CONFIG is the default name set by the `firebase functions:config:export` command
+const config = defineJsonSecret("RUNTIME_CONFIG");
+
+export const myFunction = onRequest(
+  // Bind secret to your function
+  { secrets: [config] },
+  (req, res) => {
+    // Access secret values via .value()
+    const apiKey = config.value().someapi.key;
+    // ...
+  }
+);
 ```
 
-Use `SOMESERVICE_KEY.value()` to access the value. For secrets like API keys, use `defineSecret`.
+### 3. Deploy Functions
 
-**In `index.ts`:**
+Deploy your updated functions to apply the changes and bind the secret permissions.
 
-```typescript
-import { defineSecret } from "firebase-functions/params";
-
-const SOMESERVICE_KEY = defineSecret("SOMESERVICE_KEY");
+```bash
+firebase deploy --only functions:<your-function-name>
 ```
-
-The human will be prompted to set the value on deployment. The value will be stored securely in Cloud Secret Manager.
 
 ## 6. Update Runtime Options
 
@@ -168,11 +182,9 @@ export const func = onRequest(
 
 A human should follow these steps to migrate safely:
 
-> To migrate traffic safely:
->
-> 1.  Rename your new 2nd gen function with a different name.
-> 2.  Comment out any existing `minInstances` or `maxInstances` config in the new 2nd gen function and instead set `maxInstances` to `1` while testing.
-> 3.  Deploy it alongside the old 1st gen function.
-> 4.  Gradually introduce traffic to the new function (e.g., via client-side changes or by calling it from the 1st gen function).
-> 5.  As traffic ramps up to the new 2nd gen function, scale it up by adding back the original `minInstances` and `maxInstances` settings to the 2nd gen function. Reduce the `minInstances` and `maxInstances` settings for the 1st gen function as traffic decreases.
-> 6.  The 1st gen function can be deleted once it has stopped receiving traffic.
+1. Rename your new 2nd gen function with a different name.
+2. Comment out any existing `minInstances` or `maxInstances` config in the new 2nd gen function and instead set `maxInstances` to `1` while testing.
+3. Deploy it alongside the old 1st gen function.
+4. Gradually introduce traffic to the new function (e.g., via client-side changes or by calling it from the 1st gen function).
+5. As traffic ramps up to the new 2nd gen function, scale it up by adding back the original `minInstances` and `maxInstances` settings to the 2nd gen function. Reduce the `minInstances` and `maxInstances` settings for the 1st gen function as traffic decreases.
+6. The 1st gen function can be deleted once it has stopped receiving traffic.
