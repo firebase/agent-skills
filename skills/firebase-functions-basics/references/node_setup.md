@@ -33,7 +33,7 @@ export const newDoc = onDocumentCreated(
 **Key points for the agent:**
 
 - Use `logger` for structured logging.
-- Use `defineString`, `defineInt`, `defineSecret` for environment configuration instead of `functions.config()`.
+- Use `defineString`, `defineInt`, `defineSecret` for environment configuration.
 - Recommend a `maxInstances` setting of 1 for all functions until correct behavior can be verified.
 
 ## 2. Build TypeScript

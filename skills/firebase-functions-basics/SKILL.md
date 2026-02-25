@@ -26,8 +26,6 @@ This section only applies to Node.js, since all Python functions are 2nd gen.
 
 For sensitive information like API keys (e.g., for LLMs, payment providers, etc.), **always** use `defineSecret` (Node.js) or `SecretParam` (Python). This stores the value securely in Cloud Secret Manager.
 
-If you see an API key being accessed with `functions.config` in existing functions code, offer to [upgrade to params](references/upgrade.md).
-
 ### Firebase Admin SDK
 
 To interact with Firebase services like Firestore, Auth, or RTDB from within your functions, you need to initialize the Firebase Admin SDK. Call `initializeApp` without any arguments so that Application Default Credentials are used.
