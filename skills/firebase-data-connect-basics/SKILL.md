@@ -20,6 +20,15 @@ dataconnect/
     └── mutations.gql     # Mutations
 ```
 
+## Operation Strategies: GraphQL vs. Native SQL
+
+Always default to **Native GraphQL**. **Native SQL lacks type safety** and bypasses schema-enforced structures. Only use **Native SQL** when the user explicitly requests it or when the task requires advanced database features.
+
+| Strategy | When to use | Implementation |
+|----------|-------------|----------------|
+| **Native GraphQL** (Default) | Almost all use cases. Standard CRUD, basic filtering/sorting, simple relational joins. Requires full type safety. | Auto-generated fields (`movie_insert`, `movies`). Strong typing and schema enforcement. |
+| **Native SQL** (Advanced) | PostgreSQL extensions (e.g., PostGIS), window functions (`RANK()`), complex aggregations, or highly tuned sub-queries. | Raw SQL string literals via `_select`, `_execute`, etc. Requires strict positional parameters (`$1`). No type safety. |
+
 ## Development Workflow
 
 Follow this strict workflow to build your application. You **must** read the linked reference files for each step to understand the syntax and available features.
@@ -38,6 +47,11 @@ Write the queries and mutations your client will use. Data Connect generates the
 > *   **Mutations**: Create (`_insert`), Update (`_update`), Delete (`_delete`).
 > *   **Upserts**: Use `_upsert` to "insert or update" records (CRITICAL for user profiles).
 > *   **Transactions**: use `@transaction` for multi-step atomic operations.
+> 
+> **Read [reference/native_sql.md](reference/native_sql.md)** for Native SQL operations:
+> *   Embedding raw SQL with `_select`, `_selectFirst`, `_execute`
+> *   Strict rules for positional parameters (`$1`, `$2`), quoting, and CTEs
+> *   Advanced PostgreSQL features (PostGIS, Window Functions)
 
 ### 3. Secure Your App (`connector/` files)
 Add authorization logic closely with your operations.
@@ -88,13 +102,6 @@ npx -y firebase-tools@latest dataconnect:sdk:generate
 # Deploy to production
 npx -y firebase-tools@latest deploy --only dataconnect
 ```
-
-## MCP Tools Available
-
-- `firebase_init` - Initialize Data Connect with `dataconnect` feature
-- `firebase_get_sdk_config` - Get Firebase configuration for client apps
-- `firebase_get_project` - Get current project information
-- `firebase_update_environment` - Set project directory and active project
 
 ## Examples
 
