@@ -375,3 +375,166 @@ mutation GrantRole($userUid: String!, $role: UserRole!)
   })
 }
 ```
+
+---
+
+## Native SQL Examples
+
+For scenarios where standard GraphQL cannot express the required database logic, use Native SQL.
+
+### Basic SELECT with field aliasing
+
+```graphql
+query GetMoviesByGenre($genre: String!, $limit: Int!) @auth(level: PUBLIC) {
+  movies: _select(
+    sql: """
+      SELECT id, title, release_year, rating
+      FROM movie
+      WHERE genre = $1
+      ORDER BY release_year DESC
+      LIMIT $2
+    """,
+    params: [$genre, $limit]
+  )
+}
+```
+
+### Basic UPDATE
+
+```graphql
+mutation UpdateMovieRating($movieId: UUID!, $newRating: Float!) @auth(level: USER) {
+  _execute(
+    sql: """
+      UPDATE movie
+      SET rating = $2
+      WHERE id = $1
+    """,
+    params: [$movieId, $newRating]
+  )
+}
+```
+
+### Advanced aggregation with RANK
+
+```graphql
+query GetMoviesRankedByRating @auth(level: PUBLIC) {
+  _select(
+    sql: """
+      SELECT
+        id,
+        title,
+        rating,
+        RANK() OVER (ORDER BY rating DESC) as rank
+      FROM movie
+      WHERE rating IS NOT NULL
+      LIMIT 20
+    """,
+    params: []
+  )
+}
+```
+
+### UPDATE with RETURNING and Auth Context
+
+```graphql
+mutation UpdateMyReviewText($movieId: UUID!, $newText: String!) @auth(level: USER) {
+  updatedReview: _executeReturningFirst(
+    sql: """
+      UPDATE "Reviews"
+      SET review_text = $2
+      WHERE movie_id = $1 AND user_id = $3
+      RETURNING movie_id, user_id, rating, review_text
+    """,
+    params: [$movieId, $newText, {_expr: "auth.uid"}]
+  )
+}
+```
+
+### Advanced CTE with upserts (atomic get-or-create)
+
+*Note: Data-modifying CTEs are only supported by `_execute`, not `_executeReturning`.*
+
+```graphql
+mutation CreateMovieCTE($movieId: UUID!, $userId: UUID!, $reviewId: UUID!) @auth(level: USER) {
+  _execute(
+    sql: """
+      WITH
+      new_user AS (
+        INSERT INTO "user" (id, username)
+        VALUES ($2, 'Auto-Generated User')
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id
+      ),
+      movie AS (
+        INSERT INTO movie (id, title, image_url, release_year, genre)
+        VALUES ($1, 'Auto-Generated Movie', 'https://placeholder.com', 2025, 'Sci-Fi')
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id
+      )
+      INSERT INTO "Reviews" (id, movie_id, user_id, rating, review_text, review_date)
+      VALUES (
+        $3,
+        $1,
+        $2,
+        5,
+        'Good!',
+        NOW()
+      )
+    """,
+    params: [$movieId, $userId, $reviewId]
+  )
+}
+```
+
+### Multi-statement Transactions
+
+Because `mutation` operations are single requests, you can chain multiple `_execute` commands within a `@transaction` to ensure they all succeed or fail together.
+
+```graphql
+mutation SafeTransfer($from: UUID!, $to: UUID!, $amount: Float!) @auth(level: USER) @transaction {
+  deduct: _execute(
+    sql: "UPDATE accounts SET balance = balance - $3 WHERE id = $1", 
+    params: [$from, $to, $amount]
+  )
+  add: _execute(
+    sql: "UPDATE accounts SET balance = balance + $3 WHERE id = $2", 
+    params: [$from, $to, $amount]
+  )
+}
+```
+
+### Use of extensions (e.g. PostGIS for geospatial data)
+
+*Prerequisite:* You must enable the extension on your underlying Cloud SQL instance by connecting to your database as the postgres user and running:
+```sql
+CREATE EXTENSION IF NOT EXISTS postgis;
+```
+
+```graphql
+query GetNearbyActiveRestaurants($userLong: Float!, $userLat: Float!, $maxDistanceMeters: Float!) @auth(level: USER) {
+  nearby: _select(
+    sql: """
+      SELECT 
+        id, 
+        name,
+        tags,
+        ST_Distance(
+          ST_MakePoint((metadata->>'longitude')::float, (metadata->>'latitude')::float)::geography, 
+          ST_MakePoint($1, $2)::geography
+        ) as distance_meters
+      FROM restaurant
+      WHERE active = true
+        AND metadata ? 'longitude' AND metadata ? 'latitude'
+        AND ST_DWithin(
+          ST_MakePoint((metadata->>'longitude')::float, (metadata->>'latitude')::float)::geography, 
+          ST_MakePoint($1, $2)::geography, 
+          $3
+        )
+      ORDER BY distance_meters ASC
+      LIMIT 10
+    """,
+    params: [$userLong, $userLat, $maxDistanceMeters]
+  )
+}
+```
+*After running the query using a client SDK, the result will be in `data.nearby`.*
