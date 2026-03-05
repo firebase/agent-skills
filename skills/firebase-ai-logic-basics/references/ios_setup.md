@@ -34,7 +34,9 @@ Task {
 import UIKit
 
 // Create an image from a bundled resource or URL
-let image = UIImage(systemName: "star")!
+guard let image = UIImage(systemName: "star") else {
+  fatalError("Unable to initialize image")
+}
 let prompt = "Describe what this image is."
 
 Task {
