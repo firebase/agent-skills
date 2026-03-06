@@ -28,7 +28,7 @@ generate:
 
 Generate SDKs:
 ```bash
-firebase dataconnect:sdk:generate
+npx -y firebase-tools@latest dataconnect:sdk:generate
 ```
 
 ---
@@ -283,5 +283,5 @@ generate:
 
 Generate:
 ```bash
-firebase dataconnect:sdk:generate
+npx -y firebase-tools@latest dataconnect:sdk:generate
 ```

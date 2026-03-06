@@ -32,15 +32,15 @@ The library is part of the standard Firebase Web SDK.
 
 If you're in a firebase directory (with a firebase.json) the currently selected project will be marked with "current" using this command:  
 
-`firebase projects:list`
+`npx -y firebase-tools@latest projects:list`
 
 Ensure there's at least one app associated with the current project 
 
-`firebase apps:list`
+`npx -y firebase-tools@latest apps:list`
 
 Initialize AI logic SDK with the init command
 
-`firebase init # Choose AI logic`
+`npx -y firebase-tools@latest init # Choose AI logic`
 
 This will automatically enable the Gemini Developer API in the Firebase console.
 

@@ -78,5 +78,5 @@ Your indexes should be defined in `firestore.indexes.json` (pointed to by `fireb
 
 Deploy indexes only:
 ```bash
-firebase deploy --only firestore:indexes
+npx -y firebase-tools@latest deploy --only firestore:indexes
 ```

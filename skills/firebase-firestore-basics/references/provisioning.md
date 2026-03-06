@@ -2,7 +2,7 @@
 
 ## Manual Initialization
 
-Initialize the following firebase configuration files manually. Do not use `firebase init`, as it expects interactive inputs.
+Initialize the following firebase configuration files manually. Do not use `npx -y firebase-tools@latest init`, as it expects interactive inputs.
 
 1.  **Create `firebase.json`**: This file configures the Firebase CLI.
 2.  **Create `firestore.rules`**: This file contains your security rules.
@@ -21,7 +21,7 @@ Create a file named `firebase.json` in your project root with the following cont
 }
 ```
 
-This will use the default database. To use a different database, specify the database ID and location. You can check the list of available databases using `firebase firestore:databases:list`. If the database does not exist, it will be created when you deploy:
+This will use the default database. To use a different database, specify the database ID and location. You can check the list of available databases using `npx -y firebase-tools@latest firestore:databases:list`. If the database does not exist, it will be created when you deploy:
 
 ```json
 {
@@ -81,13 +81,13 @@ Create a file named `firestore.indexes.json` with an empty configuration to star
 ## Deploy rules and indexes
 ```bash
 # To deploy all rules and indexes
-firebase deploy --only firestore
+npx -y firebase-tools@latest deploy --only firestore
 
 # To deploy just rules
-firebase deploy --only firestore:rules
+npx -y firebase-tools@latest deploy --only firestore:rules
 
 # To deploy just indexes
-firebase deploy --only firestore:indexes
+npx -y firebase-tools@latest deploy --only firestore:indexes
 ```
 
 ## Local Emulation
@@ -95,7 +95,7 @@ firebase deploy --only firestore:indexes
 To run Firestore locally for development and testing:
 
 ```bash
-firebase emulators:start --only firestore
+npx -y firebase-tools@latest emulators:start --only firestore
 ```
 
 This starts the Firestore emulator, typically on port 8080. You can interact with it using the Emulator UI (usually at http://localhost:4000/firestore).

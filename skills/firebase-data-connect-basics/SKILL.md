@@ -78,16 +78,16 @@ Common commands (run from project root):
 
 ```bash
 # Initialize Data Connect
-firebase init dataconnect
+npx -y firebase-tools@latest init dataconnect
 
 # Start local emulator
-firebase emulators:start --only dataconnect
+npx -y firebase-tools@latest emulators:start --only dataconnect
 
 # Generate SDK code
-firebase dataconnect:sdk:generate
+npx -y firebase-tools@latest dataconnect:sdk:generate
 
 # Deploy to production
-firebase deploy --only dataconnect
+npx -y firebase-tools@latest deploy --only dataconnect
 ```
 
 ## Examples

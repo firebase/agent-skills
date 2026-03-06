@@ -12,7 +12,7 @@ import { getFirestore } from "firebase/firestore";
 // const app = initializeApp();
 
 const firebaseConfig = {
-  // Your config options. Get the values by running 'firebase apps:sdkconfig <platform> <app-id>'
+  // Your config options. Get the values by running 'npx -y firebase-tools@latest apps:sdkconfig <platform> <app-id>'
 };
 
 const app = initializeApp(firebaseConfig);

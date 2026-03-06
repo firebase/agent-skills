@@ -41,6 +41,6 @@ For instructions on deploying your site, using preview channels, and managing re
 ### 3. Emulation
 To test your app locally:
 ```bash
-firebase emulators:start --only hosting
+npx -y firebase-tools@latest emulators:start --only hosting
 ```
 This serves your app at `http://localhost:5000` by default.

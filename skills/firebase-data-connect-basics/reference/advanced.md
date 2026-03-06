@@ -296,8 +296,8 @@ await dc.upsert("movie", movies[0]);
 
 ```bash
 # Export emulator data
-firebase emulators:export ./seed-data
+npx -y firebase-tools@latest emulators:export ./seed-data
 
 # Start with saved data
-firebase emulators:start --only dataconnect --import=./seed-data
+npx -y firebase-tools@latest emulators:start --only dataconnect --import=./seed-data
 ```

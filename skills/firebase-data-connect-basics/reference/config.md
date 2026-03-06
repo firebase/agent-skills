@@ -103,50 +103,50 @@ generate:
 
 ```bash
 # Interactive setup
-firebase init dataconnect
+npx -y firebase-tools@latest init dataconnect
 
 # Set project
-firebase use <project-id>
+npx -y firebase-tools@latest use <project-id>
 ```
 
 ### Local Development
 
 ```bash
 # Start emulator
-firebase emulators:start --only dataconnect
+npx -y firebase-tools@latest emulators:start --only dataconnect
 
 # Start with database seed data
-firebase emulators:start --only dataconnect --import=./seed-data
+npx -y firebase-tools@latest emulators:start --only dataconnect --import=./seed-data
 
 # Generate SDKs
-firebase dataconnect:sdk:generate
+npx -y firebase-tools@latest dataconnect:sdk:generate
 
 # Watch for schema changes (auto-regenerate)
-firebase dataconnect:sdk:generate --watch
+npx -y firebase-tools@latest dataconnect:sdk:generate --watch
 ```
 
 ### Schema Management
 
 ```bash
 # Compare local schema to production
-firebase dataconnect:sql:diff
+npx -y firebase-tools@latest dataconnect:sql:diff
 
 
 # Apply migration
-firebase dataconnect:sql:migrate
+npx -y firebase-tools@latest dataconnect:sql:migrate
 ```
 
 ### Deployment
 
 ```bash
 # Deploy Data Connect service
-firebase deploy --only dataconnect
+npx -y firebase-tools@latest deploy --only dataconnect
 
 # Deploy specific connector
-firebase deploy --only dataconnect:connector-id
+npx -y firebase-tools@latest deploy --only dataconnect:connector-id
 
 # Deploy with schema migration
-firebase deploy --only dataconnect --force
+npx -y firebase-tools@latest deploy --only dataconnect --force
 ```
 
 ---
@@ -156,7 +156,7 @@ firebase deploy --only dataconnect --force
 ### Start Emulator
 
 ```bash
-firebase emulators:start --only dataconnect
+npx -y firebase-tools@latest emulators:start --only dataconnect
 ```
 
 Default ports:
@@ -197,10 +197,10 @@ Create seed data files and import:
 
 ```bash
 # Export current emulator data
-firebase emulators:export ./seed-data
+npx -y firebase-tools@latest emulators:export ./seed-data
 
 # Start with seed data
-firebase emulators:start --only dataconnect --import=./seed-data
+npx -y firebase-tools@latest emulators:start --only dataconnect --import=./seed-data
 ```
 
 ---
@@ -210,9 +210,9 @@ firebase emulators:start --only dataconnect --import=./seed-data
 ### Deploy Workflow
 
 1. **Test locally** with emulator
-2. **Generate SQL diff**: `firebase dataconnect:sql:diff`
+2. **Generate SQL diff**: `npx -y firebase-tools@latest dataconnect:sql:diff`
 3. **Review migration**: Check breaking changes
-4. **Deploy**: `firebase deploy --only dataconnect`
+4. **Deploy**: `npx -y firebase-tools@latest deploy --only dataconnect`
 
 ### Schema Migrations
 
@@ -220,13 +220,13 @@ Data Connect auto-generates PostgreSQL migrations:
 
 ```bash
 # Preview migration
-firebase dataconnect:sql:diff
+npx -y firebase-tools@latest dataconnect:sql:diff
 
 # Apply migration (interactive)
-firebase dataconnect:sql:migrate
+npx -y firebase-tools@latest dataconnect:sql:migrate
 
 # Force migration (non-interactive)
-firebase dataconnect:sql:migrate --force
+npx -y firebase-tools@latest dataconnect:sql:migrate --force
 ```
 
 ### Breaking Changes
@@ -244,7 +244,7 @@ Use `--force` flag to acknowledge breaking changes during deploy.
 # GitHub Actions example
 - name: Deploy Data Connect
   run: |
-    firebase deploy --only dataconnect --token ${{ secrets.FIREBASE_TOKEN }} --force
+    npx -y firebase-tools@latest deploy --only dataconnect --token ${{ secrets.FIREBASE_TOKEN }} --force
 ```
 
 ---

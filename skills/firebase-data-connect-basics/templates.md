@@ -213,20 +213,20 @@ generate:
 
 ```bash
 # Initialize Data Connect in project
-firebase init dataconnect
+npx -y firebase-tools@latest init dataconnect
 
 # Initialize with specific project
-firebase use <project-id>
-firebase init dataconnect
+npx -y firebase-tools@latest use <project-id>
+npx -y firebase-tools@latest init dataconnect
 
 # Start emulator for development
-firebase emulators:start --only dataconnect
+npx -y firebase-tools@latest emulators:start --only dataconnect
 
 # Generate SDKs
-firebase dataconnect:sdk:generate
+npx -y firebase-tools@latest dataconnect:sdk:generate
 
 # Deploy to production
-firebase deploy --only dataconnect
+npx -y firebase-tools@latest deploy --only dataconnect
 ```
 
 ---

@@ -4,12 +4,12 @@
 If you haven't already created a project:
 
 ```bash
-firebase projects:create
+npx -y firebase-tools@latest projects:create
 ```
 
 Register your web app:
 ```bash
-firebase apps:create web my-web-app
+npx -y firebase-tools@latest apps:create web my-web-app
 ```
 (Note the **App ID** returned by this command).
 
@@ -24,7 +24,7 @@ npm install firebase
 Create a `firebase.js` (or `firebase.ts`) file. You can fetch your config object using the CLI:
 
 ```bash
-firebase apps:sdkconfig <APP_ID>
+npx -y firebase-tools@latest apps:sdkconfig <APP_ID>
 ```
 
 Copy the output config object into your initialization file:

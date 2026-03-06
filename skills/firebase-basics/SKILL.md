@@ -27,54 +27,42 @@ Download and install the LTS version from [nodejs.org](https://nodejs.org/).
 ```bash
 node --version
 npm --version
+npx -y firebase-tools@latest --version
 ```
 
 ## Core Workflow
 
-### 1. Installation
-
-Install the Firebase CLI globally via npm:
-
-```bash
-npm install -g firebase-tools
-```
-
-Verify installation:
-```bash
-firebase --version
-```
-
-### 2. Authentication
+### 1. Authentication
 
 Log in to Firebase:
 
 ```bash
-firebase login
+npx -y firebase-tools@latest login
 ```
 
 - This opens a browser for authentication.
-- For environments where localhost is not available (e.g., remote shell), use `firebase login --no-localhost`.
+- For environments where localhost is not available (e.g., remote shell), use `npx -y firebase-tools@latest login --no-localhost`.
 
-### 3. Creating a Project
+### 2. Creating a Project
 
 To create a new Firebase project from the CLI:
 
 ```bash
-firebase projects:create
+npx -y firebase-tools@latest projects:create
 ```
 
 You will be prompted to:
 1. Enter a Project ID (must be unique globally).
 2. Enter a display name.
 
-### 4. Initialization
+### 3. Initialization
 
 Initialize Firebase services in your project directory:
 
 ```bash
 mkdir my-project
 cd my-project
-firebase init
+npx -y firebase-tools@latest init
 ```
 
 The CLI will guide you through:
@@ -88,15 +76,15 @@ The Firebase CLI documents itself. Instruct the user to use help commands to dis
 
 - **Global Help**: List all available commands and categories.
   ```bash
-  firebase --help
+  npx -y firebase-tools@latest --help
   ```
 
 - **Command Help**: Get detailed usage for a specific command.
   ```bash
-  firebase [command] --help
+  npx -y firebase-tools@latest [command] --help
   # Example:
-  firebase deploy --help
-  firebase firestore:indexes --help
+  npx -y firebase-tools@latest deploy --help
+  npx -y firebase-tools@latest firestore:indexes --help
   ```
 
 ## SDK Setup
@@ -107,5 +95,4 @@ Detailed guides for adding Firebase to your app:
 
 ## Common Issues
 
-- **Permission Denied (EACCES)**: If `npm install -g` fails, suggest using a node version manager (nvm) or `sudo` (caution advised).
-- **Login Issues**: If the browser doesn't open, try `firebase login --no-localhost`.
+- **Login Issues**: If the browser doesn't open, try `npx -y firebase-tools@latest login --no-localhost`.

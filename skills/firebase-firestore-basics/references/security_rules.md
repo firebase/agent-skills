@@ -211,7 +211,7 @@ match /cities/{document=**} {
 ## Deploying
 
 ```bash
-firebase deploy --only firestore:rules
+npx -y firebase-tools@latest deploy --only firestore:rules
 ```
 
 ## Security Rules Development Workflow
@@ -277,7 +277,7 @@ If *any* of these succeed, fix the rule and repeat.
 
 ### Phase 4: Syntactic Validation
 
-Use `firebase deploy --only firestore:rules --dry-run` to validate syntax.
+Use `npx -y firebase-tools@latest deploy --only firestore:rules --dry-run` to validate syntax.
 
 ### Phase 5: Test Suite Generation
 
@@ -292,7 +292,7 @@ Create a comprehensive test suite using `@firebase/rules-unit-testing`. Ideally,
 
 ### Phase 6: Test Validation Loop
 
-1.  Start the emulator: `firebase emulators:start --only firestore`
+1.  Start the emulator: `npx -y firebase-tools@latest emulators:start --only firestore`
 2.  Run tests: `npm test` (inside your test directory)
 3.  If tests fail due to **rules**: Fix the rules.
 4.  If tests fail due to **test bugs**: Fix the tests.

@@ -44,7 +44,7 @@ Defines environment variables available during build and/or runtime.
 
 - `variable`: The name of the env var (e.g., `NEXT_PUBLIC_API_URL`).
 - `value`: A literal string value.
-- `secret`: The name of a secret in Cloud Secret Manager. use `firebase apphosting:secrets:set` to create these.
+- `secret`: The name of a secret in Cloud Secret Manager. use `npx -y firebase-tools@latest apphosting:secrets:set` to create these.
 - `availability`: Where the variable is needed.
   - `BUILD`: Available during the `npm run build` process.
   - `RUNTIME`: Available when the app is serving requests.

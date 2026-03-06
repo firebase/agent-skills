@@ -6,7 +6,7 @@ compatibility: This skill is best used with the Firebase CLI, but does not requi
 
 ## Prerequisites
 
-- **Firebase Project**: Created via `firebase projects:create` (see `firebase-basics`).
+- **Firebase Project**: Created via `npx -y firebase-tools@latest projects:create` (see `firebase-basics`).
 - **Firebase CLI**: Installed and logged in (see `firebase-basics`).
 
 ## Core Concepts

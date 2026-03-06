@@ -20,13 +20,13 @@ env:
 To start the App Hosting emulator:
 
 ```bash
-firebase emulators:start --only apphosting
+npx -y firebase-tools@latest emulators:start --only apphosting
 ```
 
 Or, if you are also using other emulators (Auth, Firestore, etc.):
 
 ```bash
-firebase emulators:start
+npx -y firebase-tools@latest emulators:start
 ```
 
 ## Capabilities
