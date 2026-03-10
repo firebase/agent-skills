@@ -42,7 +42,7 @@ export const helloWorld = onRequest(async (request, response) => {
 export const newDoc = onDocumentCreated(
   "/words/{wordId}",
   async (event) => {
-    logger.info("New word!", event.data.data());
+    logger.info("New word!", event.data?.data());
   }
 );
 ```
