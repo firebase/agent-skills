@@ -26,55 +26,15 @@ jobs:
           repository: genkit-ai/skills
           path: genkit-skills
 
-      # Install yq (portable YAML processor) to handle metadata
-      - name: Install yq
-        run: |
-          # Pinning to v4.52.4 to avoid unexpected breaking changes in future releases
-          wget https://github.com/mikefarah/yq/releases/download/v4.52.4/yq_linux_amd64 -O /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
-
+      # Identifies skills managed by Genkit that have been deleted from the source repo
+      # and removes them from this repo.
       - name: Prune Deleted Genkit Skills
-        run: |
-          for skill_dir in firebase-skills/skills/*; do
-            [ -d "$skill_dir" ] || continue
-            skill_name=$(basename "$skill_dir")
-            skill_md="$skill_dir/SKILL.md"
-            
-            # Check if this skill is managed by Genkit
-            if [ -f "$skill_md" ]; then
-              is_managed=$(yq -f extract '.metadata["genkit-managed"] == true' "$skill_md" 2>/dev/null || echo false)
-              
-              if [ "$is_managed" = "true" ]; then
-                # If managed by Genkit but not in source, delete it
-                if [ ! -d "genkit-skills/skills/$skill_name" ]; then
-                  echo "🗑️ Pruning deleted skill: $skill_name"
-                  rm -rf "$skill_dir"
-                fi
-              fi
-            fi
-          done
+        run: .github/scripts/prune-skills.sh
 
+      # Copies skills from Genkit repo, tags them with metadata, and handles updates.
+      # Note: Uses 'yq' which is pre-installed on GitHub ubuntu-latest runners.
       - name: Sync & Tag Skills
-        run: |
-          for skill_dir in genkit-skills/skills/*; do
-            [ -d "$skill_dir" ] || continue
-            skill_name=$(basename "$skill_dir")
-            dest_dir="firebase-skills/skills/$skill_name"
-            
-            echo "🔄 Syncing $skill_name..."
-            
-            # Clean destination to ensure exact sync (remove old files)
-            if [ -d "$dest_dir" ]; then
-              rm -rf "$dest_dir"
-            fi
-            mkdir -p "$dest_dir"
-            
-            # Copy new files
-            cp -r "$skill_dir/"* "$dest_dir/"
-            
-            # Mark as managed by Genkit
-            yq -i -f process '.metadata["genkit-managed"] = true' "$dest_dir/SKILL.md"
-          done
+        run: .github/scripts/sync-skills.sh
      
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
@@ -83,4 +43,3 @@ jobs:
           commit-message: "chore: sync updated skills"
           title: "🤖 Sync updated skills from Genkit"
           branch: "sync-skills"
-          # PR will only be created if the changes resulted in changed files!
