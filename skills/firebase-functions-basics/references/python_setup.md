@@ -7,7 +7,7 @@ This guide provides a step-by-step process for setting up Cloud Functions with t
 Replace the contents of `functions/main.py` with the following code to create a simple, modern v2 HTTP endpoint along with a Firestore-triggered function.
 
 ```python
-from firebase_functions import https_fn, firestore_fn, options, params
+from firebase_functions import https_fn, firestore_fn, options, params, init
 from firebase_admin import initialize_app, firestore
 import google.cloud.firestore
 
@@ -17,10 +17,12 @@ app = initialize_app()
 SCALE_LIMIT = params.IntParam("MAX_INSTANCES", default=1).value
 GREETING = params.StringParam("GREETING", default="Hello").value
 
+@init
+def initialize():
+  options.set_global_options(max_instances=SCALE_LIMIT)
 
 @https_fn.on_request(
-    cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]),
-    max_instances=SCALE_LIMIT,
+    cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"])
 )
 def helloworld(req: https_fn.Request) -> https_fn.Response:
     """A simple HTTP-triggered function."""
@@ -28,7 +30,7 @@ def helloworld(req: https_fn.Request) -> https_fn.Response:
     return https_fn.Response(f"{GREETING} from Firebase!")
 
 
-@firestore_fn.on_document_created(document="words/{wordId}", max_instances=SCALE_LIMIT)
+@firestore_fn.on_document_created(document="words/{wordId}")
 def newdoc(event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None]) -> None:
     """Triggered when a new document is created in /words."""
     if event.data is None:
@@ -58,8 +60,6 @@ Then install with:
 ```bash
 pip install -r functions/requirements.txt
 ```
-
-There is no build step for Python (unlike TypeScript).
 
 ## 3. Local Development and Testing
 
