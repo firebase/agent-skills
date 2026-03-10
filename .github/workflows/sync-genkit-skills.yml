@@ -5,6 +5,11 @@ on:
     # Runs at 9:00 AM EST (14:00 UTC) on weekdays (Monday-Friday)
     - cron: '0 14 * * 1-5'
   workflow_dispatch: # For manual trigger
+  # TODO(ssbushi): Remove before merging. >>>
+  push:
+    branches:
+      - sb/genkit-sync 
+  # <<<
 
 permissions:
   contents: write
