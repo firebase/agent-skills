@@ -72,10 +72,8 @@ A human should run the following command in a separate terminal window to start 
 
 ```bash
 # Start the functions emulator
-firebase emulators:start --only functions
+firebase emulators:start
 ```
-
-> Note: If testing functions that depend on other Firebase services like Firestore or Auth, omit `--only functions`).
 
 A human can then interact with the function at the local URL provided by the emulator.
 

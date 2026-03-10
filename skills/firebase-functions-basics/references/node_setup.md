@@ -61,10 +61,8 @@ This command starts the emulators, and starts the TypeScript compiler in watch m
 
 ```bash
 # Start the functions emulator
-firebase emulators:exec --only functions "tsc --watch"
+firebase emulators:exec "tsc --watch"
 ```
-
-> Note: If testing functions that depend on other Firebase services like Firestore or Auth, omit `--only functions`.
 
 You can then interact with the function at the local URL provided by the emulator.
 
