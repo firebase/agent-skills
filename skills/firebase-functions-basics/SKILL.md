@@ -59,9 +59,11 @@ See the language references for detailed setup and dependency instructions.
 
 ```bash
 # Run emulators for local development.
-# A human can run this command themselves to start the emulators.
-# Omit `--only functions` if your functions depend on other features like Firestore or Auth.
 firebase emulators:start
+
+# If you need to run another script with the emulator, like tsc,
+# use `emulators:exec` instead of `emulators:start`.
+firebase emulators:exec "tsc --watch"
 
 # Deploy functions (Building is handled automatically if needed)
 firebase deploy --only functions
