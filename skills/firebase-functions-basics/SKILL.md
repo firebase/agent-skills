@@ -13,14 +13,15 @@ compatibility: This skill requires the Firebase CLI. Install it by running `npm 
 
 Cloud Functions for Firebase lets you automatically run backend code in response to events triggered by Firebase features and HTTPS requests. Your code is stored in Google's cloud and runs in a managed environment.
 
-### Generation 1 vs Generation 2
+### 1st-gen vs 2nd-gen
 
-This section only applies to Node.js, since all Python functions are 2nd gen.
+This section **only applies to Node.js**, since all Python functions are 2nd gen.
 
 - Always use 2nd-gen functions for new development. They are powered by Cloud Run and offer better performance and configurability.
-- Use 1st-gen functions *only* for Analytics and basic Auth triggers, since those aren't supported by 2nd gen.
-- Use `firebase-functions` SDK version 6.0.0 and above.
-- Use top-level imports (e.g., `firebase-functions/https`). These are 2nd gen by default. If 1st gen is required (Analytics or basic Auth triggers), import from the `firebase-functions/v1` import path.
+- Use `firebase-functions` SDK version 7.0.0 and above.
+- Use 2nd gen Auth triggers if they are available. If not, fallback to 1st gen for Auth triggers only.
+- Avoid writing functions triggered by Analytics events. These are not supported in 2nd gen and are discouraged.
+- Use top-level imports (e.g., `firebase-functions/https`). These are 2nd gen by default. If 1st gen is required, import from the `firebase-functions/v1` import path.
 
 ### Secrets Management
 
@@ -34,26 +35,11 @@ To interact with Firebase services like Firestore, Auth, or RTDB from within you
 
 ### 1. Provisioning & Setup
 
-Functions can be initialized using the CLI or manually. Ensure you have initialized the Firebase Admin SDK to interact with other Firebase services.
+Functions can be initialized using the CLI or manually. Ensure you have initialized the Firebase Admin SDK to interact with other Firebase services. 
 
-1.  Install the Admin SDK:
-
-    ```bash
-    npm i firebase-admin
-    ```
-
-2.  Initialize in your code:
-
-    ```typescript
-    import { initializeApp } from "firebase-admin/app";
-    import { onInit } from "firebase-functions";
-
-    onInit(() => {
-      initializeApp();
-    });
-    ```
-
-    This should be done once at the top level of your `index.ts` file.
+See the language-specific references to learn how to properly install and initialize the Admin SDK:
+- Node.js: [references/node_setup.md](references/node_setup.md)
+- Python: [references/python_setup.md](references/python_setup.md)
 
 ### 2. Writing Functions
 
@@ -69,17 +55,14 @@ firebase functions:secrets:set <SECRET_NAME>
 
 #### Development Commands
 
+See the language references for detailed setup and dependency instructions.
+
 ```bash
-# Install dependencies
-npm install
+# Run emulators for local development.
+# A human can run this command themselves to start the emulators.
+# Omit `--only functions` if your functions depend on other features like Firestore or Auth.
+firebase emulators:start
 
-# Compile TypeScript
-npm run build
-
-# Run emulators for local development
-# This is a long-running command. A human can run this command themselves to start the emulators:
-firebase emulators:start --only functions
-
-# Deploy functions
+# Deploy functions (Building is handled automatically if needed)
 firebase deploy --only functions
 ```
