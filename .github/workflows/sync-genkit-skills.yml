@@ -34,12 +34,12 @@ jobs:
       # Identifies skills managed by Genkit that have been deleted from the source repo
       # and removes them from this repo.
       - name: Prune Deleted Genkit Skills
-        run: .github/scripts/prune-skills.sh
+        run: firebase-skills/.github/scripts/prune-skills.sh
 
       # Copies skills from Genkit repo, tags them with metadata, and handles updates.
       # Note: Uses 'yq' which is pre-installed on GitHub ubuntu-latest runners.
       - name: Sync & Tag Skills
-        run: .github/scripts/sync-skills.sh
+        run: firebase-skills/.github/scripts/sync-skills.sh
      
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
