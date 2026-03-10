@@ -72,6 +72,8 @@ A human should run the following command in a separate terminal window to start 
 firebase emulators:start --only functions
 ```
 
+> Note: If testing functions that depend on other Firebase services like Firestore or Auth, omit `--only functions`).
+
 A human can then interact with the function at the local URL provided by the emulator.
 
 ## 4. Deploy to Firebase
