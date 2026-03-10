@@ -1,10 +1,10 @@
 ---
-name: firebase-firestore-basics
-description: Comprehensive guide for Firestore basics including provisioning, security rules, and SDK usage. Use this skill when the user needs help setting up Firestore, writing security rules, or using the Firestore SDK in their application.
+name: firebase-firestore-standard
+description: Comprehensive guide for Firestore Standard Edition, including provisioning, security rules, and SDK usage. Use this skill when the user needs help setting up Firestore, writing security rules, or using the Firestore SDK in their application.
 compatibility: This skill is best used with the Firebase CLI, but does not require it. Install it by running `npm install -g firebase-tools`. 
 ---
 
-# Firestore Basics
+# Firestore Standard Edition
 
 This skill provides a complete guide for getting started with Cloud Firestore Standard Edition, including provisioning, securing, and integrating it into your application.
 
