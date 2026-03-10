@@ -23,11 +23,14 @@ import { onDocumentCreated } from "firebase-functions/firestore";
 import * as logger from "firebase-functions/logger";
 import { defineString, defineInt } from "firebase-functions/params";
 
+import { initializeApp } from "firebase-admin/app";
+
 // Configurable parameters
 const scaleLimit = defineInt("MAX_INSTANCES", { default: 1 });
 const greeting = defineString("GREETING", { default: "Hello" });
 
 onInit(() => {
+  initializeApp();
   setGlobalOptions({ maxInstances: scaleLimit });
 });
 

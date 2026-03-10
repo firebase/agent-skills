@@ -11,15 +11,18 @@ from firebase_functions import https_fn, firestore_fn, options, params, init
 from firebase_admin import initialize_app, firestore
 import google.cloud.firestore
 
-app = initialize_app()
-
 # Configurable parameters
-SCALE_LIMIT = params.IntParam("MAX_INSTANCES", default=1).value
-GREETING = params.StringParam("GREETING", default="Hello").value
+SCALE_LIMIT = params.IntParam("MAX_INSTANCES", default=1)
+GREETING = params.StringParam("GREETING", default="Hello")
+
+admin_app = None
 
 @init
 def initialize():
   options.set_global_options(max_instances=SCALE_LIMIT)
+  
+  global admin_app
+  admin_app = initialize_app()
 
 @https_fn.on_request(
     cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"])
@@ -27,7 +30,7 @@ def initialize():
 def helloworld(req: https_fn.Request) -> https_fn.Response:
     """A simple HTTP-triggered function."""
     print("Request received!")
-    return https_fn.Response(f"{GREETING} from Firebase!")
+    return https_fn.Response(f"{GREETING.value()} from Firebase!")
 
 
 @firestore_fn.on_document_created(document="words/{wordId}")
