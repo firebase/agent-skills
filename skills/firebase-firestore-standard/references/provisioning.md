@@ -21,7 +21,7 @@ Create a file named `firebase.json` in your project root with the following cont
 }
 ```
 
-This will use the default database. To use a different database, specify the database ID and location. You can check the list of available databases using `firebase firestore:databases:list`. If the database does not exist, it will be created when you deploy:
+This will use the default database with the Standard edition. To use a different database, specify the database ID and location. You can check the list of available databases using `firebase firestore:databases:list`. If the database does not exist, it will be created when you deploy:
 
 ```json
 {
@@ -34,20 +34,6 @@ This will use the default database. To use a different database, specify the dat
 }
 ```
  
- To use Enterprise edition, specify the `enterprise` field.
-
-```json
-{
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json",
-    "edition": "enterprise",
-    "database": "my-database-id",
-    "location": "us-central1"
-  }
-}
-```
-
 ### 2. Create `firestore.rules`
 
 Create a file named `firestore.rules`. A good starting point (locking down the database) is:

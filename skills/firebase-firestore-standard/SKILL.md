@@ -6,7 +6,7 @@ compatibility: This skill is best used with the Firebase CLI, but does not requi
 
 # Firestore Basics
 
-This skill provides a complete guide for getting started with Cloud Firestore, including provisioning, securing, and integrating it into your application.
+This skill provides a complete guide for getting started with Cloud Firestore Standard Edition, including provisioning, securing, and integrating it into your application.
 
 ## Provisioning
 

@@ -26,4 +26,4 @@ To learn how to use Firestore Enterprise Native Mode in your application code, s
 
 ## Indexes
 
-For checking index types, query support tables, and best practices, see [indexes.md](references/indexes.md).
+Indexes help improve query performance and speed up slow queries. For checking index types, query support tables, and best practices, see [indexes.md](references/indexes.md).

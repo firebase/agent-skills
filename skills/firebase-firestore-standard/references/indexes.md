@@ -5,7 +5,7 @@ Indexes allow Firestore to ensure that query performance depends on the size of 
 ## Index Types
 
 ### Single-Field Indexes
-Firestore **automatically creates** a single-field index for every field in a document (and subfields in maps).
+In Standard Edition, Firestore **automatically creates** a single-field index for every field in a document (and subfields in maps).
 *   **Support**: Simple equality queries (`==`) and single-field range/sort queries (`<`, `<=`, `orderBy`).
 *   **Behavior**: You generally don't need to manage these unless you want to *exempt* a field.
 
