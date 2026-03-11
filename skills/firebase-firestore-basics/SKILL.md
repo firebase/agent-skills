@@ -21,6 +21,7 @@ For guidance on writing and deploying Firestore Security Rules to protect your d
 To learn how to use Cloud Firestore in your application code, choose your platform:
 
 *   **Web (Modular SDK)**: [web_sdk_usage.md](references/web_sdk_usage.md)
+*   **iOS**: [ios_setup.md](references/ios_setup.md)
 
 ## Indexes
 
