@@ -63,7 +63,6 @@ projects.
   const database = defineString('DATABASE', { /* descriptions */ });
   
   export const pubsubFunction = functions.pubsub.topic(topic).onPublish((message, context) => { /* ... */});
-  );
 
   export const dbFunction = functions.database.instance(database).onWrite((change, context) => { /* ... */});
   ```
