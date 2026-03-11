@@ -56,7 +56,17 @@ projects.
 
 ### Access Pattern
 - Params are only used directly when used as a configuration placeholder. For example, given the int param "memoryParam", you would
-  use the config `{ memory: memoryParam }` (v2) or `runWith({ memory: memoryParam })` (v1).
+  use `runWith({ memory: memoryParam })`.
+- You can also use params in provider-specific configuration, for example:
+  ```typescript
+  const topic = defineString('TOPIC', { /* descriptions */ });
+  const database = defineString('DATABASE', { /* descriptions */ });
+  
+  export const pubsubFunction = functions.pubsub.topic(topic).onPublish((message, context) => { /* ... */});
+  );
+
+  export const dbFunction = functions.database.instance(database).onWrite((change, context) => { /* ... */});
+  ```
 - To actually read the value of a param at runtime, you MUST call `.value()` on the param. `.value()` will throw if called in global scope.
 
 ### Naming
@@ -110,6 +120,7 @@ future readers understand the data migration. For example "Formerly functions.co
 - If a user is doing logical operations with the variable (e.g. `runWith({ minInstances: functions.config().isProd ? 1 : 0 }))`) then use
   the logic operators that Expressions support, e.g. `runWith({ minInstances: isProdParam.thenElse(1, 0)})`. Numbers support operations like
   `lessThan` `greaterThanOrEqaulTo` and both numbers and strings suport `equals` and `notEquals`.
+- When constructing dynamic strings utilizing parameters, use the `expr` tagged template literal from `firebase-functions/params` (e.g. `expr\`every ${period} days\``) instead of standard template literals. This allows the parameter expression to evaluate at deployment and runtime correctly. When using `expr`, you MUST NOT call `.value()` on the parameters.
 - When relevant, use the built-in variables `databaseURL`, `projectID`, `gcloudProject`, `storageBucket` rather than defining a new param.
   If a user is trying to reference this data as a built-in environment variable, please also replace that with a built-in param (e.g.
   replace `process.env.GCLOUD_PROJECT` with `projectID.value()`)
@@ -203,13 +214,21 @@ export const dynamicSized = functions.runWith({
 }).https.onCall((data, context) => {
     console.log(`Hello, world`);
 });
+
+export const pubsubSample = functions.pubsub.topic(functions.config().pubsub.topic)
+    .onPublish(() => undefined);
 ```
 
 #### After
 
 ```typescript
 import * as functions from 'firebase-functions/v1';
-import { projectID } from 'firebase-functions/params';
+import { projectID, defineString } from 'firebase-functions/params';
+
+const topicParam = defineString('PUBSUB_TOPIC', {
+    label: "PubSub Topic",
+    description: "The topic to listen to. Formerly functions.config().pubsub.topic."
+});
 
 export const dynamicSized = functions.runWith({
     minInstances: projectID.equals('my-prod-project').thenElse(1, 0),
@@ -217,6 +236,35 @@ export const dynamicSized = functions.runWith({
 }).https.onCall((data, context) => {
     console.log(`Hello, world`);
 });
+
+export const pubsubSample = functions.pubsub.topic(topicParam)
+    .onPublish(() => undefined);
+```
+
+### String Interpolation (expr)
+
+#### Before
+
+```typescript
+import * as functions from 'firebase-functions/v1';
+import { onSchedule } from 'firebase-functions/installer';
+
+export const scheduleSample = onSchedule(`every ${functions.config().schedule.period} days`, () => undefined);
+```
+
+#### After
+
+```typescript
+import * as functions from 'firebase-functions/v1';
+import { onSchedule } from 'firebase-functions/scheduler';
+import { defineNumber, expr } from 'firebase-functions/params';
+
+const period = defineNumber("SCHEDULE_PERIOD", {
+    label: "Schedule period",
+    description: "How many days between runs. Formerly functions.config().schedule.period."
+});
+
+export const scheduleSample = onSchedule(expr`every ${period} days`, () => undefined);
 ```
 
 ### Nested, secrets, and init
