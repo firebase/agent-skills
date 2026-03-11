@@ -9,7 +9,6 @@ We recommend using the plugin marketplace to install both the agent skills and t
 ### 1. Add Marketplaces
 ```bash
 claude plugin marketplace add firebase/agent-skills
-claude plugin marketplace add firebase/firebase-tools
 ```
 
 ### 2. Install Plugins
@@ -17,8 +16,16 @@ claude plugin marketplace add firebase/firebase-tools
 claude plugin install firebase@firebase
 ```
 
-## Alternative: Manual MCP Configuration
-If you prefer to add the MCP server manually:
+## Alternative: Manual Installation
+
+If you prefer to install the MCP server and agent skills manually instead of using plugins, run the following commands.
+
+### 1. Add the MCP Server
 ```bash
 claude mcp add firebase npx -- -y firebase-tools@latest mcp
+```
+
+### 2. Add the Agent Skills
+```bash
+npx skills add firebase/agent-skills --agent claude-code --all --global
 ```
