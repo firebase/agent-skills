@@ -1,7 +1,7 @@
 # Authentication in Security Rules
 
 Firebase Security Rules work with Firebase Authentication to provide rule-based access control. For better advice on writing safe security rules,
-enable the `firestore-basics`  or `storage-basics` skills.
+enable the `firebase-firestore-basics`  or `firebase-storage-basics` skills.
  
 The `request.auth` variable contains authentication information for the user requesting data.
 
