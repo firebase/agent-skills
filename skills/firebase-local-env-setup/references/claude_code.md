@@ -42,4 +42,4 @@ npx skills add firebase/agent-skills --agent claude-code --skill "*" --yes --glo
 ### 3. Verify
 Run the following checks to confirm installation:
 1. `claude mcp list` -> Output should include `firebase`.
-2. `npx skills list` -> Output should include `firebase-basics`.
+2. `npx skills list --agent claude-code --global` -> Output should include `firebase-basics`.

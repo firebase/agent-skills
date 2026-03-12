@@ -47,6 +47,6 @@ The MCP server allows Antigravity to interact directly with Firebase projects.
 
 ### 3. Verify and Restart
 Run the following checks to confirm installation:
-1. `npx skills list` -> Output should include `firebase-basics`.
+1. `npx skills list --agent antigravity --global` -> Output should include `firebase-basics`.
 2. Open `mcp_config.json` -> Verify the `firebase` block is present.
 3. Instruct the user to restart Antigravity and check the MCP server list in the UI to confirm `firebase-tools` is connected.
