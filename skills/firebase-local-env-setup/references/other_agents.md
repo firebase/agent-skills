@@ -45,6 +45,6 @@ The MCP server allows the agent to interact directly with Firebase projects.
 
 ### 3. Verify and Restart
 Run the following checks to confirm installation:
-1. `npx skills list` -> Output should include `firebase-basics`.
+1. `npx skills list --agent <agent-name> --global` -> Output should include `firebase-basics`. Replace `<agent-name>` with the actual agent name, which can be found [here](https://github.com/vercel-labs/skills/blob/main/README.md).
 2. Open the configuration file -> Verify the `firebase` block is present.
 3. Instruct the user to restart the agent and check the MCP server list in the UI to confirm `firebase-tools` is connected.

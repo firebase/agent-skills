@@ -44,6 +44,6 @@ The MCP server allows Cursor to interact directly with Firebase projects.
 
 ### 3. Verify and Restart
 Run the following checks to confirm installation:
-1. `npx skills list` -> Output should include `firebase-basics`.
+1. `npx skills list --agent cursor --global` -> Output should include `firebase-basics`.
 2. Open `mcp.json` -> Verify the `firebase` block is present.
 3. Instruct the user to restart Cursor and check the MCP server list in the UI to confirm `firebase-tools` is connected.
