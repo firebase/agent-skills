@@ -123,3 +123,10 @@ You should never import `@genkit-ai/flow`, `@genkit-ai/ai` or `@genkit-ai/core` 
   }
   ```
   Failure to do so will result in errors or incorrect output format.
+
+## Audio & Speech Generation
+
+- **Raw PCM Data vs MP3**: Some providers (e.g., Google GenAI) return raw PCM data, while others (e.g., OpenAI) return MP3.
+  - **DO NOT assume MP3 format.**
+  - **DO NOT embed raw PCM in HTML audio tags.**
+  - **Action**: Run `genkit docs:search "speech audio"` to find provider-specific conversion steps (e.g., PCM to WAV).

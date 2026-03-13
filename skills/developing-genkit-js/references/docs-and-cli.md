@@ -4,7 +4,7 @@ This reference lists common tasks and workflows using the `genkit` CLI. For auth
 
 ## Prerequisites:
 
-Ensure that the CLI is on `genkit-cli` version >= 1.29.0. If not, update the Genkit CLI version. Alternatively, to run commands with a specific version or without global installation, prefix them with `npx genkit-cli@^1.29.0`.
+Ensure that the CLI is on `genkit-cli` version >= 1.29.0. If not, or if an older version (1.x < 1.29.0) is present, update the Genkit CLI version. Alternatively, to run commands with a specific version or without global installation, prefix them with `npx -y genkit-cli@^1.29.0`.
 
 ## Documentation
 
