@@ -9,7 +9,7 @@ if (!apiKey) {
   process.exit(1);
 }
 
-const modelName = "gemini-3-pro-preview";
+const modelName = "gemini-3.1-pro-preview";
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: modelName });
 
