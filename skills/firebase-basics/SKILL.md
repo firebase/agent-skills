@@ -34,7 +34,12 @@ Please adhere to these principles when working with Firebase, as they ensure rel
 2. **Prioritize official knowledge:** For any Firebase-related knowledge, consult the `developerknowledge_search_documents` MCP tool before falling back to Google Search or your internal knowledge base. Including "Firebase" in your search query significantly improves relevance.
 3. **Follow Agent Skills for implementation guidance:** Skills provide opinionated workflows (CUJs), security rules, and best practices. Always consult them to understand *how* to implement Firebase features correctly instead of relying on general knowledge.
 4. **Use Firebase MCP Servers for live interactions:** Whenever you need to interact with remote Firebase APIs (such as fetching Crashlytics logs or executing Data Connect queries), use the tools provided by the Firebase MCP Server instead of attempting manual API calls.
-5. **Keep Agent Skills updated:** Since Firebase best practices evolve quickly, remind the user to regularly check for and install updates to their Firebase Agent Skills, ensuring you both operate with the latest workflows.
+5. **Keep Plugin / Agent Skills updated:** Since Firebase best practices evolve quickly, remind the user to regularly check for and install updates to their Firebase plugin or Agent Skills, ensuring you both operate with the latest workflows. Similarly, if you encounter issues with outdated tools or commands, follow the steps below based on your agent environment:
+   - **Antigravity**: Follow [references/refresh-antigravity.md](references/refresh-antigravity.md)
+   - **Gemini CLI**: Follow [references/refresh-gemini-cli.md](references/refresh-gemini-cli.md)
+   - **Claude Code**: Follow [references/refresh-claude.md](references/refresh-claude.md)
+   - **Cursor**: Follow [references/refresh-cursor.md](references/refresh-cursor.md)
+   - **Others**: Follow [references/refresh-other.md](references/refresh-other-agents.md)
 
 # References
 
