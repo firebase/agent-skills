@@ -71,7 +71,7 @@ Enable "thinking" process for complex reasoning tasks.
 
 ```ts
 const response = await ai.generate({
-  model: googleAI.model('gemini-3.1-pro-preview'),
+  model: googleAI.model('gemini-3-pro-preview'),
   prompt: 'what is heavier, one kilo of steel or one kilo of feathers',
   config: {
     thinkingConfig: {
