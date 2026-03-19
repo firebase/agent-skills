@@ -33,6 +33,11 @@ Replace `<AGENT_NAME>` with the actual agent name, which can be found in the [sk
      npx -y skills add firebase/agent-skills --agent <AGENT_NAME> --skill "<SKILL_NAME>" --global --yes
      ```
 
+   - **IF NO Firebase skills were found in Step 2:** Add each missing skill to the global level:
+     ```bash
+     npx -y skills add firebase/agent-skills --agent <AGENT_NAME> --skill "<SKILL_NAME>" --global --yes
+     ```
+
 4. **Update Existing Skills:** Update all currently installed skills to their latest versions:
    ```bash
    # Update project-level skills
