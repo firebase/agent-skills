@@ -1,6 +1,6 @@
 ---
 name: firebase-local-env-setup
-description: Bare minimum setup for getting started with Firebase for the agent. This covers Node.js installation, Firebase CLI availability, login, and MCP server installation. Use this to ensure the local environment is fully prepared before using Firebase.
+description: Bare minimum INITIAL setup for getting started with Firebase (Node.js, CLI installation, first-time login). Use ONLY for first-time setup. For updating, troubleshooting, or refreshing an existing environment, use the firebase-basics skill instead.
 ---
 
 # Firebase Local Environment Setup
