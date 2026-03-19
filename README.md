@@ -1,8 +1,8 @@
-# Firebase Agent Skills
+# Firebase Agent Skills: `fbs-to-agy-export`
 
-A collection of skills for AI coding agents, to help them understand and work with Firebase more effectively. 
+This skill helps your AI assistant easily convert **Firebase Studio** projects into **Antigravity** projects.
 
-Skills are packaged instructions and scripts that extend agent capabilities, following the [Agent Skills](https://agentskills.io/home) format.
+It includes both the agent skill and a complementary workflow, which are designed to work out-of-the-box in the Antigravity agent environment.
 
 ## Installation
 
@@ -11,54 +11,28 @@ Skills are packaged instructions and scripts that extend agent capabilities, fol
 For most popular AI-assistive tools, you can use the `skills` CLI to install Firebase agent skills:
 
 ```bash
-npx skills add firebase/skills
+npx skills add https://github.com/firebase/agent-skills/tree/fbs-to-agy-export
 ```
 
-### Option 2: Gemini CLI Extension
-
-This repository is configured as a Gemini CLI extension. You can add it using the Gemini CLI:
-
-```bash
-gemini extensions install https://github.com/firebase/skills
-```
-
-### Option 3: Claude Plugin
-
-1. Add the Firebase marketplace for Claude plugins:
-
-```bash
-claude plugin marketplace add firebase/skills
-```
-
-Install the Claude plugin for Firebase:
-
-```bash
-claude plugin install firebase@firebase
-```
-
-Verify the installation:
-
-```bash
-claude plugin marketplace list
-```
-
-### Option 4: Manual Set Up
+### Option 2: Manual Set Up
 
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/firebase/skills.git
+git clone -b fbs-to-agy-export --single-branch https://github.com/firebase/agent-skills.git
 ```
 
-2. Copy the contents of the `skills` directory to the appropriate location for your AI tool.
+2. Copy the downloaded `skills` and `workflows` directories to your preferred Antigravity configuration folder:
+   - **For a specific project:** Place them in the `.antigravity/` folder at the root of your project.
+   - **For all projects globally:** Place them in the `~/.antigravity/` folder in your user home directory.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request (PR)
+4. Push your branch to your fork: `git push origin feature/amazing-feature`
+5. Open a Pull Request (PR) targeting the `fbs-to-agy-export` branch
 
 ## 📄 License
 
