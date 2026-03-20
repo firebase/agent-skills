@@ -50,7 +50,34 @@ claude plugin marketplace list
 git clone https://github.com/firebase/skills.git
 ```
 
-2. Copy the contents of the `skills` directory to the appropriate location for your AI tool.
+2. Copy the contents of the `skills` directory to the appropriate location for your AI tool. Common locations include:
+   - **Cursor**: `.cursor/rules/`
+   - **Windsurf**: `.windsurfrules/`
+   - **GitHub Copilot**: `.github/copilot-instructions.md` (or project-specific instruction files)
+
+### Option 5: Local Path via Agent Skills CLI
+
+The `skills` CLI also supports installing skills from a local directory. If you have cloned this repository, you can add skills by pointing the CLI to your local folder:
+
+```bash
+npx skills add /path/to/your/local/firebase-skills
+```
+
+If you make changes to the local skills repository and want to update your project with the new changes, you can restore them by running:
+
+```bash
+npx skills experimental_install
+```
+
+### Option 6: Local Development (Live Symlinking)
+
+If you are actively contributing to or developing these skills, using `npx skills add` or copying files means you have to manually update them every time you make a change. Instead, use a symlink so that changes in your local clone are immediately reflected in your test project.
+
+For example, to test with Cursor:
+
+```bash
+ln -s /path/to/firebase-skills/skills /path/to/your/test-project/.cursor/rules
+```
 
 ## 🤝 Contributing
 
