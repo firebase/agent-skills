@@ -171,11 +171,6 @@ function areImmutableFieldsUnchanged(fields) {
   return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
 }
 //
-// Check if user is an admin (using custom claims)
-function isAdmin() {
-  return isAuthenticated() && request.auth.token.admin == true;
-}
-//
 // Validate that a timestamp is recent (within the last 5 minutes)
 function isRecent(time) {
   return time is timestamp &&

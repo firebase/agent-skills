@@ -171,11 +171,6 @@ function areImmutableFieldsUnchanged(fields) {
   return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
 }
 //
-// Check if user is an admin (using custom claims)
-function isAdmin() {
-  return isAuthenticated() && request.auth.token.admin == true;
-}
-//
 // Validate that a timestamp is recent (within the last 5 minutes)
 function isRecent(time) {
   return time is timestamp &&
@@ -411,7 +406,7 @@ Once devil's advocate testing passes, repeat until rules pass validation.
 1.  **Never skip the devil's advocate phase** - this is your primary security validation
 2.  **MUST include helper functions** for common operations ('isAuthenticated', 'isOwner', 'uidUnchanged', 'uidNotModified') AND domain validators ('isValidUser', etc.)
 3.  **MUST document assumed data models** at the beginning of the rules file
-4.  **Always use `firebase deploy --only firestore:rules --dry-run`** to validate rules syntax.
+4.  **Always use a tool to validate the rules syntax** before outputting the final file.
 5.  **Provide complete, runnable code** - no placeholders or TODOs
 6.  **Document all assumptions** about data structure or access patterns
 7. **Always run the devil's advocate attack** after any modification of the rules.
