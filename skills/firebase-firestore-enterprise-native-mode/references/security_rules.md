@@ -21,7 +21,7 @@ Follow this structured workflow strictly:
    - CRUD operations (create, read, update, delete)
    - Authentication patterns (Firebase Auth, custom tokens, anonymous)
    - Access patterns and business logic rules
-2. **Document your findings** in firebase-blueprint.json following the schema provided above.
+2. **Document your findings** in a untracked file. Refer to this file when generating the security rules.
 
 #### Phase-2: Security Rules Generation
 
@@ -342,7 +342,7 @@ allow update: if isValidCounterUpdate(docId) && ...
 
 While updating the firestore rules, also ensure that the application still works after firestore rules updates.
 
-4. **For each collection, implement explicit data validation:**
+3. **For each collection, implement explicit data validation:**
 
 - Type Checking: 'field is string', 'field is number', 'field is bool', 'field is timestamp'
 - Required fields validation using 'hasRequiredFields()'
@@ -404,20 +404,4 @@ Once devil's advocate testing passes, repeat until rules pass validation.
 6.  **Document all assumptions** about data structure or access patterns
 7. **Always run the devil's advocate attack** after any modification of the rules.
 8. **Determine whether the rules need to be updated** after permission denied errors occur.
-9. **Always have a default admin and allow more to be added**: Bootstrapping the first admin is required, and let that first admin be the **User Email** (provided in the runtime context at the start of this conversation) and **HAS TO BE VERIFIED**. Future admins should be writable to the database.
-```
-function isAdmin() {
-  return isAuthenticated() &&
-    (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-      (request.auth.token.email == "<User Email from runtime context>" && request.auth.token.email_verified == true)); // Default admin
-}
-```
-10. **CRITICAL** **Write structure**: Always follow the structure below for writing:
-```
-match /users/{user} {
-  ...
-  allow create: if isAuthenticated() && domainValidator() /*such as isValidUser()*/ && onlyCreateAllowedFields() /*such as uidMatchesUserLoggedIn() and (noPrivilegedRoleCreated() || isAdmin())*/
-  allow update: if isAuthenticated() && domainValidator() /*such as isValidUser()*/ && onlyUpdateAllowedFields() /*such as uidNotModified() and (noPrivilegedRoleUpdated() || isAdmin())*/
-}
-```
-11. **Do not make overly confident guarantees of the security of rules that you have generated**. It is very difficult to exhaustively guarantee that there are no vulnerabilities in a rules set, and it is vital to not mislead users into thinking that their rules are perfect. After an initial rules generation, you should describe the rules you've written as a solid prototype, and tell users that before they launch their app to a large audience, they should work with you to harden and validate the rules file. Be clear that users should carefully review rules to ensure security.
+9. **Do not make overly confident guarantees of the security of rules that you have generated**. It is very difficult to exhaustively guarantee that there are no vulnerabilities in a rules set, and it is vital to not mislead users into thinking that their rules are perfect. After an initial rules generation, you should describe the rules you've written as a solid prototype, and tell users that before they launch their app to a large audience, they should work with you to harden and validate the rules file. Be clear that users should carefully review rules to ensure security.
