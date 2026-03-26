@@ -1,0 +1,30 @@
+{
+  "name": "firebase",
+  "displayName": "Firebase",
+  "version": "1.0.1",
+  "description": "The official Firebase Cursor plugin. Prototype, build, and run modern apps with Firebase's backend and AI infrastructure.",
+  "author": {
+    "name": "Firebase",
+    "email": "firebase-support@google.com",
+    "url": "https://firebase.google.com"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "firebase",
+    "cursor",
+    "skills",
+    "mcp",
+    "firestore",
+    "hosting",
+    "auth",
+    "storage",
+    "ailogic",
+    "backend",
+    "cloud-services"
+  ],
+  "logo": "./assets/firebase_logo.svg",
+  "homepage": "https://github.com/firebase/agent-skills",
+  "repository": "https://github.com/firebase/agent-skills",
+  "skills": "./skills/",
+  "mcpServers": "./claude-plugins/firebase/.mcp.json"
+}
