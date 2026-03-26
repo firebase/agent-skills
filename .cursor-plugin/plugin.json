@@ -22,9 +22,9 @@
     "backend",
     "cloud-services"
   ],
-  "logo": "./assets/firebase_logo.svg",
+  "logo": "../assets/firebase_logo.svg",
   "homepage": "https://github.com/firebase/agent-skills",
   "repository": "https://github.com/firebase/agent-skills",
-  "skills": "./skills/",
-  "mcpServers": "./claude-plugins/firebase/.mcp.json"
+  "skills": "../skills/",
+  "mcpServers": "../claude-plugins/firebase/.mcp.json"
 }
