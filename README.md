@@ -1,4 +1,8 @@
-# Firebase Agent Skills
+<h1 align="center">
+  <img src="assets/firebase-agent-skills_logo.svg" width="48" alt="Logo" style="vertical-align: middle; margin-right: 10px;">
+  Firebase Agent Skills
+</h1>
+
 
 A collection of skills for AI coding agents, to help them understand and work with Firebase more effectively. 
 
