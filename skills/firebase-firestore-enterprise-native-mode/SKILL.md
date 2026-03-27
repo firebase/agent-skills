@@ -26,6 +26,16 @@ To learn how to use Firestore Enterprise Native Mode in your application code, s
 - [Web SDK Usage](references/web_sdk_usage.md)
 - [Python SDK Usage](references/python_sdk_usage.md)
 
+## iOS Development Rules (Standard Across All Firestore Editions)
+
+When using Firestore Enterprise in an iOS app, you MUST follow these critical safety rules:
+
+### ⛔️ CRITICAL RULE: INITIALIZATION ORDER ⛔️
+You **MUST** ensure `FirebaseApp.configure()` is called in your `App.init()` **BEFORE** any Firestore-dependent state objects are initialized. Declaring a `@State` or `@StateObject` that touches Firestore at the root `App` level will cause a fatal crash. Refer to the `firebase-basics` skill for the "Safe Pattern."
+
+### ⛔️ CRITICAL RULE: NO FirebaseFirestoreSwift ⛔️
+UNDER NO CIRCUMSTANCES should you import or link against `FirebaseFirestoreSwift`. All Swift features (Codable, `@DocumentID`) are now in the main `FirebaseFirestore` module (v11+).
+
 ## Indexes
 
 Indexes help improve query performance and speed up slow queries. For checking index types, query support tables, and best practices, see [indexes.md](references/indexes.md).
