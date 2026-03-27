@@ -20,6 +20,9 @@ Install the Firebase SDK via npm:
 npm install firebase
 ```
 
+> **💡 TIP: ALWAYS USE THE LATEST SDK VERSION**
+> To ensure access to the latest features and security fixes, always check for the most recent version of the Firebase Web SDK at [https://github.com/firebase/firebase-js-sdk/releases](https://github.com/firebase/firebase-js-sdk/releases). Running `npm install firebase` will install the latest version by default.
+
 ## 3. Initialization
 Create a `firebase.js` (or `firebase.ts`) file. You can fetch your config object using the CLI:
 
