@@ -1,8 +1,3 @@
----
-name: firebase-local-env-setup
-description: Bare minimum INITIAL setup for getting started with Firebase (Node.js, CLI installation, first-time login). Use ONLY for first-time setup. For updating, troubleshooting, or refreshing an existing environment, use the firebase-basics skill instead.
----
-
 # Firebase Local Environment Setup
 
 This skill documents the bare minimum setup required for a full Firebase experience for the agent. Before starting to use any Firebase features, you MUST verify that each of the following steps has been completed.
@@ -59,12 +54,12 @@ You must be authenticated to manage Firebase projects.
 To fully manage Firebase, the agent needs specific skills and the Firebase MCP server installed. Identify the agent environment you are currently running in and follow the corresponding setup document strictly.
 
 **Read the setup document for your current agent:**
-- **Gemini CLI**: Review [references/gemini_cli.md](references/gemini_cli.md)
-- **Antigravity**: Review [references/antigravity.md](references/antigravity.md)
-- **Claude Code**: Review [references/claude_code.md](references/claude_code.md)
-- **Cursor**: Review [references/cursor.md](references/cursor.md)
-- **GitHub Copilot**: Review [references/github_copilot.md](references/github_copilot.md)
-- **Other Agents** (Windsurf, Cline, etc.): Review [references/other_agents.md](references/other_agents.md)
+- **Gemini CLI**: Review [setup-gemini_cli.md](setup-gemini_cli.md)
+- **Antigravity**: Review [setup-antigravity.md](setup-antigravity.md)
+- **Claude Code**: Review [setup-claude_code.md](setup-claude_code.md)
+- **Cursor**: Review [setup-cursor.md](setup-cursor.md)
+- **GitHub Copilot**: Review [setup-github_copilot.md](setup-github_copilot.md)
+- **Other Agents** (Windsurf, Cline, etc.): Review [setup-other_agents.md](setup-other_agents.md)
 
 ---
 **CRITICAL AGENT RULE:** Do NOT proceed with any other Firebase tasks until EVERY step above has been successfully verified and completed.
