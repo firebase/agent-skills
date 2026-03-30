@@ -36,8 +36,8 @@ class MainActivity : AppCompatActivity() {
         // Initialize Firebase AI
         val ai = Firebase.ai
 
-        // Use a model (e.g., gemini-2.5-flash)
-        val model = ai.generativeModel("gemini-2.5-flash")
+        // Use a model (e.g., gemini-2.5-flash-lite)
+        val model = ai.generativeModel("gemini-2.5-flash-lite")
 
         // Generate content
         lifecycleScope.launch {
