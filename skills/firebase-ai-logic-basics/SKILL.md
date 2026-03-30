@@ -105,5 +105,7 @@ Consider that you do not need to hardcode model names (e.g., `gemini-flash-lite-
 
 [Web SDK code examples and usage patterns](references/usage_patterns_web.md)
 
+[Android (Kotlin) SDK usage patterns](references/usage_patterns_android.md)
+
 
 

@@ -24,6 +24,7 @@ For guidance on writing and deploying Firestore Security Rules to protect your d
 
 To learn how to use Firestore Enterprise Native Mode in your application code, see:
 - [Web SDK Usage](references/web_sdk_usage.md)
+- [Android (Kotlin) SDK Usage](references/android_sdk_usage.md)
 - [Python SDK Usage](references/python_sdk_usage.md)
 
 ## Indexes
