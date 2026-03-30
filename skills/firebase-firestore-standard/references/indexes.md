@@ -8,6 +8,17 @@ If you write a query requiring a composite index, you **MUST** update `firestore
 
 ---
 
+## 0. Automatic vs. Manual Management
+### Single-Field Indexes (Automatic)
+Firestore **automatically creates** a single-field index for every field in a document (and subfields in maps). 
+- **Support**: Simple equality queries (`==`) and single-field range/sort queries (`<`, `<=`, `orderBy`).
+- **Merging**: Firestore can merge multiple single-field indexes for equality filters (e.g., `where("state", "==", "CA").where("country", "==", "USA")`).
+
+### Composite Indexes (Manual)
+Composite indexes store a sorted mapping of documents based on multiple fields.
+- **Support**: Complex queries that filter or sort by **multiple fields**.
+- **Action Required**: You **MUST** define these manually in `firestore.indexes.json` or via the CLI.
+
 ## 1. Automated Workflow
 1. **Identify:** Any query combining an equality filter with an `orderBy` or range filter needs an index.
 2. **Append:** Add the index block to `firestore.indexes.json`. Fields in `where` filters MUST come before `orderBy` fields.

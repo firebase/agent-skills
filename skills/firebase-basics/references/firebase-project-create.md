@@ -28,4 +28,3 @@ npx -y firebase-tools@latest apps:sdkconfig <IOS|ANDROID|WEB> <App-ID>
 Do NOT guess the configuration steps. You **MUST** refer to the specific setup guide for your target platform to see exactly how to download and integrate the config files:
 - For iOS: Refer to `ios_setup.md`
 - For Web: Refer to `web_setup.md`
-- For Android: Refer to `android_setup.md` (when available)

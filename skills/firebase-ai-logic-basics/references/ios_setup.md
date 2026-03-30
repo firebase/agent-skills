@@ -10,7 +10,7 @@ import FirebaseAILogic
 let ai = FirebaseAI.firebaseAI()
 
 // Specify a model that's appropriate for your use case.
-let model = ai.generativeModel(modelName: "gemini-1.5-flash")
+let model = ai.generativeModel(modelName: "gemini-flash-latest")
 ```
 
 ## 2. SwiftUI Integration (Best Practices)
@@ -26,7 +26,7 @@ import FirebaseAILogic
 @Observable
 class AIViewModel {
     // Initialize lazily to ensure FirebaseApp is configured first
-    private lazy var model = FirebaseAI.firebaseAI().generativeModel(modelName: "gemini-1.5-flash")
+    private lazy var model = FirebaseAI.firebaseAI().generativeModel(modelName: "gemini-flash-latest")
     
     var responseText: String = ""
     var isFetching: Bool = false
@@ -85,7 +85,7 @@ let safetySettings = [
 ]
 
 let model = FirebaseAI.firebaseAI().generativeModel(
-  modelName: "gemini-1.5-flash",
+  modelName: "gemini-flash-latest",
   safetySettings: safetySettings
 )
 ```
@@ -108,7 +108,7 @@ let getStockPriceTool = Tool(functionDeclarations: [
 ])
 
 let model = FirebaseAI.firebaseAI().generativeModel(
-  modelName: "gemini-1.5-flash",
+  modelName: "gemini-flash-latest",
   tools: [getStockPriceTool]
 )
 
@@ -126,7 +126,7 @@ let chat = model.startChat()
 
 Task {
     do {
-        let response1 = try await chat.sendMessage("Hello! I have two dogs.")
+        let response1 = try await chat.sendMessage("Hello! I have two dogs in my house.")
         print(response1.text ?? "")
 
         let response2 = try await chat.sendMessage("How many paws are in my house?")
