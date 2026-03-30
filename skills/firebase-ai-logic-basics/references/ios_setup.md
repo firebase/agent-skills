@@ -35,6 +35,7 @@ class AIViewModel {
     func generate(prompt: String) async {
         isFetching = true
         errorMessage = nil
+        defer { isFetching = false }
         
         do {
             let response = try await model.generateContent(prompt)
@@ -42,8 +43,6 @@ class AIViewModel {
         } catch {
             self.errorMessage = error.localizedDescription
         }
-        
-        isFetching = false
     }
 }
 

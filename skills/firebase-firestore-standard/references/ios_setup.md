@@ -93,7 +93,12 @@ ref = db.collection("users").addDocument(data: [
     if let err = err {
         print("Error adding document: \(err)")
     } else {
-        print("Document added with ID: \(ref!.documentID)")
+        guard let ref = ref else { return }
+        print("Document added with ID: \(ref.documentID)")
+    }
+}
+```
+
 ## 6. Realtime Listeners in SwiftUI (Lifecycle Best Practices)
 
 When implementing Firestore realtime listeners (`addSnapshotListener`) within a SwiftUI application, you **MUST** tie the listener lifecycle to the view's identity using `.task(id:)`, NOT `.onDisappear`.
