@@ -1,6 +1,6 @@
 ---
 name: xcode-project-setup
-description: Safely modifies Xcode projects (.pbxproj) to add Swift Packages and link files, OR assists with modern Tuist generation. Use this skill whenever an iOS project needs dependencies installed (e.g. Firebase, Alamofire).
+description: Safely modifies Xcode projects (.pbxproj) to add Swift Packages and link files. Use this skill whenever an iOS project needs dependencies installed (e.g. Firebase, Alamofire).
 compatibility: Requires Swift to be installed locally and macOS environment.
 ---
 
@@ -24,18 +24,22 @@ Because this skill relies entirely on a native Swift script, you must verify the
 - Run `swift --version` before proceeding.
 - If the Swift command is not found, you must stop and recommend the user install the Swift toolchain (e.g., via `xcode-select --install` on macOS), or ask if you can attempt to install it for them. Do not attempt to proceed without Swift.
 
+### 5. Mandatory Linker Flags for Static Frameworks (Firebase)
+When setting up SPM dependencies that heavily rely on internal Objective-C categories and `+load` methods (such as the Firebase iOS SDK suite), the Apple linker will aggressively strip these methods out if they are linked statically.
+
+This causes fatal runtime crashes (e.g., `FirebaseAuth/Auth.swift:167: Fatal error: Unexpectedly found nil`).
+
+**The provided `xcode_spm_setup` Swift script automatically injects the `-ObjC` flag to `OTHER_LDFLAGS` when adding Firebase products.** However, you should still verify it is present in the build settings if you encounter issues.
+- Failing to include this flag when adding Firebase dependencies is a critical error.
 ---
 
 ## Empty Directory Workflow
 
-If you are asked to build an iOS app or configure Xcode dependencies but **no `.xcodeproj`, `.xcworkspace`, or `Project.swift` exists**, you MUST use the `question` tool to ask the user how to proceed:
+If you are asked to build an iOS app or configure Xcode dependencies but **no `.xcodeproj` or `.xcworkspace` exists**, you MUST ask the user to create the project first:
 
-**"No Xcode project found in this directory. How would you like to proceed?"**
-1. **"Automatically generate a Tuist project"**
-2. **"I will create an empty Xcode project manually"**
+**"No Xcode project found in this directory. Please create an empty Xcode project manually and let me know when you are ready to proceed."**
 
-*   **If User Selects Tuist:** Run `tuist init --platform ios`. Add SPM dependencies directly to the generated `Project.swift` or `Tuist/Package.swift` manifest and run `tuist install` and `tuist generate`. **DO NOT use the `xcode_spm_setup` Swift script for Tuist projects.**
-*   **If User Selects Manual:** Wait for the user to confirm they have created the `.xcodeproj` via Xcode, then proceed with the Standard Xcode Workflow below.
+Wait for the user to confirm they have created the `.xcodeproj` via Xcode, then proceed with the Standard Xcode Workflow below.
 
 ---
 
@@ -44,6 +48,10 @@ If you are asked to build an iOS app or configure Xcode dependencies but **no `.
 Do not use raw text parsing, `sed`, or Ruby scripts to modify `.pbxproj` files directly.
 
 Instead, execute the Swift configuration package bundled with this skill (`scripts/xcode_spm_setup`) to securely install SPM packages and link optional config files (like `GoogleService-Info.plist`).
+
+### **CRITICAL: Always Use Latest SDK Version**
+To ensure access to the latest features and security fixes, always use the most recent version of the Firebase iOS SDK. Check for the latest release version at [https://github.com/firebase/firebase-ios-sdk/releases](https://github.com/firebase/firebase-ios-sdk/releases). 
+- Use the most recent version number (e.g., `11.x.y`) in your commands instead of hardcoded placeholders.
 
 ### Understanding the Script's Actions
 When adding a Swift Package to an Xcode project, two distinct steps must occur:
@@ -69,7 +77,8 @@ swift run --package-path /Users/foo/.agents/skills/xcode-project-setup/scripts/x
 ```
 
 ### Example 2: Firebase (Requires Plist)
-Adding Firebase and linking the `GoogleService-Info.plist` to the resources build phase automatically.
+Adding Firebase and linking the `GoogleService-Info.plist` to the resources build phase automatically. 
+*Note: Replace `11.0.0` with the actual latest version from [the releases page](https://github.com/firebase/firebase-ios-sdk/releases).*
 
 ```bash
 swift run --package-path /Users/foo/.agents/skills/xcode-project-setup/scripts/xcode_spm_setup xcode_spm_setup MyApp.xcodeproj https://github.com/firebase/firebase-ios-sdk 11.0.0 --plist MyApp/GoogleService-Info.plist FirebaseCore FirebaseAuth FirebaseFirestore

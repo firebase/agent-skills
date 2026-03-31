@@ -13,45 +13,113 @@ let ai = FirebaseAI.firebaseAI()
 let model = ai.generativeModel(modelName: "gemini-flash-latest")
 ```
 
-## 2. Generate Text Content
-```swift
-let prompt = "Write a story about a magic backpack."
+## 2. SwiftUI Integration (Best Practices)
+Use the `@Observable` pattern to manage AI state and provide a smooth UX with loading indicators and error handling.
 
-Task {
-    do {
-        let response = try await model.generateContent(prompt)
-        if let text = response.text {
-            print(text)
+> **⛔️ CRITICAL WARNING:** Do NOT initialize the model inline as a class property if there's any chance the view model is instantiated before `FirebaseApp.configure()` executes in the app root. 
+> To be safe, initialize the model lazily or pass it in from a point in the hierarchy where Firebase is guaranteed to be configured.
+
+```swift
+import SwiftUI
+import FirebaseAILogic
+
+@Observable
+class AIViewModel {
+    // Initialize lazily to ensure FirebaseApp is configured first
+    private lazy var model = FirebaseAI.firebaseAI().generativeModel(modelName: "gemini-flash-latest")
+    
+    var responseText: String = ""
+    var isFetching: Bool = false
+    var errorMessage: String?
+    
+    func generate(prompt: String) async {
+        isFetching = true
+        errorMessage = nil
+        defer { isFetching = false }
+        
+        do {
+            let response = try await model.generateContent(prompt)
+            self.responseText = response.text ?? "No response"
+        } catch {
+            self.errorMessage = error.localizedDescription
         }
-    } catch {
-        print("Error generating content: \(error)")
+    }
+}
+
+struct AIView: View {
+    @State private var viewModel = AIViewModel()
+    @State private var prompt = "Write a story about a magic backpack."
+    
+    var body: some View {
+        VStack {
+            TextField("Enter prompt", text: $prompt)
+            
+            Button("Generate") {
+                Task { await viewModel.generate(prompt: prompt) }
+            }
+            .disabled(viewModel.isFetching)
+            
+            if viewModel.isFetching {
+                ProgressView()
+            } else if let error = viewModel.errorMessage {
+                Text(error).foregroundColor(.red)
+            } else {
+                ScrollView {
+                    Text(viewModel.responseText)
+                }
+            }
+        }
+        .padding()
     }
 }
 ```
 
-## 3. Generate Content from Text and Image (Multimodal)
+## 3. Safety Settings
+You can configure safety thresholds to prevent the model from generating harmful content.
+
 ```swift
-import UIKit
+let safetySettings = [
+  SafetySetting(category: .harassment, threshold: .blockLowAndAbove),
+  SafetySetting(category: .hateSpeech, threshold: .blockMediumAndAbove)
+]
 
-// Create an image from a bundled resource or URL
-guard let image = UIImage(systemName: "star") else {
-  fatalError("Unable to initialize image")
-}
-let prompt = "Describe what this image is."
+let model = FirebaseAI.firebaseAI().generativeModel(
+  modelName: "gemini-flash-latest",
+  safetySettings: safetySettings
+)
+```
 
-Task {
-    do {
-        let response = try await model.generateContent(image, prompt)
-        if let text = response.text {
-            print(text)
-        }
-    } catch {
-        print("Error generating content: \(error)")
-    }
+## 4. Function Calling (Tools)
+Define functions that the model can request to execute to interact with external systems.
+
+```swift
+let getStockPriceTool = Tool(functionDeclarations: [
+  FunctionDeclaration(
+    name: "getStockPrice",
+    description: "Get the current stock price for a given symbol.",
+    parameters: [
+      "symbol": Schema(
+        type: .string,
+        description: "The stock symbol, e.g. AAPL"
+      )
+    ]
+  )
+])
+
+let model = FirebaseAI.firebaseAI().generativeModel(
+  modelName: "gemini-flash-latest",
+  tools: [getStockPriceTool]
+)
+
+// In your task:
+let response = try await model.generateContent("What is the stock price of Apple?")
+if let functionCall = response.functionCalls.first {
+    // Handle the function call (e.g. call a local API and send the result back)
+    print("Model requested function: \(functionCall.name) with args: \(functionCall.args)")
 }
 ```
 
-## 4. Chat Session (Multi-turn)
+## 5. Chat Session (Multi-turn)
 ```swift
 let chat = model.startChat()
 
@@ -60,7 +128,6 @@ Task {
         let response1 = try await chat.sendMessage("Hello! I have two dogs in my house.")
         print(response1.text ?? "")
 
-        // The model remembers the history
         let response2 = try await chat.sendMessage("How many paws are in my house?")
         print(response2.text ?? "")
     } catch {

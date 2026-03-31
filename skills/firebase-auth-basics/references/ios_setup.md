@@ -1,7 +1,12 @@
 # Firebase Auth iOS Setup Guide
 
+# ⛔️ CRITICAL RULE: NO INLINE INITIALIZATION ⛔️
+NEVER write `let auth = Auth.auth()` as an inline class or struct property if there is ANY chance the object is instantiated before `FirebaseApp.configure()` executes in the app root.
+- **FATAL CRASH:** `@Observable class AuthManager { let auth = Auth.auth() }` initialized as a `@State` in the App root.
+- **SAFE PATTERN:** Initialize `Auth.auth()` lazily (`lazy var auth = Auth.auth()`) OR explicitly initialize the manager *after* `FirebaseApp.configure()` finishes.
+
 ## 1. Import and Initialize
-Ensure you have installed the `FirebaseAuth` SDK. Use the `firebase-xcode-setup` skill to automate adding the SPM dependency to the Xcode project.
+Ensure you have installed the `FirebaseAuth` SDK. Use the `xcode-project-setup` skill to automate adding the SPM dependency to the Xcode project.
 
 > **Note:** Ensure `FirebaseApp.configure()` has been executed in your app's entry point before calling any `Auth.auth()` methods, otherwise your app will crash. Do not initialize Auth objects in SwiftUI `@State` properties at the App root level.
 
@@ -27,27 +32,27 @@ handle = Auth.auth().addStateDidChangeListener { auth, user in
 Auth.auth().removeStateDidChangeListener(handle!)
 ```
 
-## 3. Email and Password Authentication
+## 3. Email and Password Authentication (Modern Concurrency)
+
+Modern Swift projects should prioritize `async/await` for authentication calls to avoid nested completion handlers and improve readability.
 
 ### Sign Up
 ```swift
-Auth.auth().createUser(withEmail: "user@example.com", password: "password") { authResult, error in
-  if let error = error {
+do {
+    let authResult = try await Auth.auth().createUser(withEmail: "user@example.com", password: "password")
+    print("User created successfully with uid: \(authResult.user.uid)")
+} catch {
     print("Error creating user: \(error.localizedDescription)")
-    return
-  }
-  print("User created successfully!")
 }
 ```
 
 ### Sign In
 ```swift
-Auth.auth().signIn(withEmail: "user@example.com", password: "password") { authResult, error in
-  if let error = error {
+do {
+    let authResult = try await Auth.auth().signIn(withEmail: "user@example.com", password: "password")
+    print("User signed in successfully with uid: \(authResult.user.uid)")
+} catch {
     print("Error signing in: \(error.localizedDescription)")
-    return
-  }
-  print("User signed in successfully!")
 }
 ```
 
@@ -58,5 +63,20 @@ do {
   print("Successfully signed out")
 } catch let signOutError as NSError {
   print("Error signing out: %@", signOutError)
+}
+```
+
+## 5. Legacy Options (Completion Handlers)
+
+While `async/await` is the recommended standard, traditional completion handlers are still fully supported and legal to use if modern concurrency does not meet the requirements of an older codebase or specific architectural pattern.
+
+**Example (Legacy Sign In):**
+```swift
+Auth.auth().signIn(withEmail: "user@example.com", password: "password") { authResult, error in
+  if let error = error {
+    print("Error signing in: \(error.localizedDescription)")
+    return
+  }
+  print("User signed in successfully!")
 }
 ```

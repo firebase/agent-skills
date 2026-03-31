@@ -1,82 +1,50 @@
-# Firestore Indexes Reference
+# Firestore Standard Edition Indexes Reference
 
-Indexes allow Firestore to ensure that query performance depends on the size of the result set, not the size of the database.
+# ⛔️ CRITICAL RULE: FULLY AUTOMATED INDEX MANAGEMENT ⛔️
 
-## Index Types
+You **MUST** manage Firestore indexes programmatically. **NEVER** ask the user to manually create indexes in the Firebase Console.
 
-### Single-Field Indexes
-In Standard Edition, Firestore **automatically creates** a single-field index for every field in a document (and subfields in maps).
-*   **Support**: Simple equality queries (`==`) and single-field range/sort queries (`<`, `<=`, `orderBy`).
-*   **Behavior**: You generally don't need to manage these unless you want to *exempt* a field.
+If you write a query requiring a composite index, you **MUST** update `firestore.indexes.json` and deploy it immediately (`npx firebase-tools deploy --only firestore:indexes`).
 
-### Composite Indexes
-A composite index stores a sorted mapping of all documents based on an ordered list of fields.
-*   **Support**: Complex queries that filter or sort by **multiple fields**.
-*   **Creation**: These are **NOT** automatically created. You must define them manually or via the console/CLI.
+---
 
-## Automatic vs. Manual Management
+## 0. Automatic vs. Manual Management
+### Single-Field Indexes (Automatic)
+Firestore **automatically creates** a single-field index for every field in a document (and subfields in maps). 
+- **Support**: Simple equality queries (`==`) and single-field range/sort queries (`<`, `<=`, `orderBy`).
+- **Merging**: Firestore can merge multiple single-field indexes for equality filters (e.g., `where("state", "==", "CA").where("country", "==", "USA")`).
 
-### What is Automatic?
-*   Indexes for simple queries.
-*   Merging of single-field indexes for multiple equality filters (e.g., `where("state", "==", "CA").where("country", "==", "USA")`).
+### Composite Indexes (Manual)
+Composite indexes store a sorted mapping of documents based on multiple fields.
+- **Support**: Complex queries that filter or sort by **multiple fields**.
+- **Action Required**: You **MUST** define these manually in `firestore.indexes.json` or via the CLI.
 
-### When Do I Need to Act?
-If you attempt a query that requires a composite index, the SDK will throw an error containing a **direct link** to the Firebase Console to create that specific index.
+## 1. Automated Workflow
+1. **Identify:** Any query combining an equality filter with an `orderBy` or range filter needs an index.
+2. **Append:** Add the index block to `firestore.indexes.json`. Fields in `where` filters MUST come before `orderBy` fields.
+3. **Deploy:** `npx -y firebase-tools@latest deploy --only firestore:indexes`.
 
-**Example Error:**
-> "The query requires an index. You can create it here: https://console.firebase.google.com/project/..."
-
-## Query Support Examples
-
-| Query Type | Index Required |
-| :--- | :--- |
-| **Simple Equality**<br>`where("a", "==", 1)` | Automatic (Single-Field) |
-| **Simple Range/Sort**<br>`where("a", ">", 1).orderBy("a")` | Automatic (Single-Field) |
-| **Multiple Equality**<br>`where("a", "==", 1).where("b", "==", 2)` | Automatic (Merged Single-Field) |
-| **Equality + Range/Sort**<br>`where("a", "==", 1).where("b", ">", 2)` | **Composite Index** |
-| **Multiple Ranges**<br>`where("a", ">", 1).where("b", ">", 2)` | **Composite Index** (and technically limited query support) |
-| **Array Contains + Equality**<br>`where("tags", "array-contains", "news").where("active", "==", true)` | **Composite Index** |
-
-## Best Practices & Exemptions
-
-You can **exempt** fields from automatic indexing to save storage or strictly enforce write limits.
-
-### 1. High Write Rates (Sequential Values)
-*   **Problem**: Indexing fields that increase sequentially (like `timestamp`) limits the write rate to ~500 writes/second per collection.
-*   **Solution**: If you don't query on this field, **exempt** it from simple indexing.
-
-### 2. Large String/Map/Array Fields
-*   **Problem**: Indexing limits (40k entries per doc). Indexing large blobs wastes storage.
-*   **Solution**: Exempt large text blobs or huge arrays if they aren't used for filtering.
-
-### 3. TTL Fields
-*   **Problem**: TTL (Time-To-Live) deletion can cause index churn.
-*   **Solution**: Exempt the TTL timestamp field from indexing if you don't query it.
-
-## Management
-
-### Config files
-Your indexes should be defined in `firestore.indexes.json` (pointed to by `firebase.json`).
-
+## 2. Standard Index Template
 ```json
 {
-  "indexes": [
-    {
-      "collectionGroup": "cities",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "country", "order": "ASCENDING" },
-        { "fieldPath": "population", "order": "DESCENDING" }
-      ]
-    }
-  ],
-  "fieldOverrides": []
+  "collectionGroup": "COLLECTION_NAME",
+  "queryScope": "COLLECTION",
+  "fields": [
+    { "fieldPath": "FIELD_1", "order": "ASCENDING" },
+    { "fieldPath": "FIELD_2", "order": "ASCENDING" }
+  ]
 }
 ```
 
-### CLI Commands
+## 3. Query Support (When is a Composite Index Required?)
 
-Deploy indexes only:
-```bash
-npx -y firebase-tools@latest deploy --only firestore:indexes
-```
+| Query Type | Index Required |
+| :--- | :--- |
+| **Equality + Range/Sort**<br>`where("a", "==", 1).where("b", ">", 2)` | **Composite Index** on `a` and `b` |
+| **Multiple Ranges**<br>`where("a", ">", 1).where("b", ">", 2)` | **Composite Index** on `a` and `b` |
+| **Array Contains + Equality**<br>`where("tags", "array-contains", "x").where("a", "==", true)` | **Composite Index** on `tags` and `a` |
+
+---
+
+## 4. Standard Edition Behavior
+Firestore Standard creates single-field indexes by default. If a required composite index is missing, the SDK **will throw an error**. You must capture this error and self-correct by updating the JSON and deploying.

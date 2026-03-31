@@ -1,5 +1,10 @@
 # Python SDK Usage
 
+# ⛔️ CRITICAL RULE: PROACTIVE INDEXING ⛔️
+Whenever you write a query that combines an equality filter (`where(filter=FieldFilter("x", "==", y))`) with an order-by clause (`order_by("z")`) or a range filter, you **MUST** proactively generate the required composite index in `firestore.indexes.json` and deploy it. Do NOT wait for the code to run and crash.
+- In Enterprise Native Mode, missing indexes do not throw errors; they cause slow, expensive full-collection scans. You MUST prevent this by generating the index immediately.
+- Read `indexes.md` for the exact JSON template and deployment command.
+
 The Python Server SDK is used for backend/server environments and utilizes Google Application Default Credentials in most Google Cloud environments.
 
 ### Writing Data

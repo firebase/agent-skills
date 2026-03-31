@@ -1,5 +1,21 @@
 # Firebase iOS Setup Guide
 
+# ⛔️ CRITICAL RULE: STATE MANAGEMENT (OBSERVATION VS COMBINE) ⛔️
+
+When writing or updating SwiftUI code, you **MUST** use the modern Swift **Observation framework (`@Observable` macro and `@State`)**. 
+
+- **Do NOT use Combine** (`ObservableObject`, `@Published`, `@StateObject`, `@EnvironmentObject`) for state management *unless* there are very strong signals in the existing codebase that the project is heavily relying on Combine. 
+- Prioritize modern Swift 5.9+ `@Observable` patterns as the default approach.
+
+# ⛔️ CRITICAL RULE: INITIALIZATION ORDER ⛔️
+
+When using SwiftUI, you **MUST** ensure `FirebaseApp.configure()` is called **BEFORE** any Firebase-dependent state objects are initialized. 
+
+- **UNSAFE (CRASH):** Declaring a `@State` (for `@Observable`) or `@StateObject` (for Combine) property in the root `App` struct if its initializer touches Firebase. Property initializers run *before* the `App.init()` body, meaning the object's `init()` will fire before Firebase is configured.
+- **SAFE:** Initialize Firebase in `App.init()` and pass your state objects into the sub-views (like `ContentView`), or use `onAppear` for delayed setup.
+
+Failing to follow this will result in a fatal crash: `Default FirebaseApp is not configured`.
+
 ## 1. Create a Firebase Project and App (Automated)
 Do not use the Firebase Console. Use the CLI to automate setup:
 
@@ -14,30 +30,39 @@ Do not use raw text parsing, sed, or Ruby scripts (like `xcodeproj` gem) to modi
 Instead, use the **`xcode-project-setup`** skill. 
 Load that skill using your tools to securely execute its native Swift package setup script. That skill handles installing the required SPM packages and safely linking the `GoogleService-Info.plist` file.
 
+> **💡 TIP: ALWAYS USE THE LATEST SDK VERSION**
+> To ensure access to the latest features and security fixes, always check for the most recent version of the Firebase iOS SDK at [https://github.com/firebase/firebase-ios-sdk/releases](https://github.com/firebase/firebase-ios-sdk/releases) and use that version when adding the SPM dependency.
+
 ## 3. Initialization
 Configure the shared `FirebaseApp` instance. You can do this either in a modern SwiftUI `App` structure or a traditional `AppDelegate`.
 
-### SwiftUI (Modern)
+### SwiftUI (Modern - SAFE PATTERN)
 ```swift
 import SwiftUI
 import FirebaseCore
 
 @main
 struct YourApp: App {
+  // ⛔️ FATAL CRASH: @State private var auth = AuthManager()
+  // property initializers run before init(), causing FirebaseApp not configured error
+  @State private var authManager: AuthManager
+
   init() {
+    // ✅ SAFE: This runs FIRST
     FirebaseApp.configure()
+    
+    // ✅ SAFE: Initialize state ONLY AFTER Firebase is configured
+    _authManager = State(initialValue: AuthManager())
   }
 
   var body: some Scene {
     WindowGroup {
       ContentView()
+        .environment(authManager)
     }
   }
 }
 ```
-> **⚠️ CRITICAL SWIFTUI INITIALIZATION WARNING:**
-> Never initialize Firebase-dependent objects (like an `AuthViewModel` or `Firestore` service) using `@State`, `@StateObject`, or global variables at the root `App` struct level. Property initializers run *before* the `init()` method where `FirebaseApp.configure()` is called, causing an immediate fatal crash. 
-> Always instantiate these view models further down the view hierarchy (e.g., inside `ContentView`).
 
 ### AppDelegate (Traditional / UIKit)
 ```swift
@@ -48,6 +73,7 @@ import FirebaseCore
 class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    // ✅ SAFE: Always the first line in didFinishLaunching
     FirebaseApp.configure()
     return true
   }

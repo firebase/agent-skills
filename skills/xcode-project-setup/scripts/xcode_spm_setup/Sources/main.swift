@@ -110,6 +110,27 @@ func main() {
             if frameworksBuildPhase?.files == nil { frameworksBuildPhase?.files = [] }
             frameworksBuildPhase?.files?.append(buildFile)
         }
+
+        // 4. Add -ObjC linker flag if adding Firebase
+        if products.contains(where: { $0.contains("Firebase") }) {
+            print("Adding -ObjC to OTHER_LDFLAGS...")
+            for configuration in target.buildConfigurationList?.buildConfigurations ?? [] {
+                var otherLdFlags: [String] = []
+                if let current = configuration.buildSettings["OTHER_LDFLAGS"] {
+                    if let currentArray = current as? [String] {
+                        otherLdFlags = currentArray
+                    } else if let currentString = current as? String {
+                        otherLdFlags = [currentString]
+                    }
+                }
+                
+                if !otherLdFlags.contains("-ObjC") {
+                    otherLdFlags.append("-ObjC")
+                    configuration.buildSettings["OTHER_LDFLAGS"] = otherLdFlags
+                    print("Updated OTHER_LDFLAGS for configuration: \(configuration.name)")
+                }
+            }
+        }
         
         // Write changes
         try xcodeproj.write(path: projectPath)
