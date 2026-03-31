@@ -2,6 +2,16 @@
 
 This guide walks you through using Firebase Authentication in your Android app using Kotlin DSL (`build.gradle.kts`) and Kotlin code.
 
+### Enable Authentication via CLI
+
+Before adding dependencies in your app, make sure you enable the Auth service in your Firebase Project using the Firebase CLI:
+
+```bash
+npx -y firebase-tools@latest init auth
+```
+
+ ---
+
 ### 1. Enable Authentication in the Firebase Console
 
 Before you begin, make sure you have enabled the sign-in providers you want to use in the Firebase Console:

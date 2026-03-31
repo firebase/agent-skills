@@ -1,53 +1,47 @@
-# Adding Firebase to your Android App
-
-This guide walks you through adding Firebase to your Android project using Kotlin DSL (`build.gradle.kts`).
-
-### 1. Register your app in the Firebase Console
-
-1. Go to the [Firebase Console](https://console.firebase.google.com/).
-2. Select your Firebase project.
-3. Click the **Android icon** to add a new app.
-4. Enter your app's package name (e.g., `com.example.myapp`) and follow the workflow.
-5. Download the `google-services.json` file and place it in your app module directory (usually `app/`).
+# 🛠️ Firebase Android Setup Guide
 
 ---
+## 📋 Prerequisites
+Before running these commands, ensure you are authenticated:
+` firebase login` (or `firebase login --no-localhost` on remote servers)
+---
 
-### 2. Configure Gradle Files
+## 1. Create a Firebase Project
+If you haven't already created a project, create a new cloud project with a unique ID:
+` firebase projects:create <UNIQUE_PROJECT_ID> --display-name '<DISPLAY_NAME>'`
+*Example:*
+` firebase projects:create my-cool-app-vguthal-20260330 --display-name 'MyCoolApp'`
+### 2. Register Your Android App
+Link your Android app module (package name) to your project. Notice that the display name is passed as a positional argument at the end:
+` firebase apps:create ANDROID '<APP_DISPLAY_NAME>' --package-name '<PACKAGE_NAME>' --project <PROJECT_ID>`
+*Example:*
+` firebase apps:create ANDROID 'MyApplication' --package-name 'com.example.myapplication' --project my-cool-app-vguthal-2b`
+### 3. Download `google-services.json`
+Fetch the configuration file using the App ID (which is printed in the output of the previous command):
+` firebase apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>`
+*Example output extraction to file:*
+` # (Output must be saved as app/google-services.json)`
+---
+## ✅ Verification Plan
+### Manual Verification
+Validate that the project was created and registered successfully:
+` firebase projects:list`
+` firebase apps:list --project <PROJECT_ID>`
 
-#### Project-level `build.gradle.kts`
-Add the Google Services plugin to your root-level `build.gradle.kts` file:
+---
+## 🤖 AI Automation Workflow
 
-```kotlin
-plugins {
-    // ... other plugins
-    id("com.google.gms.google-services") version "4.4.2" apply false
-}
-```
+If you are working with an AI agent (like Antigravity), you can ask it to automate these steps for you!
 
-#### Module-level (app) `build.gradle.kts`
-Apply the plugin and add the Firebase BOM (Bill of Materials) to manage your Firebase library versions:
+**Usage:** Ask the agent to create the app and pass the display name.
 
-```kotlin
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    // Add the Google services plugin
-    id("com.google.gms.google-services")
-}
+**Example Prompt:**
+"Create a Firebase app for this project. Use your own unique project ID and ask me for the display name."
 
-dependencies {
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0")) // Check for latest version
-
-    // Add the dependency for the Firebase SDKs you want to use
-    // When using the BoM, don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-analytics")
-    
-    // Add other Firebase products as needed (e.g., Auth, Firestore)
-    // implementation("com.google.firebase:firebase-auth")
-}
-```
-
-### Next Steps:
-*   **Sync your project:** In Android Studio, click **"Sync Now"** in the notification bar that appears after file changes.
-*   **Verify Connection:** Run your app to send verification to the Firebase console that you've successfully installed the SDK.
+The agent will:
+1. Generate a unique project ID.
+2. Ask you for the app display name.
+3. Automatically run the CLI commands to:
+    - Create the project.
+    - Register the app.
+    - Download `google-services.json` to the correct location.
