@@ -1,9 +1,5 @@
 # Web SDK Usage
 
-# ⛔️ CRITICAL RULE: PROACTIVE INDEXING ⛔️
-Whenever you write a query that combines an equality filter (`where("x", "==", y)`) with an order-by clause (`orderBy("z")`) or a range filter, you **MUST** proactively generate the required composite index in `firestore.indexes.json` and deploy it. Do NOT wait for the code to run and crash.
-- In Enterprise Native Mode, missing indexes do not throw errors; they cause slow, expensive full-collection scans. You MUST prevent this by generating the index immediately.
-- Read `indexes.md` for the exact JSON template and deployment command.
 
 This guide focuses on the **Modular Web SDK** (v9+), which is tree-shakeable and efficient.
 

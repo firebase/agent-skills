@@ -12,9 +12,6 @@ As of Firebase SDK v11+, all Swift-specific features (including `@DocumentID`, `
 
 This is a zero-tolerance constraint. Using `FirebaseFirestoreSwift` is fundamentally incorrect and unacceptable.
 
-# ⛔️ CRITICAL RULE: PROACTIVE INDEXING ⛔️
-Whenever you write a query that combines an equality filter (`whereField("x", isEqualTo: y)`) with an order-by clause (`order(by: "z")`) or a range filter, you **MUST** proactively generate the required composite index in `firestore.indexes.json` and deploy it. Do NOT wait for the code to run and crash.
-- Read `indexes.md` for the exact JSON template and deployment command.
 
 # ⛔️ CRITICAL RULE: NO INLINE INITIALIZATION ⛔️
 NEVER write `let db = Firestore.firestore()` as an inline class or struct property if there is ANY chance the object is instantiated before `FirebaseApp.configure()` executes in the app root.

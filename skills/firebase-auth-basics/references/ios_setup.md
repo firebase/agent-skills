@@ -29,7 +29,9 @@ handle = Auth.auth().addStateDidChangeListener { auth, user in
 }
 
 // To remove the listener when no longer needed:
-Auth.auth().removeStateDidChangeListener(handle!)
+if let handle = handle {
+  Auth.auth().removeStateDidChangeListener(handle)
+}
 ```
 
 ## 3. Email and Password Authentication (Modern Concurrency)
@@ -62,7 +64,7 @@ do {
   try Auth.auth().signOut()
   print("Successfully signed out")
 } catch let signOutError as NSError {
-  print("Error signing out: %@", signOutError)
+  print("Error signing out: \(signOutError)")
 }
 ```
 

@@ -2,10 +2,13 @@
 
 # ⛔️ CRITICAL RULE: STATE MANAGEMENT (OBSERVATION VS COMBINE) ⛔️
 
-When writing or updating SwiftUI code, you **MUST** use the modern Swift **Observation framework (`@Observable` macro and `@State`)**. 
+When writing or updating SwiftUI code, you **MUST** prioritize the modern Swift **Observation framework (`@Observable` macro and `@State`)** as your default approach.
+ 
+However, it is acceptable to use **Combine** (`ObservableObject`, `@Published`, `@StateObject`, `@EnvironmentObject`) under the following conditions:
+- The user explicitly asks you to use Combine.
+- There are strong signals in the existing codebase that the project is heavily relying on Combine. 
 
-- **Do NOT use Combine** (`ObservableObject`, `@Published`, `@StateObject`, `@EnvironmentObject`) for state management *unless* there are very strong signals in the existing codebase that the project is heavily relying on Combine. 
-- Prioritize modern Swift 5.9+ `@Observable` patterns as the default approach.
+If neither of those conditions are true, default to the Swift 5.9+ Observation framework.
 
 # ⛔️ CRITICAL RULE: INITIALIZATION ORDER ⛔️
 
