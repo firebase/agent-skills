@@ -100,11 +100,14 @@ ref = db.collection("users").addDocument(data: [
 
 When implementing Firestore realtime listeners (`addSnapshotListener`) within a SwiftUI application, you **MUST** tie the listener lifecycle to the view's identity using `.task(id:)`, NOT `.onDisappear`.
 
-However, because `addSnapshotListener` is a synchronous call, if you simply place it inside a `.task`, the task will complete immediately and bypass SwiftUI's cancellation mechanism. To fix this, you must **explicitly suspend the task** and manage the `ListenerRegistration` handle.
+### ⛔️ UNSAFE PATTERN (.onDisappear)
+Presenting a `.sheet` or `.fullScreenCover` can trigger the underlying view's `onDisappear` method. If you stop your listener here, the feed will stop updating while the sheet is open, and won't resume when it's dismissed.
 
-### ✅ SAFE PATTERN (.task with explicit cancellation)
+### ✅ SAFE PATTERN (.task with deinit)
 
-In your `@Observable` view model, bridge the synchronous listener to the async task lifecycle by suspending it indefinitely until SwiftUI cancels the task:
+Because `addSnapshotListener` is a synchronous call, placing it inside a `.task` means the task completes immediately. This breaks SwiftUI's automatic cancellation mechanism. 
+
+To safely manage traditional Firebase listeners in SwiftUI, you must use **`deinit`** to handle memory cleanup when the view is destroyed, and **`.task(id:)`** to handle data identity changes while the view is active.
 
 ```swift
 import SwiftUI
@@ -115,30 +118,48 @@ class DataManager {
     private var listenerHandle: ListenerRegistration?
     var data: [String] = []
     
-    // Make the function async so it can participate in the .task lifecycle
-    func startListening(for userId: String) async {
-        // 1. Clean up any existing listener to prevent duplicates
+    func startListening(for userId: String) {
+        // 1. Clean up any existing listener to prevent duplicates if the ID changes
         stopListening()
         
         // 2. Start the regular listener and capture the handle
         listenerHandle = Firestore.firestore().collection("users").document(userId).addSnapshotListener { snapshot, error in
             // Handle updates
         }
-        
-        // 3. Guarantee cleanup when the task exits
-        defer {
-            stopListening()
-        }
-        
-        // 4. Suspend the task indefinitely to keep it alive.
-        // When SwiftUI cancels the .task (e.g. view dismissed or ID changed),
-        // this sleep will throw a CancellationError and trigger the defer block.
-        try? await Task.sleep(nanoseconds: UInt64.max)
     }
     
     func stopListening() {
         listenerHandle?.remove()
         listenerHandle = nil
+    }
+    
+    // 3. Guarantee cleanup when the View is destroyed and this object is deallocated
+    deinit {
+        stopListening()
+    }
+}
+```
+
+Then, in your SwiftUI View, trigger the listener using `.task(id:)`. 
+
+```swift
+struct MyView: View {
+    @State private var manager = DataManager()
+    @Environment(AuthManager.self) var authManager
+    
+    var body: some View {
+        List(manager.data, id: \.self) { item in
+            Text(item)
+        }
+        // .task(id:) automatically re-runs if the userId changes.
+        // The view model handles stopping the old listener and starting the new one.
+        .task(id: authManager.userId) {
+            if let userId = authManager.userId {
+                manager.startListening(for: userId)
+            } else {
+                manager.stopListening()
+            }
+        }
     }
 }
 ```
