@@ -19,8 +19,8 @@ In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add th
 
 ```kotlin
 dependencies {
-    // Import the BoM (verify latest version)
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    // [AGENT] Fetch the latest available BoM version from Maven Central / Web before adding this
+    implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
     // Add the dependency for the Firebase AI library
     implementation("com.google.firebase:firebase-ai")
@@ -57,6 +57,39 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Response: ${response.text}")
             } catch (e: Exception) {
                 Log.e(TAG, "Error generating content", e)
+            }
+        }
+    }
+}
+```
+
+#### Jetpack Compose (Modern)
+
+Initialize inside a `ComponentActivity` and use `setContent`:
+
+```kotlin
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import kotlinx.coroutines.launch
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val ai = Firebase.ai
+        val model = ai.generativeModel("gemini-2.5-flash-lite")
+        
+        lifecycleScope.launch {
+            val response = model.generateContent("Hello Gemini!")
+            setContent {
+                MaterialTheme {
+                    Text("AI Response: ${response.text}")
+                }
             }
         }
     }
