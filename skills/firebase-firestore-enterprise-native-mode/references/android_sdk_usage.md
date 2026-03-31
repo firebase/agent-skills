@@ -2,6 +2,16 @@
 
 This guide walks you through using the Cloud Firestore SDK in your Android app using Kotlin. The SDK for Firestore Enterprise Native Mode is the same as the standard Cloud Firestore SDK.
 
+### Enable Firestore via CLI
+
+Before adding dependencies in your app, make sure you enable the Firestore service in your Firebase Project using the Firebase CLI:
+
+```bash
+npx -y firebase-tools@latest init firestore
+```
+
+ ---
+ 
 ### 1. Add Dependencies
 
 In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add the dependency for Cloud Firestore:
