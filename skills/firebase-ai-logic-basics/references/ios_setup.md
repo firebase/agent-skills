@@ -23,8 +23,9 @@ Use the `@Observable` pattern to manage AI state and provide a smooth UX with lo
 import SwiftUI
 import FirebaseAILogic
 
+@MainActor
 @Observable
-class AIViewModel {
+final class AIViewModel {
     // Initialize lazily to ensure FirebaseApp is configured first
     private lazy var model = FirebaseAI.firebaseAI().generativeModel(modelName: "gemini-flash-latest")
     
@@ -62,7 +63,7 @@ struct AIView: View {
             if viewModel.isFetching {
                 ProgressView()
             } else if let error = viewModel.errorMessage {
-                Text(error).foregroundColor(.red)
+                Text(error).foregroundStyle(.red)
             } else {
                 ScrollView {
                     Text(viewModel.responseText)

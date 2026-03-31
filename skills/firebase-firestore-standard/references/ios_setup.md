@@ -113,8 +113,9 @@ To safely manage traditional Firebase listeners in SwiftUI, you must use **`dein
 import SwiftUI
 import FirebaseFirestore
 
+@MainActor
 @Observable 
-class DataManager {
+final class DataManager {
     private var listenerHandle: ListenerRegistration?
     var data: [String] = []
     
@@ -134,7 +135,7 @@ class DataManager {
     }
     
     // 3. Guarantee cleanup when the View is destroyed and this object is deallocated
-    deinit {
+    isolated deinit {
         stopListening()
     }
 }
