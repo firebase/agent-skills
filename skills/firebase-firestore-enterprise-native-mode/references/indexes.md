@@ -1,65 +1,111 @@
-# Firestore Enterprise Native Mode Indexes Reference
+# Firestore Indexes Reference
 
-# ⛔️ CRITICAL RULE: FULLY AUTOMATED INDEX MANAGEMENT ⛔️
+Indexes helps to improve query performance. Firestore Enterprise edition does not create any indexes by default. By default, Firestore Enterprise performs a full collection scan to find documents that match a query, which can be slow and expensive for large collections. To avoid this, you can create indexes to optimize your queries.
 
-Firestore Enterprise **does not create any indexes by default**. Without indexes, it performs a full collection scan (slow/expensive). You **MUST** manage all indexes programmatically. **NEVER** ask the user to manually create indexes.
+## Index Structure
 
-If you write a query that needs to be performant, you **MUST** update `firestore.indexes.json` and deploy it immediately.
+An index consists of the following:
 
----
+* a collection ID.
+* a list of fields in the given collection.
+* an order, either ascending or descending, for each field.
 
-## 1. Enterprise-Specific Index Schema
-When adding indexes for Enterprise Native Mode, you MUST include the edition-specific fields: `"density"` and `"unique"`.
+### Index Ordering
 
-### **Standard Dense Index Template**
-```json
-{
-  "collectionGroup": "COLLECTION_NAME",
-  "queryScope": "COLLECTION",
-  "density": "DENSE",
-  "fields": [
-    { "fieldPath": "FIELD_1", "order": "ASCENDING" },
-    { "fieldPath": "FIELD_2", "order": "ASCENDING" }
-  ]
-}
-```
+The order and sort direction of each field uniquely defines the index. For example, the following indexes are two distinct indexes and not interchangeable:
 
-### **Sparse Index Template** (Only indexes documents with these fields)
-```json
-{
-  "collectionGroup": "COLLECTION_NAME",
-  "queryScope": "COLLECTION",
-  "density": "SPARSE_ANY",
-  "fields": [
-    { "fieldPath": "FIELD_1", "order": "ASCENDING" }
-  ]
-}
-```
+* Field name `name` (ascending) and `population` (descending)
+* Field name `name` (descending) and `population` (ascending)
 
-### **Unique Index Template** (Enforces unique values)
-```json
-{
-  "collectionGroup": "COLLECTION_NAME",
-  "queryScope": "COLLECTION",
-  "density": "SPARSE_ANY",
-  "unique": true,
-  "fields": [
-    { "fieldPath": "FIELD_1", "order": "ASCENDING" }
-  ]
-}
-```
+### Index Density
 
-## 2. Query Support Matrix
+Dense indexes: By default, Firestore indexes store data from all documents in a collection. An index entry will be added for a document regardless of whether the document contains any of the fields specified in the index. Non-existent fields are treated as having a NULL value when generating index entries. 
 
-| Query Type | Index Required (Enterprise) |
+Sparse indexes: To change this behavior, you can define the index as a sparse index. A sparse index indexes only the documents in the collection that contain a value (including null) for at least one of the indexed fields. A sparse index reduces storage costs and can improve performance.
+
+### Unique Indexes
+
+You can use unique index option to enforce unique values for the indexed fields. For indexes on multiple fields, each combination of values must be unique across the index. The database rejects any update and insert operations that attempt to create index entries with duplicate values. 
+
+## Query Support Examples
+
+| Query Type | Index Required |
 | :--- | :--- |
-| **Simple Equality** | Single-Field Index on `a` |
-| **Equality + Range/Sort** | **Composite Index** on `a` and `b` |
-| **Multiple Ranges** | **Composite Index** on `a` and `b` |
+| **Simple Equality**<br>`where("a", "==", 1)` | Single-Field Index on field `a` |
+| **Simple Range/Sort**<br>`where("a", ">", 1).orderBy("a")` | Single-Field Index on field `a` |
+| **Multiple Equality**<br>`where("a", "==", 1).where("b", "==", 2)` | Single-Field Index on field `a` and `b` |
+| **Equality + Range/Sort**<br>`where("a", "==", 1).where("b", ">", 2)` | **Composite Index** on field `a` and `b` |
+| **Multiple Ranges**<br>`where("a", ">", 1).where("b", ">", 2)` | **Composite Index** on field `a` and `b` |
+| **Array Contains + Equality**<br>`where("tags", "array-contains", "news").where("active", "==", true)` | **Composite Index** on field `tags` and `active` |
 
----
+If no indexes is present, Firestore Enterprise will perform a full collection scan to find documents that match a query.
 
-## 3. Enterprise Deployment Lifecycle
-1. **Append:** Add the index to `firestore.indexes.json` using the Enterprise-specific schema (Density, Unique).
-2. **Deploy:** `npx -y firebase-tools@latest deploy --only firestore:indexes`.
-3. **Behavior:** Enterprise Edition **will not** throw an error for missing indexes (it defaults to full scan). You **MUST** ensure an index is present to prevent performance degradation and high costs.
+## Management
+
+### Config files
+Your indexes should be defined in `firestore.indexes.json` (pointed to by `firebase.json`).
+
+Define a dense index:
+
+```json
+{
+  "indexes": [
+    {
+      "collectionGroup": "cities",
+      "queryScope": "COLLECTION",
+      "density": "DENSE",
+      "fields": [
+        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "population", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
+```
+
+Define a sparse-any index:
+
+```json
+{
+  "indexes": [
+    {
+      "collectionGroup": "cities",
+      "queryScope": "COLLECTION",
+      "density": "SPARSE_ANY",
+      "fields": [
+        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "population", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
+```
+
+Define a unique index:
+
+```json
+{
+  "indexes": [
+    {
+      "collectionGroup": "cities",
+      "queryScope": "COLLECTION",
+      "density": "SPARSE_ANY",
+      "unique": true,
+      "fields": [
+        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "population", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
+```
+
+### CLI Commands
+
+Deploy indexes only:
+```bash
+npx firebase-tools@latest -y deploy --only firestore:indexes
+```
