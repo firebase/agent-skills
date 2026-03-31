@@ -1,6 +1,5 @@
 # Web SDK Usage
 
-
 This guide focuses on the **Modular Web SDK** (v9+), which is tree-shakeable and efficient.
 
 ### Initialization

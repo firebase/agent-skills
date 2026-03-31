@@ -1,6 +1,5 @@
 # Python SDK Usage
 
-
 The Python Server SDK is used for backend/server environments and utilizes Google Application Default Credentials in most Google Cloud environments.
 
 ### Writing Data
