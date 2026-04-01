@@ -1,27 +1,81 @@
-# Firebase Functions V1 vs V2 Function Mapping
+# Firebase Functions V1 vs V2 Signature Mapping
 
-This reference table maps legacy V1 functions to their modern V2 equivalents. Use this table to find the correct V2 function names when migrating.
+This reference maps legacy V1 functions to their modern V2 equivalents. It includes the **Shimmed Parameter Key** you should use when destructuring the V2 event object to preserve V1 business logic.
 
-| Category | V1 Function | V2 Function | Status | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| **Auth** | `auth.user().beforeSignIn()` | `identity.beforeUserSignedIn()` | **Available** | Renamed to `beforeUserSignedIn`. |
-| **Auth** | `auth.user().beforeCreate()` | `identity.beforeUserCreated()` | **Available** | |
-| **Auth** | `auth.user().beforeEmail()` | `identity.beforeEmailSent()` | **Available** | Renamed to `beforeEmailSent`. |
-| **Auth** | `auth.user().beforeSms()` | `identity.beforeSmsSent()` | **Available** | |
-| **Database** | `database.ref().onWrite()` | `database.onValueWritten()` | **Available** | |
-| **Database** | `database.ref().onCreate()` | `database.onValueCreated()` | **Available** | |
-| **Database** | `database.ref().onUpdate()` | `database.onValueUpdated()` | **Available** | |
-| **Database** | `database.ref().onDelete()` | `database.onValueDeleted()` | **Available** | |
-| **Firestore** | `firestore.document().onWrite()` | `firestore.onDocumentWritten()` | **Available** | |
-| **Firestore** | `firestore.document().onCreate()` | `firestore.onDocumentCreated()` | **Available** | |
-| **Firestore** | `firestore.document().onUpdate()` | `firestore.onDocumentUpdated()` | **Available** | |
-| **Firestore** | `firestore.document().onDelete()` | `firestore.onDocumentDeleted()` | **Available** | |
-| **Pub/Sub** | `pubsub.topic().onPublish()` | `pubsub.onMessagePublished()` | **Available** | |
-| **Pub/Sub** | `pubsub.schedule().onRun()` | `scheduler.onSchedule()` | **Available** | Moved to `scheduler` namespace. |
-| **Storage** | `storage.object().onArchive()` | `storage.onObjectArchived()` | **Available** | |
-| **Storage** | `storage.object().onDelete()` | `storage.onObjectDeleted()` | **Available** | |
-| **Storage** | `storage.object().onFinalize()` | `storage.onObjectFinalized()` | **Available** | |
-| **Storage** | `storage.object().onMetadataUpdate()` | `storage.onObjectMetadataUpdated()` | **Available** | |
-| **HTTPS** | `https.onRequest()` | `https.onRequest()` | **Both** | Same name, different module. |
-| **HTTPS** | `https.onCall()` | `https.onCall()` | **Both** | Different parameter type (`CallableRequest`). |
-| **Tasks** | `tasks.taskQueue().onDispatch()` | `tasks.onTaskDispatched()` | **Available** | |
+---
+
+## 🔥 Cloud Firestore
+
+| V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
+| :--- | :--- | :--- | :--- |
+| `firestore.document().onWrite()` | `onDocumentWritten()` | `change` | `({ change, context })` |
+| `firestore.document().onCreate()` | `onDocumentCreated()` | `snapshot` | `({ snapshot, context })` |
+| `firestore.document().onUpdate()` | `onDocumentUpdated()` | `change` | `({ change, context })` |
+| `firestore.document().onDelete()` | `onDocumentDeleted()` | `snapshot` | `({ snapshot, context })` |
+
+---
+
+## 📨 Cloud Pub/Sub
+
+| V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
+| :--- | :--- | :--- | :--- |
+| `pubsub.topic().onPublish()` | `onMessagePublished()` | `message` | `({ message, context })` |
+| `pubsub.schedule().onRun()` | `scheduler.onSchedule()` | **N/A** | Access `event` directly |
+
+> [!NOTE]
+> Scheduled functions moved from the `pubsub` namespace to the `scheduler` namespace in V2.
+
+---
+
+## 💾 Realtime Database
+
+| V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
+| :--- | :--- | :--- | :--- |
+| `database.ref().onWrite()` | `onValueWritten()` | `change` | `({ change, context })` |
+| `database.ref().onCreate()` | `onValueCreated()` | `snapshot` | `({ snapshot, context })` |
+| `database.ref().onUpdate()` | `onValueUpdated()` | `change` | `({ change, context })` |
+| `database.ref().onDelete()` | `onValueDeleted()` | `snapshot` | `({ snapshot, context })` |
+
+---
+
+## 🗄️ Cloud Storage
+
+| V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
+| :--- | :--- | :--- | :--- |
+| `storage.object().onArchive()` | `onObjectArchived()` | `object` | `({ object, context })` |
+| `storage.object().onDelete()` | `onObjectDeleted()` | `object` | `({ object, context })` |
+| `storage.object().onFinalize()` | `onObjectFinalized()` | `object` | `({ object, context })` |
+| `storage.object().onMetadataUpdate()` | `onObjectMetadataUpdated()` | `object` | `({ object, context })` |
+
+---
+
+## 🌐 HTTP / Callables
+
+| V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
+| :--- | :--- | :--- | :--- |
+| `https.onRequest()` | `https.onRequest()` | **N/A** | Standard Express `(req, res)` |
+| `https.onCall()` | `https.onCall()` | **N/A** | Destructure `({ data, auth })` |
+
+> [!IMPORTANT]
+> **HTTP Callables do NOT use the Destructuring Shim.** 
+> In V2, the handler receives a single `CallableRequest` object (not a `CloudEvent`). You should destructure properties like `data`, `auth`, and `app` directly from it. The traditional `context` object is **unavailable**.
+
+---
+
+## 🔑 Auth (Blocking)
+
+| V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
+| :--- | :--- | :--- | :--- |
+| `auth.user().beforeSignIn()` | `identity.beforeUserSignedIn()` | **N/A** | Access `event` directly |
+| `auth.user().beforeCreate()` | `identity.beforeUserCreated()` | **N/A** | Access `event` directly |
+
+> [!NOTE]
+> Auth Blocking triggers moved to the `identity` namespace in V2.
+
+---
+
+## ⏰ Cloud Tasks
+
+| V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
+| :--- | :--- | :--- | :--- |
+| `tasks.taskQueue().onDispatch()` | `tasks.onTaskDispatched()` | **N/A** | Access `event` directly |
