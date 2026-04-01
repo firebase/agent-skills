@@ -2,7 +2,7 @@
 
 ## Manual Initialization
 
-Initialize the following firebase configuration files manually. Do not use `firebase init`, as it expects interactive inputs.
+Initialize the following firebase configuration files manually. Do not use `npx -y firebase-tools@latest init`, as it expects interactive inputs.
 
 1.  **Create a Firestore Enterprise Database**: Create a Firestore Enterprise database using the Firebase CLI.
 2.  **Create `firebase.json`**: This file contains database configuration for the Firebase CLI.
@@ -33,8 +33,6 @@ firebase firestore:databases:create my-database-id \
 ```
 
 ### 2. Create `firebase.json`
-
-Run `firebase init firestore` to create `firebase.json` with firestore configuration you defined in step 1.
 
 Create a file named `firebase.json` in your project root with the following content. If this file already exists, instead append to the existing JSON:
 

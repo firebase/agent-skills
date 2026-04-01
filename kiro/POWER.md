@@ -17,17 +17,16 @@ Before using the Firebase MCP server, ensure Node.js and the Firebase CLI are in
   - Install if needed: Download from [nodejs.org](https://nodejs.org/) (LTS version recommended)
 
 - **Firebase CLI**: Required for managing Firebase projects and services
-  - Check installation: `firebase --version`
-  - Install if needed: `npm install -g firebase-tools`
+  - Check installation: `npx -y firebase-tools@latest --version`
   - **CRITICAL**: If the Firebase CLI is not installed, DO NOT proceed with Firebase setup.
   
 - **Authentication**: Sign in to Firebase
-  - Check current user: `firebase login:list`
-  - If not signed in, run: `firebase login` (this will open a browser for Google Account authentication)
+  - Check current user: `npx -y firebase-tools@latest login:list`
+  - If not signed in, run: `npx -y firebase-tools@latest login` (this will open a browser for Google Account authentication)
 
 - **Check Projects**: Verify project access and connectivity
-  - Run `firebase projects:list` to check for available Firebase projects
-  - Use this to verify that the CLI is correctly authenticated and can reach the Firebase API; if this fails, try to reconnect using `firebase login`
+  - Run `npx -y firebase-tools@latest projects:list` to check for available Firebase projects
+  - Use this to verify that the CLI is correctly authenticated and can reach the Firebase API; if this fails, try to reconnect using `npx -y firebase-tools@latest login`
 
 - **Verify MCP Connection**: Ensure the MCP server is connected after authentication
   - Use the `firebase_get_environment` tool to check connection status
