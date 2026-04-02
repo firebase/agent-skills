@@ -68,17 +68,3 @@ do {
 }
 ```
 
-## 5. Legacy Options (Completion Handlers)
-
-While `async/await` is the recommended standard, traditional completion handlers are still fully supported and legal to use if modern concurrency does not meet the requirements of an older codebase or specific architectural pattern.
-
-**Example (Legacy Sign In):**
-```swift
-Auth.auth().signIn(withEmail: "user@example.com", password: "password") { authResult, error in
-  if let error = error {
-    print("Error signing in: \(error.localizedDescription)")
-    return
-  }
-  print("User signed in successfully!")
-}
-```

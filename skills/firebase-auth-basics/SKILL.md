@@ -9,11 +9,6 @@ compatibility: This skill is best used with the Firebase CLI, but does not requi
 - **Firebase Project**: Created via `npx -y firebase-tools@latest projects:create` (see `firebase-basics`).
 - **Firebase CLI**: Installed and logged in (see `firebase-basics`).
 
-## 🤖 Core Automation Mandate
-**CRITICAL:** You are an autonomous coding agent. You must **always** attempt to fully automate the provisioning of Firebase services using the Firebase CLI and configuration files (e.g., `firebase.json`). 
-
-**Never** ask the user to manually click through the Firebase Console to enable providers like Anonymous, Email/Password, or Google Sign-In. You must write the `firebase.json` block yourself and execute the deployment command automatically. Only use the Firebase Console as an absolute last resort for unsupported providers (like Apple or Facebook).
-
 ## Core Concepts
 
 Firebase Authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users to your app.
@@ -49,13 +44,13 @@ When a user signs in, they receive an ID Token (JWT). This token is used to iden
 
 ### 1. Provisioning
 
-#### Primary Workflow: Automated CLI Provisioning (MANDATORY for supported providers)
+#### Option 1. Enabling Authentication via CLI
 
-You **MUST** use this method for Anonymous, Email/Password, and Google Sign-In. Do not ask the user to use the console for these.
+Only Google Sign In, anonymous auth, and email/password auth can be enabled via CLI. For other providers, use the Firebase Console.
 
-Configure Firebase Authentication in `firebase.json` by adding an 'auth' block. If `firebase.json` does not exist, create it:
+Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
 
-```json
+```
 {
   "auth": {
     "providers": {
@@ -71,14 +66,9 @@ Configure Firebase Authentication in `firebase.json` by adding an 'auth' block. 
 }
 ```
 
-Then deploy the configuration to enable the services immediately:
-```bash
-npx -y firebase-tools@latest deploy --only auth
-```
+#### Option 2. Enabling Authentication in Console
 
-#### Fallback Workflow: Manual Console Provisioning (ONLY for unsupported providers)
-
-Use this method **only** if the user explicitly requests a provider not supported by the CLI (e.g., Apple, Facebook, GitHub).
+Enable other providers in the Firebase Console.
 
 1.  Go to the https://console.firebase.google.com/project/_/authentication/providers
 2.  Select your project.
@@ -88,9 +78,6 @@ Use this method **only** if the user explicitly requests a provider not supporte
 
 **Web**
 See [references/client_sdk_web.md](references/client_sdk_web.md).
-
-**iOS**
-See [references/ios_setup.md](references/ios_setup.md).
 
 ### 3. Security Rules
 

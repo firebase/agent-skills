@@ -21,10 +21,7 @@ For guidance on writing and deploying Firestore Security Rules to protect your d
 To learn how to use Cloud Firestore in your application code, choose your platform:
 
 *   **Web (Modular SDK)**: [web_sdk_usage.md](references/web_sdk_usage.md)
-*   **iOS**: [ios_setup.md](references/ios_setup.md)
 
 ## Indexes
-
-When writing complex queries using the SDK, **anticipate** the need for composite indexes (e.g., combining `==` on one field with `orderBy` on another) and proactively generate the `firestore.indexes.json` file. 
 
 For checking index types, query support tables, and best practices, see [indexes.md](references/indexes.md).

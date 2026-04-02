@@ -12,7 +12,7 @@ You will be prompted to:
 2. Enter a **display name**.
 
 ## 2. Register Platform-Specific Apps
-A Firebase Project is just a container. To actually use Firebase in code, you must register a platform-specific "App" (iOS, Android, or Web) within the project and download its configuration file.
+A Firebase Project is just a container. To actually use Firebase in code, you must register a platform-specific "App" (iOS, Android, or Web) within the Firebase project and download its configuration file so that it can be added to the codebase.
 
 **Generic App Creation Command:**
 ```bash

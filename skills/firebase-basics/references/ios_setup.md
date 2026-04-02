@@ -23,9 +23,10 @@ Failing to follow this will result in a fatal crash: `Default FirebaseApp is not
 Do not use the Firebase Console. Use the CLI to automate setup:
 
 1. Create the project: `npx -y firebase-tools@latest projects:create`
-2. Register the iOS app: `npx -y firebase-tools@latest apps:create IOS <bundle-id>`
-3. Fetch the config: `npx -y firebase-tools@latest apps:sdkconfig IOS <App-ID>`
-4. Save the output as `GoogleService-Info.plist` in your Xcode project folder. Ensure you remove any non-XML CLI output headers.
+2. Action: Read the Xcode project (`.pbxproj` or `Info.plist`) to determine the iOS bundle ID.
+3. Register the iOS app: `npx -y firebase-tools@latest apps:create IOS <bundle-id>`
+4. Fetch the config: `npx -y firebase-tools@latest apps:sdkconfig IOS <App-ID>`
+5. Save the output as `GoogleService-Info.plist` in your Xcode project folder. Ensure you remove any non-XML CLI output headers, and ensure the file is linked to the main application target.
 
 ## 2. Installation (Automated via Swift Package Manager CLI)
 Do not use raw text parsing, sed, or Ruby scripts (like `xcodeproj` gem) to modify `.pbxproj` files directly.

@@ -90,8 +90,27 @@ let model = FirebaseAI.firebaseAI().generativeModel(
 )
 ```
 
-## 4. Function Calling (Tools)
-Define functions that the model can request to execute to interact with external systems.
+## 4. Chat Session (Multi-turn)
+Chat sessions persist state across multiple interactions, which is essential for ongoing conversations or when using tools like function calling.
+
+```swift
+let chat = model.startChat()
+
+Task {
+    do {
+        let response1 = try await chat.sendMessage("Hello! I have two dogs in my house.")
+        print(response1.text ?? "")
+
+        let response2 = try await chat.sendMessage("How many paws are in my house?")
+        print(response2.text ?? "")
+    } catch {
+        print("Error in chat: \(error)")
+    }
+}
+```
+
+## 5. Function Calling (Tools)
+Define functions that the model can request to execute to interact with external systems. *Note: Advanced workflows like function calling generally require a multi-turn Chat Session to handle the back-and-forth execution.*
 
 ```swift
 let getStockPriceTool = Tool(functionDeclarations: [
@@ -112,27 +131,11 @@ let model = FirebaseAI.firebaseAI().generativeModel(
   tools: [getStockPriceTool]
 )
 
-// In your task:
-let response = try await model.generateContent("What is the stock price of Apple?")
+// In your task (using a chat session):
+let chat = model.startChat()
+let response = try await chat.sendMessage("What is the stock price of Apple?")
 if let functionCall = response.functionCalls.first {
     // Handle the function call (e.g. call a local API and send the result back)
     print("Model requested function: \(functionCall.name) with args: \(functionCall.args)")
-}
-```
-
-## 5. Chat Session (Multi-turn)
-```swift
-let chat = model.startChat()
-
-Task {
-    do {
-        let response1 = try await chat.sendMessage("Hello! I have two dogs in my house.")
-        print(response1.text ?? "")
-
-        let response2 = try await chat.sendMessage("How many paws are in my house?")
-        print(response2.text ?? "")
-    } catch {
-        print("Error in chat: \(error)")
-    }
 }
 ```
