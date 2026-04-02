@@ -75,28 +75,7 @@ do {
 }
 ```
 
-## 5. Legacy Options (Dictionaries & Completion Handlers)
-
-While type-safe models (`Codable`) and modern concurrency (`async/await`) are strongly recommended, writing or reading raw dictionaries (`[String: Any]`) and using completion handlers is completely legal. Use these legacy options if `Codable` does not meet the requirements of a specific architectural pattern or when working within an older codebase.
-
-**Example (Legacy Dictionary Write):**
-```swift
-var ref: DocumentReference? = nil
-ref = db.collection("users").addDocument(data: [
-    "first": "Ada",
-    "last": "Lovelace",
-    "born": 1815
-]) { err in
-    if let err = err {
-        print("Error adding document: \(err)")
-    } else {
-        guard let ref = ref else { return }
-        print("Document added with ID: \(ref.documentID)")
-    }
-}
-```
-
-## 6. Realtime Listeners in SwiftUI (Lifecycle Best Practices)
+## 5. Realtime Listeners in SwiftUI (Lifecycle Best Practices)
 
 When implementing Firestore realtime listeners (`addSnapshotListener`) within a SwiftUI application, you **MUST** tie the listener lifecycle to the view's identity using `.task(id:)`, NOT `.onDisappear`.
 

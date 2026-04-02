@@ -90,7 +90,9 @@ let model = FirebaseAI.firebaseAI().generativeModel(
 )
 ```
 
-## 4. Chat Session (Multi-turn)
+# Advanced Features
+
+### Chat Session (Multi-turn)
 Chat sessions persist state across multiple interactions, which is essential for ongoing conversations or when using tools like function calling.
 
 ```swift
@@ -109,7 +111,7 @@ Task {
 }
 ```
 
-## 5. Function Calling (Tools)
+### Function Calling (Tools)
 Define functions that the model can request to execute to interact with external systems. *Note: Advanced workflows like function calling generally require a multi-turn Chat Session to handle the back-and-forth execution.*
 
 ```swift
