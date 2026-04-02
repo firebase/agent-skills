@@ -1,6 +1,6 @@
 ---
 name: firebase-basics
-description: Core principles, workflow, and maintenance for using Firebase. Use this for all Firebase CLI tasks, building, service setup, and REFRESHING or UPDATING an existing environment. Make sure to ALWAYS use this skill whenever you are trying to use Firebase, even if not explicitly asked.
+description: The definitive, foundational skill for ANY Firebase task. Make sure to ALWAYS use this skill whenever the user mentions or interacts with Firebase, even if they do not explicitly ask for it. This skill covers everything from the bare minimum INITIAL setup (Node.js setup, Firebase CLI installation, first-time login) to ongoing operations (core principles, workflows, building, service setup, executing Firebase CLI commands, troubleshooting, refreshing, or updating an existing environment).
 ---
 # Prerequisites
 
@@ -9,7 +9,7 @@ Please complete these setup steps before proceeding, and remember your progress 
 1. **Local Environment Setup:** Verify the environment is properly set up so we can use Firebase tools:
    - Run `npx -y firebase-tools@latest --version` to check if the Firebase CLI is installed.
    - Verify if the Firebase MCP server is installed using your existing tools.
-   - If either of these checks fails, please use the `firebase-local-env-setup` skill to get the environment ready.
+   - If either of these checks fails, please review [references/local-env-setup.md](references/local-env-setup.md) to get the environment ready.
 
 2. **Authentication:**
    Ensure you are logged in to Firebase so that commands have the correct permissions. Run `npx -y firebase-tools@latest login`. For environments without a browser (e.g., remote shells), use `npx -y firebase-tools@latest login --no-localhost`.
@@ -45,7 +45,9 @@ Please adhere to these principles when working with Firebase, as they ensure rel
 
 - **Initialize Firebase:** See [references/firebase-service-init.md](references/firebase-service-init.md) when you need to initialize new Firebase services using the CLI.
 - **Exploring Commands:** See [references/firebase-cli-guide.md](references/firebase-cli-guide.md) to discover and understand CLI functionality.
-- **SDK Setup:** For detailed guides on adding Firebase to a web app, see [references/web_setup.md](references/web_setup.md), or for an **Android app**, see [references/android_setup.md](references/android_setup.md).
+- **SDK Setup:** For detailed guides on adding Firebase to your app:
+  - **Web**: See [references/web_setup.md](references/web_setup.md)
+  - **Android**: See [references/android_setup.md](references/android_setup.md)
 
 # Common Issues
 
