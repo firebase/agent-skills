@@ -1,6 +1,5 @@
-# Creating a Project and App
+# Creating a Project
 
-## 1. Create a Firebase Project
 To create a new Firebase project from the CLI:
 
 ```bash

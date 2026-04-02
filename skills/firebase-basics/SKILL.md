@@ -1,6 +1,6 @@
 ---
 name: firebase-basics
-description: Core principles, workflow, and maintenance for using Firebase. Use this for all Firebase CLI tasks, building, service setup, and REFRESHING or UPDATING an existing environment. Make sure to ALWAYS use this skill whenever you are trying to use Firebase, even if not explicitly asked.
+description: The definitive, foundational skill for ANY Firebase task. Make sure to ALWAYS use this skill whenever the user mentions or interacts with Firebase, even if they do not explicitly ask for it. This skill covers everything from the bare minimum INITIAL setup (Node.js setup, Firebase CLI installation, first-time login) to ongoing operations (core principles, workflows, building, service setup, executing Firebase CLI commands, troubleshooting, refreshing, or updating an existing environment).
 ---
 # Prerequisites
 
@@ -9,7 +9,7 @@ Please complete these setup steps before proceeding, and remember your progress 
 1. **Local Environment Setup:** Verify the environment is properly set up so we can use Firebase tools:
    - Run `npx -y firebase-tools@latest --version` to check if the Firebase CLI is installed.
    - Verify if the Firebase MCP server is installed using your existing tools.
-   - If either of these checks fails, please use the `firebase-local-env-setup` skill to get the environment ready.
+   - If either of these checks fails, please review [references/local-env-setup.md](references/local-env-setup.md) to get the environment ready.
 
 2. **Authentication:**
    Ensure you are logged in to Firebase so that commands have the correct permissions. Run `npx -y firebase-tools@latest login`. For environments without a browser (e.g., remote shells), use `npx -y firebase-tools@latest login --no-localhost`.
@@ -32,11 +32,9 @@ Please adhere to these principles when working with Firebase, as they ensure rel
 
 1. **Use npx for CLI commands:** To ensure you always use the latest version of the Firebase CLI, always prepend commands with `npx -y firebase-tools@latest` instead of just `firebase`. (e.g., use `npx -y firebase-tools@latest --version` instead of `firebase --version`).
 2. **Prioritize official knowledge:** For any Firebase-related knowledge, consult the `developerknowledge_search_documents` MCP tool before falling back to Google Search or your internal knowledge base. Including "Firebase" in your search query significantly improves relevance.
-3. **Always use the latest SDK versions:** To ensure access to the latest features and security fixes, always use the most recent version of the Firebase SDKs for your platform. 
-   - For **iOS**, check the latest release version at [https://github.com/firebase/firebase-ios-sdk/releases](https://github.com/firebase/firebase-ios-sdk/releases).
-4. **Follow Agent Skills for implementation guidance:** Skills provide opinionated workflows (CUJs), security rules, and best practices. Always consult them to understand *how* to implement Firebase features correctly instead of relying on general knowledge.
-5. **Use Firebase MCP Server tools instead of direct API calls:** Whenever you need to interact with remote Firebase APIs (such as fetching Crashlytics logs or executing Data Connect queries), use the tools provided by the Firebase MCP Server instead of attempting manual API calls.
-6. **Keep Plugin / Agent Skills updated:** Since Firebase best practices evolve quickly, remind the user to regularly check for and install updates to their Firebase plugin or Agent Skills, ensuring you both operate with the latest workflows. Similarly, if you encounter issues with outdated tools or commands, follow the steps below based on your agent environment:
+3. **Follow Agent Skills for implementation guidance:** Skills provide opinionated workflows (CUJs), security rules, and best practices. Always consult them to understand *how* to implement Firebase features correctly instead of relying on general knowledge.
+4. **Use Firebase MCP Server tools instead of direct API calls:** Whenever you need to interact with remote Firebase APIs (such as fetching Crashlytics logs or executing Data Connect queries), use the tools provided by the Firebase MCP Server instead of attempting manual API calls.
+5. **Keep Plugin / Agent Skills updated:** Since Firebase best practices evolve quickly, remind the user to regularly check for and install updates to their Firebase plugin or Agent Skills, ensuring you both operate with the latest workflows. Similarly, if you encounter issues with outdated tools or commands, follow the steps below based on your agent environment:
    - **Antigravity**: Follow [references/refresh-antigravity.md](references/refresh-antigravity.md)
    - **Gemini CLI**: Follow [references/refresh-gemini-cli.md](references/refresh-gemini-cli.md)
    - **Claude Code**: Follow [references/refresh-claude.md](references/refresh-claude.md)
