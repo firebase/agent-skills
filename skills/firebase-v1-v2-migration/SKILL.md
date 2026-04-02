@@ -2,6 +2,17 @@
 name: firebase-v1-v2-migration
 description: Use this skill when a user wants to upgrade their legacy Firebase Functions from V1 (GCF 1st Gen) to V2 (GCF 2nd Gen) safely without rewriting their internal business logic. This skill relies on the Destructuring Compatibility Shim.
 ---
+# 🚀 Supported Migration Strategies
+
+This skill currently supports the **In-Place Migration** strategy.
+
+### 🚜 In-Place Migration (Standard)
+The agent modifies the existing V1 code file directly to use V2 syntax and overwrites the deployment slot.
+*   **Pros**: Fast, simple, clean repository history.
+*   **Cons**: No safety net during deployment. If the V2 deployment fails, you must rollback using Git.
+
+*Note: For complex or zero-downtime migrations (e.g. Side-by-Side deployment), refer to external orchestration skills.*
+
 # Prerequisites
 Please ensure the workspace is ready for V2 before attempting a code migration:
 1.  **Configuration Check**: Ensure the workspace has transitioned away from functions.config() to Parameterized Configuration or standard environment variables.
@@ -51,6 +62,15 @@ After making any migration edits, immediately run the following verification ste
 > **Crucial**: The key name in the test mock must match the specific **Shimmed Key** for that trigger (e.g., `change` for `onDocumentWritten`, `snapshot` for `onDocumentCreated`, `message` for PubSub, or `object` for Storage). 
 >
 > Example: `myFn({ change: mockChange, context: mockContext })` or `myFn({ message: mockMessage, context: mockContext })`. See [signature-mapping.md](references/signature-mapping.md) for the exact keys.
+
+# 💸 Performance & Cost Considerations
+
+In Firebase Functions V2, you can handle multiple requests concurrently per instance (up to 1,000 requests, default 80 if CPU >= 1). However, enabling concurrency requires assigning at least 1 full CPU.
+
+*   **V1 Cost Parity**: If you want to keep V1 fractional CPU pricing (and disable concurrency), you must explicitly set `cpu: "gcf_gen1"`.
+*   **Modernization**: If you want to take advantage of Concurrency, you must assign at least 1 CPU.
+
+See [configuration-migration.md](references/configuration-migration.md) for how to set these options.
 
 # References
 - **Deep Dive into Shims**: See the architectural choices for the shim in [destructuring-shim.md](references/destructuring-shim.md).
