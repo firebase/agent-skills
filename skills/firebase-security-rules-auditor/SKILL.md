@@ -32,4 +32,16 @@ The admin bootstrapping process is limited in this app. If the rules use a singl
 - **4 (Minor):** Problems that result in self-data corruption like update bypasses that only impact the user's own data, lack of size limits, missing minor type checks or over-permissive read access on non-sensitive fields.
 - **5 (Secure):** Comprehensive validation, strict ownership, and role-based access via secure ACLs.
 
-Return your assessment in JSON format.
+Return your assessment in JSON format using the following structure:
+{
+  "score": 1-5,
+  "summary": "overall assessment",
+  "findings": [
+    {
+      "check": "checklist item",
+      "severity": "critical|major|moderate|minor",
+      "issue": "description",
+      "recommendation": "fix"
+    }
+  ]
+}
