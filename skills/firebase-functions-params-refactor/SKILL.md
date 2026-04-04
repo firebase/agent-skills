@@ -18,7 +18,7 @@ Activate this skill when:
 2. You detect `functions.config()` usage in the code snippet.
 
 # Follow up
-This skill refactors the code but does not move data from Remote Config to .env files and Cloud Secret Manager. That skill is firebase-functions-params-migration and should be run after this skill. This is a separate skill so it can be run across multiple
+This skill refactors the code but does not move data from functions.config() to .env files and Cloud Secret Manager. That skill is firebase-functions-params-data-migration and should be run after this skill. This is a separate skill so it can be run across multiple
 projects.
 
 ## Rules & Constraints
