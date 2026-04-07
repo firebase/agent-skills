@@ -1,6 +1,6 @@
 ---
 name: firebase-security-rules-auditor
-description: A skill to evaluate and score Firebase security rules based on specific criteria. Use this when firestore security rules are updated so that the generated rules are extremely secure and robust.
+description: A skill to evaluate how secure Firestore security rules are. Use this when Firestore security rules are updated to ensure that the generated rules are extremely secure and robust.
 ---
 
 # Overview
