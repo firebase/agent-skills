@@ -1,11 +1,12 @@
 ---
 name: firebase
-description: Manages Firebase projects, apps, and services including Firestore, Authentication, Hosting, and Cloud Functions. Use this skill when the user asks to manage Firebase resources or implement mobile/web backend features.
+description: Use this skill whenever you are working on a project that uses Firebase products or services.
 ---
 
 
 ## Quick Start
 
+  The best way to use Firebase is with the full set of [Agent Skills for Firebase](https://github.com/firebase/agent-skills). These skills provide detailed guides on Firebase best practices and how to use different Firebase products and tools. For example, these skills help with creating and setting up a Firebase project, getting started with the client-side SDKs, and setting up and using Firebase products (like Firebase Authentication, Firestore, and Firebase AI Logic).
 
 1.  **Ensure NPM is installed.**
 
@@ -24,11 +25,16 @@ description: Manages Firebase projects, apps, and services including Firestore, 
 
 2.  **Install Agent Skills for Firebase.**
 
+    First, check if Agent Skills for Firebase are already installed by comapring the output of the following 2 commands:
+    ```bash
+    ## List the available skills for Firebase
+    npx -y skills search firebase/agent-skills
 
-    These skills provide detailed guides on Firebase best practices and how to use different Firebase products and tools. For example, these skills help with creating and setting up a Firebase project, getting started with the client-side SDKs, and setting up and using Firebase products (like Firebase Authentication, Firestore, and Firebase AI Logic).
-
-
-    Run this command:
+    ## List the currently locally installed skills
+    npx -y skills list
+    ```
+    - If the skills are already installed locally, you can skip to step 3.
+    - If not, install them by running this command:
 
 
     ```bash
