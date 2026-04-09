@@ -45,7 +45,8 @@ Please adhere to these principles when working with Firebase, as they ensure rel
 
 - **Initialize Firebase:** See [references/firebase-service-init.md](references/firebase-service-init.md) when you need to initialize new Firebase services using the CLI.
 - **Exploring Commands:** See [references/firebase-cli-guide.md](references/firebase-cli-guide.md) to discover and understand CLI functionality.
-- **SDK Setup:** For detailed guides on adding Firebase to a web app, see [references/web_setup.md](references/web_setup.md).
+- **Web SDK Setup:** For detailed guides on adding Firebase to a web app, see [references/web_setup.md](references/web_setup.md).
+- **Flutter Setup:** For detailed guides on adding Firebase to a Flutter app, see [references/flutter_setup.md](references/flutter_setup.md).
 
 # Common Issues
 
