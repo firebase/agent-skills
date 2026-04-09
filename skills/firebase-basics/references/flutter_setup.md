@@ -89,7 +89,7 @@ When creating a new project, developers often change the bundle identifier (iOS)
 
 ### 2. Platform-Specific Build Requirements
 - **Android**: Adding Firebase often requires a higher `minSdkVersion` (commonly `21` or `23`) than the platform default. Be prepared to update `android/app/build.gradle` automatically when installing certain plugins.
-- **iOS**: Always run `pod install` inside the `/ios` directory whenever native services (like `cloud_firestore`) are added. Failing to do this will cause Xcode build errors.
+- **iOS**: Always check if there is a `Podfile` in the `/ios` directory whenever native services (like `cloud_firestore`) are added. If there is, run `pod install`. Failing to do this will cause Xcode build errors. Note that Flutter is moving towards Swift Package Manager (SPM), and FlutterFire supports SPM, so a `Podfile` may not exist if the project only uses SPM dependencies.
 
 ### 3. Web CORS Best Practices
 When testing Firebase features locally on Chrome, requests to Google servers can sometimes get blocked by CORS policies. Avoid relying on `--disable-web-security` flags as it promotes bad security practices. Instead, run the app on localhost with a specific port, and ensure `localhost` is added to your Firebase Auth "Authorized Domains".
