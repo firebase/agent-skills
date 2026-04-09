@@ -33,13 +33,24 @@ cd my_awesome_app
 ```
 
 ## Step 2: Configure Firebase
-Run the `flutterfire configure` command from the root of your Flutter project. This tool automates:
+> [!IMPORTANT]
+> **For Agents:** Before running the configuration command, you MUST pause and ask the developer if they prefer to:
+> 1. Create a new Firebase project, or
+> 2. Provide an existing Firebase Project ID.
+
+- If the developer provides an existing Project ID, run:
+  ```bash
+  flutterfire configure --project=<project_id>
+  ```
+- If the developer prefers to create a new project interactively, run:
+  ```bash
+  flutterfire configure
+  ```
+
+This tool automates:
 - Registering your apps (iOS, Android, Web, etc.) with a Firebase project.
 - Generating the `lib/firebase_options.dart` file.
 
-```bash
-flutterfire configure
-```
 
 ## Step 3: Initialize Firebase in Code
 Add the `firebase_core` package and initialize it in your `main.dart`.
