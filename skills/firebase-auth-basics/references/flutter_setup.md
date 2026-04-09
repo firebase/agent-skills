@@ -33,3 +33,66 @@ When integrating Firebase Authentication and Google Sign-In into Flutter apps ta
 
 When querying data via `FirebaseFirestore.instance`, using `.where('userId', isEqualTo: uid)` combined with a sort on a different field like `.orderBy('createdAt', descending: true)` mandates a custom composite index. 
 - **Quick Alternative**: During local development, you can avoid defining indexes by pulling the data using only `.where()` and applying the `.sort()` operation client-side on the resulting `List` in Dart.
+
+## 5. Robust `AuthService` Boilerplate
+Here is a comprehensive `AuthService` implementation that properly handles the initialization and platform differences between Flutter Web and Mobile:
+
+```dart
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  AuthService() {
+    if (!kIsWeb) {
+      GoogleSignIn.instance.initialize();
+    }
+  }
+
+  // Stream to listen to auth state changes
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Get current user
+  User? get currentUser => _auth.currentUser;
+
+  // Google Sign-In
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      if (kIsWeb) {
+        // Web uses popup to avoid DWDS hangs and manual client ID config
+        GoogleAuthProvider authProvider = GoogleAuthProvider();
+        return await _auth.signInWithPopup(authProvider);
+      } else {
+        // Mobile uses standard flow
+        final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
+        if (googleUser == null) return null; // Cancelled
+
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+        );
+        
+        return await _auth.signInWithCredential(credential);
+      }
+    } catch (e) {
+      print("Error during Google Sign-In: \$e");
+      return null;
+    }
+  }
+
+  // Sign out
+  Future<void> signOut() async {
+    try {
+      if (!kIsWeb) {
+        await GoogleSignIn.instance.signOut();
+      }
+      await _auth.signOut();
+    } catch (e) {
+      print("Error signing out: \$e");
+    }
+  }
+}
+```
