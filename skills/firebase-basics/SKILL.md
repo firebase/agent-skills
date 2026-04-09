@@ -28,7 +28,7 @@ Please complete these setup steps before proceeding, and remember your progress 
        ```bash
        npx -y firebase-tools@latest projects:create <project-id> --display-name "<display-name>"
        ```
-
+       *Note: The `<project-id>` must be 6-30 characters, lowercase, and can contain digits and hyphens. It must be globally unique.*
 
 # Firebase Usage Principles
 
