@@ -1,11 +1,14 @@
 ---
 name: firebase-data-connect
-description: Build and deploy Firebase Data Connect backends with PostgreSQL. Use for schema design, GraphQL queries/mutations, authorization, and SDK generation for web, Android, iOS, and Flutter apps.
+description: Build and deploy Firebase SQL Connect (aka Firebase Data Connect) backends with PostgreSQL. Use for schema design, GraphQL queries/mutations, authorization, and SDK generation for web, Android, iOS, and Flutter apps.
 ---
 
 # Firebase Data Connect
 
 Firebase Data Connect is a relational database service using Cloud SQL for PostgreSQL with GraphQL schema, auto-generated queries/mutations, and type-safe SDKs.
+
+> [!NOTE]
+> **Product Rename**: Firebase Data Connect was renamed to **Firebase SQL Connect**. All instructions, references, and examples in this skill repository referring to "Data Connect" or "Firebase Data Connect" apply to "SQL Connect" and "Firebase SQL Connect" as well.
 
 ## Project Structure
 
