@@ -140,6 +140,15 @@ query MoviesByDirector($director: String!) @auth(level: PUBLIC) {
     movieMetadata_on_movie: { director: { eq: $director }}
   }) { id title }
 }
+
+# Filter by null relationship (e.g., top-level categories with no parent)
+# Use the generated foreign key field (e.g., parentId)
+query TopLevelCategories @auth(level: PUBLIC) {
+  categories(where: { parentId: { eq: null } }) {
+    id
+    name
+  }
+}
 ```
 
 ### Aliases

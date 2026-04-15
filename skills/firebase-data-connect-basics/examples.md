@@ -145,6 +145,73 @@ mutation DeleteReview($id: UUID!) @auth(level: USER) {
 }
 ```
 
+### Realtime Queries
+
+```graphql
+# queries.gql (realtime additions)
+
+# Auto-refresh: this single-entity lookup refreshes automatically
+# when any mutation modifies this specific movie. No @refresh needed.
+query GetMovie($id: UUID!) @auth(level: PUBLIC) {
+  movie(id: $id) {
+    id title genre rating releaseYear description
+    metadata: movieMetadata_on_movie { director runtime }
+    reviews: reviews_on_movie(orderBy: [{ createdAt: DESC }], limit: 10) {
+      rating text createdAt
+      user { displayName }
+    }
+  }
+}
+
+# Event-driven: refresh movie list when a new review is posted
+query ListMovies($genre: String, $minRating: Float, $limit: Int)
+  @auth(level: PUBLIC)
+  @refresh(onMutationExecuted: {
+    operation: "AddReview"
+  }) {
+  movies(
+    where: {
+      genre: { eq: $genre },
+      rating: { ge: $minRating }
+    },
+    orderBy: [{ rating: DESC }],
+    limit: $limit
+  ) {
+    id title genre rating releaseYear posterUrl
+  }
+}
+
+# Time-based: live leaderboard refreshing every 30 seconds
+query MovieLeaderboard
+  @auth(level: PUBLIC)
+  @refresh(every: { seconds: 30 }) {
+  movies(orderBy: [{ rating: DESC }], limit: 10) {
+    id title rating
+  }
+}
+```
+
+```typescript
+import { listMoviesRef, movieLeaderboardRef } from '@movie-app/dataconnect';
+import { subscribe } from 'firebase/data-connect';
+
+// Subscribe to movie list — refreshes when AddReview mutation runs
+const unsubMovies = subscribe(listMoviesRef({ genre: 'Action' }), {
+  onNext: (result) => updateMovieList(result.data.movies),
+  onError: (error) => console.error(error)
+});
+
+// Subscribe to leaderboard — refreshes every 30 seconds
+const unsubLeaderboard = subscribe(movieLeaderboardRef(), {
+  onNext: (result) => updateLeaderboard(result.data.movies),
+  onError: (error) => console.error(error)
+});
+
+// Cleanup
+// unsubMovies();
+// unsubLeaderboard();
+```
+
 ---
 
 ## E-Commerce Store

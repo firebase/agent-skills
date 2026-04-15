@@ -267,3 +267,52 @@ console.log(data.items);
 // Create item (requires auth)
 await createItem({ name: 'New Item', description: 'Description' });
 ```
+
+---
+
+## Realtime Query Templates
+
+### Time-Based Polling
+
+```graphql
+query LiveDashboard
+  @auth(level: PUBLIC)
+  @refresh(every: { seconds: 30 }) {
+  items(orderBy: [{ updatedAt: DESC }], limit: 20) {
+    id name updatedAt
+  }
+}
+```
+
+### Event-Driven Refresh
+
+```graphql
+query ItemList($categoryId: UUID!)
+  @auth(level: PUBLIC)
+  @refresh(onMutationExecuted: {
+    operation: "CreateItem",
+    condition: "request.variables.categoryId == mutation.variables.categoryId"
+  }) {
+  items(where: { category: { id: { eq: $categoryId }}}) {
+    id name createdAt
+  }
+}
+```
+
+### Client Subscribe (Web)
+
+```typescript
+import { liveDashboardRef } from '@myapp/dataconnect';
+import { subscribe } from 'firebase/data-connect';
+
+const unsubscribe = subscribe(liveDashboardRef(), {
+  onNext: (result) => {
+    // Called immediately with current data, then on each refresh
+    renderDashboard(result.data.items);
+  },
+  onError: (error) => console.error('Subscription error:', error)
+});
+
+// Cleanup when done
+// unsubscribe();
+```
