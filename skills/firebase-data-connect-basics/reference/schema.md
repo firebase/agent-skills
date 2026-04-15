@@ -11,7 +11,7 @@
 
 ## Defining Types
 
-Types with `@table` map to PostgreSQL tables. Data Connect auto-generates an implicit `id: UUID!` primary key.
+Types with `@table` map to PostgreSQL tables. SQL Connect auto-generates an implicit `id: UUID!` primary key.
 
 ```graphql
 type Movie @table {

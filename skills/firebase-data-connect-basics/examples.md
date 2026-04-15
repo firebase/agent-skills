@@ -1,6 +1,6 @@
 # Examples
 
-Complete, working examples for common Data Connect use cases.
+Complete, working examples for common SQL Connect use cases.
 
 ---
 
@@ -163,22 +163,44 @@ query GetMovie($id: UUID!) @auth(level: PUBLIC) {
   }
 }
 
-# Event-driven: refresh movie list when a new review is posted
-query ListMovies($genre: String, $minRating: Float, $limit: Int)
-  @auth(level: PUBLIC)
+# Event-driven: Simple refresh when any movie is added
+query ListMoviesSimple @auth(level: PUBLIC) @refresh(onMutationExecuted: { operation: "AddMovie" }) {
+  movies { id title }
+}
+
+# Counterpart mutation for ListMoviesSimple
+mutation AddMovie($title: String!) @auth(level: USER) {
+  movie_insert(data: { title: $title })
+}
+
+# Event-driven: Refresh only when a movie of the same genre is added
+# Demonstrates the use of 'condition' and 'mutation.variables'
+query ListMoviesByGenre($genre: String!) @auth(level: PUBLIC)
   @refresh(onMutationExecuted: {
-    operation: "AddReview"
+    operation: "AddMovieWithGenre",
+    condition: "mutation.variables.genre == request.variables.genre"
   }) {
-  movies(
-    where: {
-      genre: { eq: $genre },
-      rating: { ge: $minRating }
-    },
-    orderBy: [{ rating: DESC }],
-    limit: $limit
-  ) {
-    id title genre rating releaseYear posterUrl
-  }
+  movies(where: { genre: { eq: $genre } }) { id title }
+}
+
+# Counterpart mutation for ListMoviesByGenre
+mutation AddMovieWithGenre($title: String!, $genre: String!) @auth(level: USER) {
+  movie_insert(data: { title: $title, genre: $genre })
+}
+
+# Event-driven: Refresh user profile when updated
+# Demonstrates condition based on auth context
+query MyProfile @auth(level: USER)
+  @refresh(onMutationExecuted: {
+    operation: "UpdateProfile",
+    condition: "mutation.auth.uid == request.auth.uid"
+  }) {
+  user(uid_expr: "auth.uid") { id name }
+}
+
+# Counterpart mutation for MyProfile
+mutation UpdateProfile($name: String!) @auth(level: USER) {
+  user_update(id_expr: "auth.uid", data: { name: $name })
 }
 
 # Time-based: live leaderboard refreshing every 30 seconds

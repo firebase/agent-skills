@@ -4,21 +4,21 @@
 - [When to Use What](#when-to-use-what)
 - [The @refresh Directive](#the-refresh-directive)
 - [CEL Bindings in Conditions](#cel-bindings-in-conditions)
-- [Automatic Entity Refreshes](#automatic-entity-refreshes)
+- [Implicit Entity Refresh signals](#implicit-entity-refresh-signals)
 
 ---
 
 ## When to Use What
 
-FDC provides three mechanisms for live data updates. Pick the right one based on what you're querying:
+SQL Connect provides three mechanisms for live data updates. Pick the right one based on what you're querying:
 
 | Scenario | Mechanism | Directive Needed? |
 |----------|-----------|-------------------|
-| Single-entity lookup by ID (e.g., `movie(id: $id)`) | **Automatic refresh** | No — FDC handles it |
+| Single-entity lookup by ID (e.g., `movie(id: $id)`) | **Automatic refresh** | No — SQL Connect handles it |
 | List query that should update when a specific mutation runs | **Event-driven refresh** | `@refresh(onMutationExecuted: ...)` |
 | Any query that should poll at a fixed interval | **Time-based polling** | `@refresh(every: ...)` |
 
-List queries require explicit `@refresh` to tell FDC which mutations affect the result set.
+List queries require explicit `@refresh` to tell SQL Connect which mutations affect the result set.
 
 Clients consume all three using `subscribe()` instead of `execute()`. See [sdks.md](sdks.md) for per-platform subscribe patterns.
 
@@ -30,7 +30,7 @@ Clients consume all three using `subscribe()` instead of `execute()`. See [sdks.
 
 ### Time-Based Polling (`every`)
 
-Force the query to re-execute at a regular interval, regardless of mutations.
+Keep the query fresh with a recommended refresh interval. Note that `every` and `mutation` signals can be used together; whichever signal arrives first will trigger the refresh.
 
 ```graphql
 query MovieLeaderboard
@@ -44,13 +44,13 @@ query MovieLeaderboard
 
 **Constraints:**
 - The `every` argument takes a duration object: `{ seconds: Int }`
-- **Minimum**: 10 seconds — protects against excessive server load
-- **Maximum**: 3600 seconds (1 hour)
+- **Minimum**: `{ seconds: 10 }` — protects against excessive server load
+- **Maximum**: `{ hours: 1 }` (3600 seconds)
 - Values outside this range fail validation at deploy time
 
 Use time-based polling when freshness matters but you don't have a specific mutation to listen for (e.g., dashboards aggregating external data, stock tickers, activity feeds).
 
-### Event-Driven Refresh (`onMutationExecuted`)
+### Explicit Mutation Signals (`onMutationExecuted`)
 
 Trigger a query refresh when a specific mutation executes. This is the most common pattern for keeping lists in sync.
 
@@ -79,6 +79,8 @@ query ListAllMessages
 **Arguments:**
 - **`operation`** (required): The name of the mutation operation to listen for. Must match the mutation's operation name exactly.
 - **`condition`** (optional): A CEL expression that must evaluate to `true` for the refresh to fire. Without a condition, every execution of the named mutation triggers a refresh.
+
+It's highly recommended to define fine granular conditions. Inaccurate refresh policies could consume Postgres resources and make your app slower.
 
 Use conditions to scope refreshes precisely — a review list should only refresh when the mutation targets the same movie, not every review across the entire app.
 
@@ -144,22 +146,25 @@ The mutation that just executed.
 
 ---
 
-## Automatic Entity Refreshes
+## Implicit Entity Refresh signals
 
-For single-entity lookups by unique identifier, FDC handles refreshes automatically — no `@refresh` directive needed.
+For single-entity lookups by unique identifier, SQL Connect handles refreshes automatically — no `@refresh` directive needed.
 
 **What qualifies:**
 - Queries fetching one entity by its primary key: `movie(id: $id)`, `user(key: { uid: $uid })`
 - If a single-entity mutation modifies that specific entity, all active subscribers automatically receive the update. Supported operations include:
-    *   `_insert(data)`
-    *   `_upsert(data)`
+    *   `_insert(data)` or `_insertMany(data)`
+    *   `_upsert(data)` or `_upsertMany(data)`
     *   `_update(id)` or `_update(key)`
     *   `_delete(id)` or `_delete(key)`
 - **Note**: Bulk operations like `_updateMany` and `_deleteMany` do **not** trigger automatic entity refreshes.
 
 **What does NOT qualify:**
 - List queries: `movies(where: {...})`, `users { id name }` — these require explicit `@refresh`
-- Aggregate queries or queries joining multiple entities
+- Nested query with JOINs
+- Aggregation
+- Native SQL
+- Customized Resolver (if supported)
 
 ```graphql
 # When subscribed to, this query auto-refreshes when movie data changes — no @refresh needed

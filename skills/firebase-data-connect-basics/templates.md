@@ -1,6 +1,6 @@
 # Templates
 
-Ready-to-use templates for common Firebase Data Connect patterns.
+Ready-to-use templates for common Firebase SQL Connect patterns.
 
 ---
 
@@ -212,7 +212,7 @@ generate:
 ## Firebase Init Commands
 
 ```bash
-# Initialize Data Connect in project
+# Initialize SQL Connect in project
 npx -y firebase-tools@latest init dataconnect
 
 # Initialize with specific project

@@ -11,7 +11,7 @@
 
 ## Generated Fields
 
-Data Connect auto-generates fields for each `@table` type:
+SQL Connect auto-generates fields for each `@table` type:
 
 | Generated Field | Purpose | Example |
 |-----------------|---------|---------|
@@ -33,6 +33,16 @@ For a `Post` with `author: User!`:
 For many-to-many via `MovieActor`:
 - `movie.actors_via_MovieActor` - Get all actors
 - `actor.movies_via_MovieActor` - Get all movies
+
+---
+
+## Referencing Generated GraphQL Schema
+
+**Do not guess** available queries or mutations. Review the generated schema files instead of trying to deduce them from the data model.
+
+1. **Location**: `.dataconnect/schema/main/` (relative to project root).
+2. **Action**: Scan this directory for generated files (`query.gql`, `mutation.gql`, `relation.gql`, `input.gql`) to understand the exact shape of the API and auto-generated types.
+3. **Validation**: Always run `firebase dataconnect:compile` to verify operations against the full schema.
 
 ---
 
