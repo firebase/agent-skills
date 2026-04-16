@@ -24,7 +24,8 @@ export async function setupFirebaseSSR(request: Request) {
   const authIdToken = authHeader?.split('Bearer ')[1];
 
   const app = initializeServerApp(firebaseConfig, {
-    authIdToken: authIdToken
+    authIdToken: authIdToken,
+    releaseOnDeref: request
   });
 
   return { 

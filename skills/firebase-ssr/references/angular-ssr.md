@@ -31,7 +31,8 @@ export class FirebaseSSRService {
     const authIdToken = authHeader ? authHeader.split('Bearer ')[1] : undefined;
 
     const app = initializeServerApp(firebaseConfig, {
-      authIdToken: authIdToken
+      authIdToken: authIdToken,
+      releaseOnDeref: this.request
     });
 
     return { 
