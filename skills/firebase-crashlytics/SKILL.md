@@ -21,7 +21,14 @@ To learn how to setup Crashlytics in your application code, choose your platform
 
 ## SDK Usage
 
-To learn how to customize crash reports and add additional debugging data, choose your platform:
+The SDK provides a number of features to make crash reports more actionable.
 
-*   **Android**: [android_usage.md](references/android_usage.md)
-*   **iOS**: [ios_usage.md](references/ios_usage.md)
+* Add custom keys
+* Add custom logs
+* Set user identifiers
+* Report non-fatal exceptions
+
+To learn how to customize crash reports and add additional debugging data, consult the documentaion for your platform.
+
+*   **Android**: [Customize Crash Reports for Android](https://firebase.google.com/docs/crashlytics/android/customize-crash-reports)
+*   **iOS**: [Customize Crash Reports for Apple Platforms](https://firebase.google.com/docs/crashlytics/ios/customize-crash-reports)
