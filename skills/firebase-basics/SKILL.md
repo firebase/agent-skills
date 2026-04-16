@@ -7,7 +7,7 @@ description: >-
   environment, authenticating, setting active projects, or executing core
   Firebase CLI commands.
 ---
-# Prerequisites
+# Prerequisites:
 
 Complete these setup steps before proceeding:
 
