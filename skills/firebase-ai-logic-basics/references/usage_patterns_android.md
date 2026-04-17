@@ -19,7 +19,7 @@ In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add th
 
 ```kotlin
 dependencies {
-    // [AGENT] Fetch the latest available BoM version from Maven Central / Web before adding this
+    // [AGENT] Fetch the latest available BoM version from https://firebase.google.com/support/release-notes/android before adding this
     implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
     // Add the dependency for the Firebase AI library

@@ -121,7 +121,7 @@ const myReviews = await myReviews(); // @auth(level: USER) query from examples.m
 
 ```kotlin
 dependencies {
-    // [AGENT] Fetch the latest available BoM version from Maven Central / Web before adding this
+    // [AGENT] Fetch the latest available BoM version from https://firebase.google.com/support/release-notes/android before adding this
     implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
     implementation("com.google.firebase:firebase-dataconnect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
