@@ -26,6 +26,7 @@ To learn how to use Firestore Enterprise Native Mode in your application code, s
 - [Web SDK Usage](references/web_sdk_usage.md)
 - [Android (Kotlin) SDK Usage](references/android_sdk_usage.md)
 - [Python SDK Usage](references/python_sdk_usage.md)
+- [Flutter Setup](references/flutter_setup.md)
 
 ## Indexes
 
