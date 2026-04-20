@@ -99,6 +99,7 @@ Consider that you do not need to hardcode model names (e.g., `gemini-flash-lite-
 | :---- | :---- | :---- |
 | Web Modular API | Gemini Developer API (Developer API) | firebase://docs/ai-logic/get-started  |
 | iOS (Swift) | Gemini Developer API | [ios_setup.md](references/ios_setup.md) |
+| Flutter (Dart) | Gemini Developer API | [flutter_setup.md](references/flutter_setup.md) |
 
 **Always use the most recent version of Gemini (gemini-flash-latest) unless another model is requested by the docs or the user. DO NOT USE gemini-1.5-flash**
 
@@ -106,6 +107,8 @@ Consider that you do not need to hardcode model names (e.g., `gemini-flash-lite-
 
 [Web SDK code examples and usage patterns](references/usage_patterns_web.md)
 [iOS SDK code examples and usage patterns](references/ios_setup.md)
+[Flutter SDK code examples and usage patterns](references/flutter_setup.md)
+
 
 [Android (Kotlin) SDK usage patterns](references/usage_patterns_android.md)
 

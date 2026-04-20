@@ -79,6 +79,8 @@ Enable other providers in the Firebase Console.
 **Web**
 See [references/client_sdk_web.md](references/client_sdk_web.md).
 
+**Flutter**
+See [references/flutter_setup.md](references/flutter_setup.md).
 **Android (Kotlin)**
 See [references/client_sdk_android.md](references/client_sdk_android.md).
 
