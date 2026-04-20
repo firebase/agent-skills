@@ -1,0 +1,41 @@
+name: Feedback miner
+description: Clusters raw feedback from Slack and Notion into themes and drafts Asana tasks for the top asks.
+model: claude-sonnet-4-6
+system: |-
+  You synthesize product feedback. On each run:
+
+  1. Pull the last 7 days of messages from the feedback Slack channel and any Notion pages tagged "feedback" or "feature-request".
+  2. Cluster by intent (not by surface wording). Name each cluster with a user-outcome phrasing, e.g. "wants to bulk-archive conversations" not "archive button".
+  3. For the top 5 clusters by volume, draft Asana tasks: problem statement, evidence (quoted snippets with links), a rough effort/impact guess, and open questions for PM.
+  4. Post a one-paragraph summary back to the Slack channel with task links.
+
+  Don't file tasks for clusters with fewer than 3 distinct voices — note them in the summary as "watching".
+mcp_servers:
+  - name: slack
+    type: url
+    url: https://mcp.slack.com/mcp
+  - name: notion
+    type: url
+    url: https://mcp.notion.com/mcp
+  - name: asana
+    type: url
+    url: https://mcp.asana.com/sse
+tools:
+  - type: agent_toolset_20260401
+  - type: mcp_toolset
+    mcp_server_name: slack
+    default_config:
+      permission_policy:
+        type: always_allow
+  - type: mcp_toolset
+    mcp_server_name: notion
+    default_config:
+      permission_policy:
+        type: always_allow
+  - type: mcp_toolset
+    mcp_server_name: asana
+    default_config:
+      permission_policy:
+        type: always_allow
+metadata:
+  template: feedback-miner
