@@ -47,8 +47,7 @@ Please adhere to these principles when working with Firebase, as they ensure rel
 - **Exploring Commands:** See [references/firebase-cli-guide.md](references/firebase-cli-guide.md) to discover and understand CLI functionality.
 - **SDK Setup:** For detailed guides on adding Firebase to your app:
   - **Web**: See [references/web_setup.md](references/web_setup.md)
-  - **iOS**: See [references/ios_setup.md](references/ios_setup.md)
-  - **Flutter**: See [references/flutter_setup.md](references/flutter_setup.md)
+  - **Android**: See [references/android_setup.md](references/android_setup.md)
 
 # Common Issues
 
