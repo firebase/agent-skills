@@ -58,7 +58,7 @@ func addCrashlyticsRunScriptBuildPhase(project: PBXProj) {
         outputPaths: [],
         shellPath: "/bin/sh",
         shellScript: "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n",
-        runOnlyForDeploymentPostprocessing: false,
+        runOnlyForDeploymentPostprocessing: false
     )
 
     project.add(object: phase)
