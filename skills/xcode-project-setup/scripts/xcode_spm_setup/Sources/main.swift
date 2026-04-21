@@ -2,6 +2,83 @@ import Foundation
 import XcodeProj
 import PathKit
 
+func isUserScriptSandboxingEnabled(project: PBXProj) -> Bool {
+    guard let target = project.projects.first else {
+        print("Error: No project targets found")
+        return false
+    }
+
+    for configuration in target.buildConfigurationList?.buildConfigurations ?? [] {
+        if let userSandbox = configuration.buildSettings["ENABLE_USER_SCRIPT_SANDBOXING"] {
+            if let userSandboxValue = userSandbox as? String {
+                return userSandboxValue.uppercased() == "YES"
+            }
+        }
+    }
+
+    return false;
+}
+
+func hasCrashlyticsRunScriptBuildPhase(project: PBXProj) -> Bool {
+    guard let nativeTargets = project.nativeTargets.first else {
+        return false
+    }
+
+    for phase in nativeTargets.buildPhases {
+        if phase.buildPhase == BuildPhase.runScript, let scriptPhase = phase as? PBXShellScriptBuildPhase {
+            if let script = scriptPhase.shellScript, script.contains("Crashlytics") {
+                return true
+            }
+        }
+    }
+
+    return false
+}
+
+func addCrashlyticsRunScriptBuildPhase(project: PBXProj) {
+    guard let nativeTarget = project.nativeTargets.first else {
+        print("Error: couldn't add the Crashlytics Run Script Build phase automatically, plase add it manually")
+        return
+    }
+
+    var inputPaths = [
+        "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+        "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+        "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+        "$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+        "$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)"
+    ]
+
+    if isUserScriptSandboxingEnabled(project: project) {
+        inputPaths.append("${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}.debug.dylib")
+    }
+
+    let phase = PBXShellScriptBuildPhase(
+        files: [],
+        inputPaths: inputPaths,
+        outputPaths: [],
+        shellPath: "/bin/sh",
+        shellScript: "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n",
+        runOnlyForDeploymentPostprocessing: false,
+    )
+
+    project.add(object: phase)
+    nativeTarget.buildPhases.append(phase)
+}
+
+func setDwarfWithDsymDebugInformationFormat(project: PBXProj) {
+    guard let target = project.projects.first else {
+        print("Error: No project targets found")
+        return
+    }
+
+    for configuration in target.buildConfigurationList?.buildConfigurations ?? [] {
+        if (configuration.name == "Debug") {
+            configuration.buildSettings["DEBUG_INFORMATION_FORMAT"] = "dwarf-with-dsym"
+        }
+    }
+}
+
 func main() {
     let args = CommandLine.arguments
     guard args.count >= 5 else {
@@ -21,7 +98,7 @@ func main() {
         arguments.remove(at: plistIndex + 1)
         arguments.remove(at: plistIndex)
     }
-    
+
     let products = arguments
 
     guard !products.isEmpty else {
@@ -129,6 +206,18 @@ func main() {
                     configuration.buildSettings["OTHER_LDFLAGS"] = otherLdFlags
                     print("Updated OTHER_LDFLAGS for configuration: \(configuration.name)")
                 }
+            }
+        }
+
+        if products.contains(where: { $0.contains("FirebaseCrashlytics")}) {
+            print("Setting the debug format to DWARF with dSYMs")
+            setDwarfWithDsymDebugInformationFormat(project: pbxproj)
+
+            print("Adding the Crashlytics Run Script Build phase")
+            if !hasCrashlyticsRunScriptBuildPhase(project: pbxproj) {
+                addCrashlyticsRunScriptBuildPhase(project: pbxproj)
+            } else {
+                print("Crashlytics Run Script Build phase already exists")
             }
         }
         
