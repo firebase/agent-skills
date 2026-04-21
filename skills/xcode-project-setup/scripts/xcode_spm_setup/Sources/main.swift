@@ -9,14 +9,13 @@ func isUserScriptSandboxingEnabled(project: PBXProj) -> Bool {
     }
 
     for configuration in target.buildConfigurationList?.buildConfigurations ?? [] {
-        if let userSandbox = configuration.buildSettings["ENABLE_USER_SCRIPT_SANDBOXING"] {
-            if let userSandboxValue = userSandbox as? String {
-                return userSandboxValue.uppercased() == "YES"
-            }
+        if let userSandbox = configuration.buildSettings["ENABLE_USER_SCRIPT_SANDBOXING"] as? String {
+            return userSandbox.uppercased() == "YES"
         }
     }
 
-    return false;
+    // If the value is absent, assume it is the default "YES"
+    return true
 }
 
 func hasCrashlyticsRunScriptBuildPhase(project: PBXProj) -> Bool {
@@ -37,7 +36,7 @@ func hasCrashlyticsRunScriptBuildPhase(project: PBXProj) -> Bool {
 
 func addCrashlyticsRunScriptBuildPhase(project: PBXProj) {
     guard let nativeTarget = project.nativeTargets.first else {
-        print("Error: couldn't add the Crashlytics Run Script Build phase automatically, plase add it manually")
+        print("Error: couldn't add the Crashlytics Run Script Build phase automatically, please add it manually")
         return
     }
 
@@ -73,9 +72,8 @@ func setDwarfWithDsymDebugInformationFormat(project: PBXProj) {
     }
 
     for configuration in target.buildConfigurationList?.buildConfigurations ?? [] {
-        if (configuration.name == "Debug") {
-            configuration.buildSettings["DEBUG_INFORMATION_FORMAT"] = "dwarf-with-dsym"
-        }
+        // Set debug format for all configs
+        configuration.buildSettings["DEBUG_INFORMATION_FORMAT"] = "dwarf-with-dsym"
     }
 }
 

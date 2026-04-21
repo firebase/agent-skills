@@ -36,7 +36,7 @@ Add a Run Script phase to the main app target in Xcode. This step is required to
     ${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run
     ```
 
-When using the `xcode-project-setup` skills, the above two steps will be done as part of adding the `FirebaseCrashlytics` package. Once the skill has been invoked and succeeded, verify that the app's project.pbxproj file contains a Run Script Build phase where the shell script attribute value contains 'Crashlytics'. Specifically, there should be a `PBXShellScriptBuildPhase` section with the attribute `shellScript` that is set to a value that contains `Crashlytics/run` and an attribute `inputPaths` that where one of the values contains `GoogleService-Info.plist`. If verification is not successful, present the above two options to be done manually.
+When using the `xcode-project-setup` skills, the above two steps will be done as part of adding the `FirebaseCrashlytics` package. Once the skill has been invoked and succeeded, verify that the app's project.pbxproj file contains a Run Script Build phase where the shell script attribute value contains 'Crashlytics'. Specifically, there should be a `PBXShellScriptBuildPhase` section with the attribute `shellScript` that is set to a value that contains `Crashlytics/run` and an attribute `inputPaths` where one of the values contains `GoogleService-Info.plist`. If verification is not successful, present the above two options to be done manually.
 
 ## Follow up Steps
 
