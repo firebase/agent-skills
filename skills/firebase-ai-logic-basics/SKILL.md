@@ -87,7 +87,10 @@ Hybrid on-device inference for web apps, where the Firebase Javascript SDK autom
 
 ### App Check
 
-Recommended: The developer must enable Firebase App Check to prevent unauthorized clients from using their API quota. see [App-check recaptcha enterprise](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider.md.txt).
+> [!WARNING]
+> **Critical Safety Requirement:** In order to use AI Logic safely, you MUST set up App Check on your app. This prevents unauthorized clients from using your API quota and accessing your backend resources.
+
+See [App Check with reCAPTCHA Enterprise](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider.md.txt) for setup instructions.
 
 ### Remote Config
 
