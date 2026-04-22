@@ -1,8 +1,9 @@
-# Web SDK Usage
+# Firestore Web SDK Usage Guide
 
-This guide focuses on the **Modular Web SDK** (v9+), which is tree-shakeable and efficient.
+This guide focuses on the **Modular Web SDK** (v9+), which is tree-shakeable and
+efficient.
 
-### Initialization
+## Initialization
 
 ```javascript
 import { initializeApp } from "firebase/app";
@@ -12,20 +13,22 @@ import { getFirestore } from "firebase/firestore";
 // const app = initializeApp();
 
 const firebaseConfig = {
-  // Your config options. Get the values by running 'firebase apps:sdkconfig <platform> <app-id>'
+  // Your config options. Get the values by running 'npx -y firebase-tools@latest apps:sdkconfig <platform> <app-id>'
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 ```
 
-### Writing Data
+## Writing Data
 
-#### Set a Document
-Creates a document if it doesn't exist, or overwrites it if it does. You can also specify a merge option to only update provided fields.
+### Set a Document (`setDoc`)
+
+Creates a document if it doesn't exist, or overwrites it if it does.
 
 ```javascript
-import { doc, setDoc } from "firebase/firestore"; 
+import { doc, setDoc } from "firebase/firestore";
 
 // Create/Overwrite document with ID "LA"
 await setDoc(doc(db, "cities", "LA"), {
@@ -38,11 +41,12 @@ await setDoc(doc(db, "cities", "LA"), {
 await setDoc(doc(db, "cities", "LA"), { population: 3900000 }, { merge: true });
 ```
 
-#### Add a Document with Auto-ID
-Use when you don't care about the document ID and want Firestore to automatically generate one.
+### Add a Document with Auto-ID (`addDoc`)
+
+Use when you don't care about the document ID.
 
 ```javascript
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc } from "firebase/firestore";
 
 const docRef = await addDoc(collection(db, "cities"), {
   name: "Tokyo",
@@ -51,8 +55,10 @@ const docRef = await addDoc(collection(db, "cities"), {
 console.log("Document written with ID: ", docRef.id);
 ```
 
-#### Update a Document
-Update some fields of an existing document without overwriting the entire document. Fails if the document doesn't exist.
+### Update a Document (`updateDoc`)
+
+Update some fields of an existing document without overwriting the entire
+document. Fails if the document doesn't exist.
 
 ```javascript
 import { doc, updateDoc } from "firebase/firestore";
@@ -64,7 +70,8 @@ await updateDoc(laRef, {
 });
 ```
 
-#### Transactions
+### Transactions
+
 Perform an atomic read-modify-write operation.
 
 ```javascript
@@ -88,9 +95,9 @@ try {
 }
 ```
 
-### Reading Data
+## Reading Data
 
-#### Get a Single Document
+### Get a Single Document (`getDoc`)
 
 ```javascript
 import { doc, getDoc } from "firebase/firestore";
@@ -105,7 +112,8 @@ if (docSnap.exists()) {
 }
 ```
 
-#### Get Multiple Documents
+### Get Multiple Documents (`getDocs`)
+
 Fetches all documents in a query or collection once.
 
 ```javascript
@@ -113,13 +121,14 @@ import { collection, getDocs } from "firebase/firestore";
 
 const querySnapshot = await getDocs(collection(db, "cities"));
 querySnapshot.forEach((doc) => {
+  // doc.data() is never undefined for query doc snapshots
   console.log(doc.id, " => ", doc.data());
 });
 ```
 
-### Realtime Updates
+## Realtime Updates
 
-#### Listen to a Document or Query
+### Listen to a Document/Query (`onSnapshot`)
 
 ```javascript
 import { doc, onSnapshot } from "firebase/firestore";
@@ -128,11 +137,11 @@ const unsub = onSnapshot(doc(db, "cities", "SF"), (doc) => {
     console.log("Current data: ", doc.data());
 });
 
-// To stop listening: 
+// Stop listening
 // unsub();
 ```
 
-### Handle Changes
+### Handle Changes (Added/Modified/Removed)
 
 ```javascript
 import { collection, query, where, onSnapshot } from "firebase/firestore";
@@ -153,10 +162,11 @@ const unsubscribe = onSnapshot(q, (snapshot) => {
 });
 ```
 
-### Queries
+## Queries
 
-#### Simple and Compound Queries
-Use `query()` and `where()` to combine filters safely.
+### Simple and Compound Queries
+
+Use `query()` to combine filters.
 
 ```javascript
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -167,35 +177,16 @@ const citiesRef = collection(db, "cities");
 const q1 = query(citiesRef, where("state", "==", "CA"));
 
 // Compound (AND)
-// Note: Requires a composite index if filtering on different fields
+// Note: Requires an index if filtering on different fields
 const q2 = query(citiesRef, where("state", "==", "CA"), where("population", ">", 1000000));
 ```
 
-#### Order and Limit
-Sort and limit results cleanly.
+### Order and Limit
+
+Sort and limit results.
 
 ```javascript
 import { orderBy, limit } from "firebase/firestore";
 
 const q = query(citiesRef, orderBy("name"), limit(3));
-```
-
-#### Pipeline Queries
-
-You can use pipeline queries to perform complex queries.
-
-```javascript
-
-const readDataPipeline = db.pipeline()
-  .collection("users");
-
-// Execute the pipeline and handle the result
-try {
-  const querySnapshot = await execute(readDataPipeline);
-  querySnapshot.results.forEach((result) => {
-    console.log(`${result.id} => ${result.data()}`);
-  });
-} catch (error) {
-    console.error("Error getting documents: ", error);
-}
 ```
