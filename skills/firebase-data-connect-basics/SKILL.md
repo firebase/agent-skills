@@ -61,6 +61,10 @@ Write the queries and mutations your client will use, including authorization lo
 > *   `@auth(level: ...)` for PUBLIC, USER, or NO_ACCESS.
 > *   `@check` and `@redact` for row-level security and validation.
 >
+> **Read [reference/realtime.md](reference/realtime.md)** for real-time subscriptions:
+> *   `@refresh` directive for time-based polling and event-driven updates.
+> *   CEL conditions to scope refresh triggers precisely.
+>
 > **Read [reference/native_sql.md](reference/native_sql.md)** for Native SQL operations:
 > *   Embedding raw SQL with `_select`, `_selectFirst`, `_execute`
 > *   Strict rules for positional parameters (`$1`, `$2`), quoting, and CTEs
@@ -68,16 +72,35 @@ Write the queries and mutations your client will use, including authorization lo
 
 ### 3. Use type-safe SDK in your apps
 Generate type-safe code for your client platform.
-> **Read [reference/sdks.md](reference/sdks.md)** for:
-> *   Android (Kotlin), iOS (Swift), Web (TypeScript), Flutter (Dart).
-> *   How to initialize and call your queries/mutations.
-> *   **Nested Data**: See how to access related fields (e.g., `movie.reviews`).
 
-### 4. Add Real-time Subscriptions (Optional)
-Enable live data updates to push changes to connected clients.
-> **Read [reference/realtime.md](reference/realtime.md)** for:
-> *   `@refresh` directive for time-based polling and event-driven updates.
-> *   CEL conditions to scope refresh triggers precisely.
+Configure SDK generation in `connector.yaml`:
+
+```yaml
+connectorId: my-connector
+generate:
+  javascriptSdk:
+    outputDir: "../web-app/src/lib/dataconnect"
+    package: "@movie-app/dataconnect"
+  kotlinSdk:
+    outputDir: "../android-app/app/src/main/kotlin/com/example/dataconnect"
+    package: "com.example.dataconnect"
+  swiftSdk:
+    outputDir: "../ios-app/DataConnect"
+```
+
+Generate SDKs:
+```bash
+npx -y firebase-tools@latest dataconnect:sdk:generate
+```
+
+For platform-specific instructions on how to use the generated SDKs, read:
+*   **Web (TypeScript)**: [reference/sdk_web.md](reference/sdk_web.md)
+*   **Android (Kotlin)**: [reference/sdk_android.md](reference/sdk_android.md)
+*   **iOS (Swift)**: [reference/sdk_ios.md](reference/sdk_ios.md)
+*   **Admin (Node.js)**: [reference/sdk_admin_node.md](reference/sdk_admin_node.md)
+*   **Flutter (Dart)**: [reference/sdk_flutter.md](reference/sdk_flutter.md)
+
+
 
 ---
 
