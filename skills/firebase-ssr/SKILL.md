@@ -33,14 +33,15 @@ In a Node.js SSR context, utilizing the single `initializeApp` singleton is extr
 > [!WARNING]
 > DO NOT use the standard `initializeApp()` inside server-side code that responds to HTTP endpoints or renders pages. It will cause severe data and authentication token leakage between different users.
 
-Instead, use `initializeServerApp` to create a lightweight, request-scoped Firebase app instance.
+Instead, use `initializeServerApp` to create a lightweight, request-scoped Firebase app instance. You can pass both the user's Auth ID token and an App Check token (if enabled) to authenticate the server-side requests on behalf of the client.
 
 ```typescript
 import { initializeServerApp } from "firebase/app";
 
 // Must be called for every incoming request handling routine
 const app = initializeServerApp(firebaseConfig, {
-  authIdToken: extractedToken // Provided by framework-specific headers
+  authIdToken: extractedToken, // Provided by framework-specific headers
+  appCheckToken: extractedAppCheckToken // Optional, provided by framework-specific headers if App Check is enabled
 });
 ```
 

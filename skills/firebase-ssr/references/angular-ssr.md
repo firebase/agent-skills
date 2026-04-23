@@ -26,12 +26,14 @@ export class FirebaseSSRService {
       // ...
     };
     
-    // Extract custom Auth token securely from the injected HTTP request context
+    // Extract custom Auth token and App Check token securely from the injected HTTP request context
     const authHeader = this.request?.headers['authorization'];
     const authIdToken = authHeader ? authHeader.split('Bearer ')[1] : undefined;
+    const appCheckToken = this.request?.headers['x-firebase-appcheck'] as string | undefined;
 
     const app = initializeServerApp(firebaseConfig, {
       authIdToken: authIdToken,
+      appCheckToken: appCheckToken,
       releaseOnDeref: this.request
     });
 

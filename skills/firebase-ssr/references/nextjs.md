@@ -23,12 +23,14 @@ export async function setupFirebaseSSR() {
     // ...
   };
   
-  // Extract custom Auth token using modern Next.js headers()
+  // Extract custom Auth token and App Check token using modern Next.js headers()
   const reqHeaders = await headers();
   const authIdToken = reqHeaders.get('authorization')?.split('Bearer ')[1];
+  const appCheckToken = reqHeaders.get('x-firebase-appcheck');
 
   const app = initializeServerApp(firebaseConfig, {
     authIdToken: authIdToken,
+    appCheckToken: appCheckToken,
     releaseOnDeref: reqHeaders
   });
 

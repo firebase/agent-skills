@@ -19,12 +19,14 @@ export async function setupFirebaseSSR(request: Request) {
     // ...
   };
   
-  // Extract custom Auth token using standard Fetch API Headers
+  // Extract custom Auth token and App Check token using standard Fetch API Headers
   const authHeader = request.headers.get('Authorization');
   const authIdToken = authHeader?.split('Bearer ')[1];
+  const appCheckToken = request.headers.get('x-firebase-appcheck');
 
   const app = initializeServerApp(firebaseConfig, {
     authIdToken: authIdToken,
+    appCheckToken: appCheckToken,
     releaseOnDeref: request
   });
 
