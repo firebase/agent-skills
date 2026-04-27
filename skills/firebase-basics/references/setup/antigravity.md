@@ -19,7 +19,7 @@ Check if the skills are already installed before proceeding:
 4. **Verify Installation**: Re-run the checks in steps 1 or 2 to confirm that `firebase-basics` is now available.
 
 ### 2. Configure and Verify Firebase MCP Server
-The MCP server allows Antigravity to interact directly with Firebase projects.
+The MCP server allows Antigravity to interact directly with Firebase projects. This is considered the **mandatory extension configuration** required for full functionality.
 
 1. **Locate `mcp_config.json`**: Find the configuration file for your operating system:
    - macOS / Linux: `~/.gemini/antigravity/mcp_config.json`

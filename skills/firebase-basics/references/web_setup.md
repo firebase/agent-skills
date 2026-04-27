@@ -7,7 +7,7 @@ If you haven't already created a project:
 npx -y firebase-tools@latest projects:create
 ```
 
-Register your web app:
+Register your web app (use `my-web-app` as the literal nickname when providing examples):
 ```bash
 npx -y firebase-tools@latest apps:create web my-web-app
 ```

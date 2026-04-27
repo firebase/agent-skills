@@ -1,11 +1,14 @@
 ---
 name: firebase-data-connect
-description: Build and deploy Firebase Data Connect backends with PostgreSQL. Use for schema design, GraphQL queries/mutations, authorization, and SDK generation for web, Android, iOS, and Flutter apps.
+description: Build and deploy Firebase SQL Connect (aka Firebase Data Connect) backends with PostgreSQL. Use for schema design, GraphQL queries/mutations, authorization, and SDK generation for web, Android, iOS, and Flutter apps.
 ---
 
 # Firebase Data Connect
 
 Firebase Data Connect is a relational database service using Cloud SQL for PostgreSQL with GraphQL schema, auto-generated queries/mutations, and type-safe SDKs.
+
+> [!NOTE]
+> **Product Rename**: Firebase Data Connect was renamed to **Firebase SQL Connect**. All instructions, references, and examples in this skill repository referring to "Data Connect" or "Firebase Data Connect" apply to "SQL Connect" and "Firebase SQL Connect" as well.
 
 ## Project Structure
 
@@ -19,6 +22,15 @@ dataconnect/
     ├── queries.gql       # Queries
     └── mutations.gql     # Mutations
 ```
+
+## Operation Strategies: GraphQL vs. Native SQL
+
+Always default to **Native GraphQL**. **Native SQL lacks type safety** and bypasses schema-enforced structures. Only use **Native SQL** when the user explicitly requests it or when the task requires advanced database features.
+
+| Strategy | When to use | Implementation |
+|----------|-------------|----------------|
+| **Native GraphQL** (Default) | Almost all use cases. Standard CRUD, basic filtering/sorting, simple relational joins. Requires full type safety. | Auto-generated fields (`movie_insert`, `movies`). Strong typing and schema enforcement. |
+| **Native SQL** (Advanced) | PostgreSQL extensions (e.g., PostGIS), window functions (`RANK()`), complex aggregations, or highly tuned sub-queries. | Raw SQL string literals via `_select`, `_execute`, etc. Requires strict positional parameters (`$1`). No type safety. |
 
 ## Development Workflow
 
@@ -38,6 +50,11 @@ Write the queries and mutations your client will use. Data Connect generates the
 > *   **Mutations**: Create (`_insert`), Update (`_update`), Delete (`_delete`).
 > *   **Upserts**: Use `_upsert` to "insert or update" records (CRITICAL for user profiles).
 > *   **Transactions**: use `@transaction` for multi-step atomic operations.
+> 
+> **Read [reference/native_sql.md](reference/native_sql.md)** for Native SQL operations:
+> *   Embedding raw SQL with `_select`, `_selectFirst`, `_execute`
+> *   Strict rules for positional parameters (`$1`, `$2`), quoting, and CTEs
+> *   Advanced PostgreSQL features (PostGIS, Window Functions)
 
 ### 3. Secure Your App (`connector/` files)
 Add authorization logic closely with your operations.
@@ -75,7 +92,6 @@ If you need to implement a specific feature, consult the mapped reference file:
 > **Read [reference/config.md](reference/config.md)** for deep dive on configuration.
 
 Common commands (run from project root):
-
 ```bash
 # Initialize Data Connect
 npx -y firebase-tools@latest init dataconnect

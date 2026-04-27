@@ -1,15 +1,27 @@
 ---
 name: firebase-basics
-description: The definitive, foundational skill for ANY Firebase task. Make sure to ALWAYS use this skill whenever the user mentions or interacts with Firebase, even if they do not explicitly ask for it. This skill covers everything from the bare minimum INITIAL setup (Node.js setup, Firebase CLI installation, first-time login) to ongoing operations (core principles, workflows, building, service setup, executing Firebase CLI commands, troubleshooting, refreshing, or updating an existing environment).
+description: >-
+  Provides foundational setup, authentication, and project management workflows
+  for Firebase using the Firebase CLI. Use when checking Firebase CLI version
+  (must use 'npx -y firebase-tools@latest --version'), initializing a Firebase
+  environment, authenticating, setting active projects, or executing core
+  Firebase CLI commands.
 ---
 # Prerequisites
 
-Please complete these setup steps before proceeding, and remember your progress to avoid repeating them in future interactions.
+Complete these setup steps before proceeding:
 
 1. **Local Environment Setup:** Verify the environment is properly set up so we can use Firebase tools:
    - Run `npx -y firebase-tools@latest --version` to check if the Firebase CLI is installed.
    - Verify if the Firebase MCP server is installed using your existing tools.
-   - If either of these checks fails, please review [references/local-env-setup.md](references/local-env-setup.md) to get the environment ready.
+   - **CRITICAL**: Before configuring any extensions or agent environments below, you MUST read [references/local-env-setup.md](references/local-env-setup.md).
+   - To fully manage Firebase, ensure you have installed the necessary agent skills and MCP server for your environment:
+     - **Gemini CLI**: Review [references/setup/gemini_cli.md](references/setup/gemini_cli.md)
+     - **Antigravity**: Review [references/setup/antigravity.md](references/setup/antigravity.md)
+     - **Claude Code**: Review [references/setup/claude_code.md](references/setup/claude_code.md)
+     - **Cursor**: Review [references/setup/cursor.md](references/setup/cursor.md)
+     - **GitHub Copilot**: Review [references/setup/github_copilot.md](references/setup/github_copilot.md)
+     - **Other Agents**: Review [references/setup/other_agents.md](references/setup/other_agents.md)
 
 2. **Authentication:**
    Ensure you are logged in to Firebase so that commands have the correct permissions. Run `npx -y firebase-tools@latest login`. For environments without a browser (e.g., remote shells), use `npx -y firebase-tools@latest login --no-localhost`.
@@ -24,22 +36,26 @@ Please complete these setup steps before proceeding, and remember your progress 
        ```bash
        npx -y firebase-tools@latest use --add <PROJECT_ID>
        ```
-     - If no: Follow the project creation instructions in [references/firebase-project-create.md](references/firebase-project-create.md).
+     - If no: Follow these steps to create a new Firebase project from the CLI:
+       ```bash
+       npx -y firebase-tools@latest projects:create <project-id> --display-name "<display-name>"
+       ```
+       *Note: The `<project-id>` must be 6-30 characters, lowercase, and can contain digits and hyphens. It must be globally unique.*
 
 # Firebase Usage Principles
 
-Please adhere to these principles when working with Firebase, as they ensure reliability and up-to-date project tools:
+Adhere to these principles:
 
-1. **Use npx for CLI commands:** To ensure you always use the latest version of the Firebase CLI, always prepend commands with `npx -y firebase-tools@latest` instead of just `firebase`. (e.g., use `npx -y firebase-tools@latest --version` instead of `firebase --version`).
+1. **Use npx for CLI commands:** To ensure you always use the latest version of the Firebase CLI, always prepend commands with `npx -y firebase-tools@latest` instead of just `firebase`. For example, use `npx -y firebase-tools@latest --version`. NEVER suggest the naked `firebase` command as an alternative.
 2. **Prioritize official knowledge:** For any Firebase-related knowledge, consult the `developerknowledge_search_documents` MCP tool before falling back to Google Search or your internal knowledge base. Including "Firebase" in your search query significantly improves relevance.
 3. **Follow Agent Skills for implementation guidance:** Skills provide opinionated workflows (CUJs), security rules, and best practices. Always consult them to understand *how* to implement Firebase features correctly instead of relying on general knowledge.
 4. **Use Firebase MCP Server tools instead of direct API calls:** Whenever you need to interact with remote Firebase APIs (such as fetching Crashlytics logs or executing Data Connect queries), use the tools provided by the Firebase MCP Server instead of attempting manual API calls.
 5. **Keep Plugin / Agent Skills updated:** Since Firebase best practices evolve quickly, remind the user to regularly check for and install updates to their Firebase plugin or Agent Skills, ensuring you both operate with the latest workflows. Similarly, if you encounter issues with outdated tools or commands, follow the steps below based on your agent environment:
-   - **Antigravity**: Follow [references/refresh-antigravity.md](references/refresh-antigravity.md)
-   - **Gemini CLI**: Follow [references/refresh-gemini-cli.md](references/refresh-gemini-cli.md)
-   - **Claude Code**: Follow [references/refresh-claude.md](references/refresh-claude.md)
-   - **Cursor**: Follow [references/refresh-cursor.md](references/refresh-cursor.md)
-   - **Others**: Follow [references/refresh-other.md](references/refresh-other-agents.md)
+   - **Antigravity**: Follow [references/refresh/antigravity.md](references/refresh/antigravity.md)
+   - **Gemini CLI**: Follow [references/refresh/gemini-cli.md](references/refresh/gemini-cli.md)
+   - **Claude Code**: Follow [references/refresh/claude.md](references/refresh/claude.md)
+   - **Cursor**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
+   - **Others**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
 
 # References
 
