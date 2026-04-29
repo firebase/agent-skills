@@ -64,7 +64,7 @@ Add a Run Script phase to the main app target in Xcode. This step is required to
     }
     ```
 
-2.  Run your app on a device or emulator. If running in the Xcode emulator, make sure that the Xcode debugger is disconnected, otherwise the crash will not make it to Crashlytics. The app should crash after a short delay.
+2.  Run your app on a device or simulator. If running in the iOS simulator, make sure that the Xcode debugger is disconnected, otherwise the crash will not make it to Crashlytics. The app should crash after a short delay.
 
 3.  Restart the app. The Crashlytics SDK will send the crash report to Firebase on the next app launch.
 
@@ -72,7 +72,7 @@ Add a Run Script phase to the main app target in Xcode. This step is required to
   -  If the Firebase MCP server is installed, use the `get_report` tool to check that a crash was received.
   -  As a fallback, visit the Crashlytics dashboard in the Firebase console to see the new crash report.
 
-5. After verifying that the crash has made it to the Firebase console - either via `get_report` or manually using the Firebase console - remove the code from step 1 that triggers the crash to prevent the application from always crashing on start up after a delay.
+5. After verifying that Firebase has received the crash report - either using the `get_report` tool or manually viewing it in the Firebase console - remove the code from step 1 that triggers the crash.  This prevents the application from always crashing on start up after a delay.
 
 ### Optional: Add custom debugging information
 
