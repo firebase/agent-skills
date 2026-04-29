@@ -1,18 +1,18 @@
 ---
 name: firebase-data-connect
-description: Build and deploy Firebase SQL Connect (aka Firebase Data Connect) backends with PostgreSQL. Use for schema design, GraphQL queries/mutations, authorization, and SDK generation for web, Android, iOS, and Flutter apps.
+description: Builds and deploys Firebase SQL Connect (aka Firebase Data Connect) backends with PostgreSQL securely. Use when designing schemas with tables and relations, writing authorized queries and mutations, configuring real-time data updates, or generating type-safe SDKs. Use when you need a relational database with Firebase, or when the user mentions SQL Connect or Data Connect.
 ---
 
-# Firebase Data Connect
+# Firebase SQL Connect
 
-Firebase Data Connect is a relational database service using Cloud SQL for PostgreSQL with GraphQL schema, auto-generated queries/mutations, and type-safe SDKs.
+Firebase SQL Connect is a relational database service using Cloud SQL for PostgreSQL with GraphQL schema, auto-generated queries/mutations, and type-safe SDKs.
 
 > [!NOTE]
 > **Product Rename**: Firebase Data Connect was renamed to **Firebase SQL Connect**. All instructions, references, and examples in this skill repository referring to "Data Connect" or "Firebase Data Connect" apply to "SQL Connect" and "Firebase SQL Connect" as well.
 
 ## Project Structure
 
-```
+```text
 dataconnect/
 ├── dataconnect.yaml      # Service configuration
 ├── schema/
@@ -22,6 +22,12 @@ dataconnect/
     ├── queries.gql       # Queries
     └── mutations.gql     # Mutations
 ```
+
+## Key Tools for Validation
+
+Rely on these two mechanisms to ensure project correctness:
+1. **Review GraphQL Schema**: Both user-defined and generated extensions (in `.dataconnect/schema/main/`).
+2. **Validate Operations**: Run `npx -y firebase-tools@latest dataconnect:compile` against the schema.
 
 ## Operation Strategies: GraphQL vs. Native SQL
 
@@ -37,37 +43,41 @@ Always default to **Native GraphQL**. **Native SQL lacks type safety** and bypas
 Follow this strict workflow to build your application. You **must** read the linked reference files for each step to understand the syntax and available features.
 
 ### 1. Define Data Model (`schema/schema.gql`)
-Define your GraphQL types, tables, and relationships.
+Define your GraphQL types, tables, and relationships (which map to a Postgres schema).
 > **Read [reference/schema.md](reference/schema.md)** for:
 > *   `@table`, `@col`, `@default`
 > *   Relationships (`@ref`, one-to-many, many-to-many)
 > *   Data types (UUID, Vector, JSON, etc.)
 
-### 2. Define Operations (`connector/queries.gql`, `connector/mutations.gql`)
-Write the queries and mutations your client will use. Data Connect generates the underlying SQL.
+### 2. Define Authorized Operations (`connector/queries.gql`, `connector/mutations.gql`)
+Write the queries and mutations your client will use, including authorization logic. SQL Connect is secure by default.
 > **Read [reference/operations.md](reference/operations.md)** for:
 > *   **Queries**: Filtering (`where`), Ordering (`orderBy`), Pagination (`limit`/`offset`).
 > *   **Mutations**: Create (`_insert`), Update (`_update`), Delete (`_delete`).
 > *   **Upserts**: Use `_upsert` to "insert or update" records (CRITICAL for user profiles).
-> *   **Transactions**: use `@transaction` for multi-step atomic operations.
-> 
+> *   **Transactions**: Use `@transaction` for multi-step atomic operations. Use `_expr: "response.<prevStep>"` to pass data between steps.
+>
+> **Read [reference/security.md](reference/security.md)** for authorization:
+> *   `@auth(level: ...)` for PUBLIC, USER, or NO_ACCESS.
+> *   `@check` and `@redact` for row-level security and validation.
+>
 > **Read [reference/native_sql.md](reference/native_sql.md)** for Native SQL operations:
 > *   Embedding raw SQL with `_select`, `_selectFirst`, `_execute`
 > *   Strict rules for positional parameters (`$1`, `$2`), quoting, and CTEs
 > *   Advanced PostgreSQL features (PostGIS, Window Functions)
 
-### 3. Secure Your App (`connector/` files)
-Add authorization logic closely with your operations.
-> **Read [reference/security.md](reference/security.md)** for:
-> *   `@auth(level: ...)` for PUBLIC, USER, or NO_ACCESS.
-> *   `@check` and `@redact` for row-level security and validation.
-
-### 4. Generate & Use SDKs
+### 3. Use type-safe SDK in your apps
 Generate type-safe code for your client platform.
 > **Read [reference/sdks.md](reference/sdks.md)** for:
 > *   Android (Kotlin), iOS (Swift), Web (TypeScript), Flutter (Dart).
 > *   How to initialize and call your queries/mutations.
 > *   **Nested Data**: See how to access related fields (e.g., `movie.reviews`).
+
+### 4. Add Real-time Subscriptions (Optional)
+Enable live data updates to push changes to connected clients.
+> **Read [reference/realtime.md](reference/realtime.md)** for:
+> *   `@refresh` directive for time-based polling and event-driven updates.
+> *   CEL conditions to scope refresh triggers precisely.
 
 ---
 
@@ -84,6 +94,8 @@ If you need to implement a specific feature, consult the mapped reference file:
 | **Complex Filters** | [reference/operations.md](reference/operations.md) | `_or`, `_and`, `_not`, `eq`, `contains` |
 | **Transactions** | [reference/operations.md](reference/operations.md) | `@transaction`, `response` binding |
 | **Environment Config** | [reference/config.md](reference/config.md) | `dataconnect.yaml`, `connector.yaml` |
+| **Realtime Subscriptions** | [reference/realtime.md](reference/realtime.md) | `@refresh`, `subscribe()`, auto-refresh |
+| **Starter Templates** | [templates.md](templates.md) | CRUD, user-owned resources, many-to-many, SDK init |
 
 ---
 
@@ -91,21 +103,29 @@ If you need to implement a specific feature, consult the mapped reference file:
 
 > **Read [reference/config.md](reference/config.md)** for deep dive on configuration.
 
-Common commands (run from project root):
-```bash
-# Initialize Data Connect
-npx -y firebase-tools@latest init dataconnect
+Follow these patterns based on your current task:
 
-# Start local emulator
-npx -y firebase-tools@latest emulators:start --only dataconnect
+### How to initialize SQL Connect in a Firebase project
 
-# Generate SDK code
-npx -y firebase-tools@latest dataconnect:sdk:generate
+1.  Understand the app idea. Ask clarification questions if unclear.
+2.  Run `npx -y firebase-tools@latest init dataconnect`.
+3.  Validate that the app template and generated SDK are setup.
 
-# Deploy to production
-npx -y firebase-tools@latest deploy --only dataconnect
-```
+### How to build apps using SQL Connect locally
+
+1.  Start the emulator: `npx -y firebase-tools@latest emulators:start --only dataconnect`.
+2.  Write schema and operations.
+3.  Run `npx -y firebase-tools@latest dataconnect:compile` or `npx -y firebase-tools@latest dataconnect:sdk:generate` to
+    validate them.
+4.  Use the operations in your app and build it.
+
+### How to deploy SQL Connect to Cloud SQL
+
+1.  Run `npx -y firebase-tools@latest deploy --only dataconnect`.
 
 ## Examples
 
-For complete, working code examples of schemas and operations, see **[examples.md](examples.md)**.
+For complete, working code examples of schemas and operations, see
+**[examples.md](examples.md)**.
+
+For ready-to-use starter templates (CRUD, user-owned resources, many-to-many, YAML configs, SDK init), see **[templates.md](templates.md)**.
