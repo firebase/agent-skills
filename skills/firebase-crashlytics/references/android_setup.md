@@ -59,21 +59,6 @@ plugins {
 
 The following optional steps are recommended, but don't necessarily apply to all projects.
 
-### Optional: Link with Google Analytics
-
-Integrating Firebase Crashlytics with Google Analytics provides a more comprehensive view of your app's stability and user behavior. When linked, Crashlytics can log Analytics events leading up to a crash, helping you understand the user's journey and actions that might have preceded the issue. Analytics is also required to measure crash-free users and crash-free sessions.
-
-Add the `firebase-analytics-ktx` dependency:
-
- ```kotlin
-    dependencies {
-        // ... other dependencies
-        implementation("com.google.firebase:firebase-analytics-ktx")
-    }
-```
-
-Enabling Google Analytics in your Firebase project is necessary for this integration to function correctly. 
-
 ### Optional: Install the NDK SDK to capture native crashes
 
 If your app uses native code (C/C++), or includes a library with native code, you can configure Crashlytics to report native crashes.

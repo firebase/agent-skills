@@ -38,19 +38,7 @@ Add a Run Script phase to the main app target in Xcode. This step is required to
 
 ## Follow up Steps
 
-The following optional steps are recommended, but don't necessarily apply to all projects.
-
-### Optional: Link with Google Analytics
-
-Integrating Firebase Crashlytics with Google Analytics provides a more comprehensive view of your app's stability and user behavior. When linked, Crashlytics can log Analytics events leading up to a crash, helping you understand the user's journey and actions that might have preceded the issue. Analytics is also required to measure crash-free users and crash-free sessions.
-
-Install the Google Analytics for Firebase SDK using the Swift packages manager, or the script in the `xcode-project-setup` skill.
-
-Install the `FirebaseAnalytics` package from the `https://github.com/firebase/firebase-ios-sdk.git` repository.
-
-Enabling Google Analytics in your Firebase project is necessary for this integration to function correctly. 
-
-### Optional: Force a Test Crash
+### Required: Force a Test Crash
 
 1. Add code to trigger a crash a few seconds after app startup to verify Crashlytics setup.
 
@@ -76,13 +64,15 @@ Enabling Google Analytics in your Firebase project is necessary for this integra
     }
     ```
 
-2.  Run your app on a device or emulator. The app should crash after a short delay.
+2.  Run your app on a device or emulator. If running in the Xcode emulator, make sure that the Xcode debugger is disconnected, otherwise the crash will not make it to Crashlytics. The app should crash after a short delay.
 
 3.  Restart the app. The Crashlytics SDK will send the crash report to Firebase on the next app launch.
 
-4.  After a few minutes, the crash should be available in Crashlytics.
+4.  After a few minutes, the crash should be available in the Firebase console. Go to **DevOps & Engagement** > **Crashlytics** to view your dashboard and crash reports.
   -  If the Firebase MCP server is installed, use the `get_report` tool to check that a crash was received.
   -  As a fallback, visit the Crashlytics dashboard in the Firebase console to see the new crash report.
+
+5. After verifying that the crash has made it to the Firebase console - either via `get_report` or manually using the Firebase console - remove the code from step 1 that triggers the crash to prevent the application from always crashing on start up after a delay.
 
 ### Optional: Add custom debugging information
 
