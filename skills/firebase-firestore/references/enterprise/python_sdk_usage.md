@@ -1,11 +1,14 @@
 # Python SDK Usage
 
-The Python Server SDK is used for backend/server environments and utilizes Google Application Default Credentials in most Google Cloud environments.
+The Python Server SDK is used for backend/server environments and utilizes
+Google Application Default Credentials in most Google Cloud environments.
 
 ### Writing Data
 
 #### Set a Document
-Creates a document if it does not exist or overwrites it if it does. You can also specify a merge option to only update provided fields.
+
+Creates a document if it does not exist or overwrites it if it does. You can
+also specify a merge option to only update provided fields.
 
 ```python
 city_ref = db.collection("cities").document("LA")
@@ -22,7 +25,9 @@ city_ref.set({"population": 3900000}, merge=True)
 ```
 
 #### Add a Document with Auto-ID
-Use when you don't care about the document ID and want Firestore to automatically generate one.
+
+Use when you don't care about the document ID and want Firestore to
+automatically generate one.
 
 ```python
 update_time, city_ref = db.collection("cities").add({
@@ -33,7 +38,9 @@ print("Document written with ID: ", city_ref.id)
 ```
 
 #### Update a Document
-Update some fields of an existing document without overwriting the entire document. Fails if the document doesn't exist.
+
+Update some fields of an existing document without overwriting the entire
+document. Fails if the document doesn't exist.
 
 ```python
 city_ref = db.collection("cities").document("LA")
@@ -43,6 +50,7 @@ city_ref.update({
 ```
 
 #### Transactions
+
 Perform an atomic read-modify-write operation.
 
 ```python
@@ -56,7 +64,7 @@ def update_in_transaction(transaction, city_ref):
     snapshot = city_ref.get(transaction=transaction)
     if not snapshot.exists:
         raise Exception("Document does not exist!")
-    
+
     new_population = snapshot.get("population") + 1
     transaction.update(city_ref, {"population": new_population})
 
@@ -78,6 +86,7 @@ else:
 ```
 
 #### Get Multiple Documents
+
 Fetches all documents in a query or collection once.
 
 ```python
@@ -90,7 +99,9 @@ for doc in docs:
 ### Queries
 
 #### Simple and Compound Queries
-Use `.where()` to combine filters safely. Stack `.where()` calls for compound queries.
+
+Use `.where()` to combine filters safely. Stack `.where()` calls for compound
+queries.
 
 ```python
 from google.cloud.firestore import FieldFilter
@@ -109,6 +120,7 @@ query_2 = cities_ref.where(
 ```
 
 #### Order and Limit
+
 Sort and limit results cleanly.
 
 ```python
