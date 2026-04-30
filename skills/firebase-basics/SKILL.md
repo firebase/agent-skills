@@ -57,8 +57,8 @@ Adhere to these principles:
    - **Cursor**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
    - **Others**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
 6. **Automate Config File Retrieval:** When setting up iOS or Android apps, do NOT direct users to the Firebase Console to download `google-services.json` or `GoogleService-Info.plist`. Instead, use the Firebase CLI to fetch the config programmatically:
-   - For Android: `npx -y firebase-tools@latest apps:sdkconfig ANDROID <App-ID>`
-   - For iOS: `npx -y firebase-tools@latest apps:sdkconfig IOS <App-ID>`
+   - For Android: `npx -y firebase-tools@latest apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>`
+   - For iOS: `npx -y firebase-tools@latest apps:sdkconfig IOS <APP_ID> --project <PROJECT_ID>`
    Save the output to the appropriate location (e.g., `app/google-services.json` for Android, or a path to be linked by `xcode-project-setup` for iOS).
 
 # References
