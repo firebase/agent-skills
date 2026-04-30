@@ -41,7 +41,7 @@ Complete these setup steps before proceeding:
      2. If the command outputs `Active Project: <project-id>`, confirm with the user if this is the intended project.
      3. If not, or if no project is active, set the project provided by the user:
         ```bash
-        npx -y firebase-tools@latest use --add <PROJECT_ID>
+        npx -y firebase-tools@latest use <PROJECT_ID>
         ```
 
    - **If creating a new project:**
