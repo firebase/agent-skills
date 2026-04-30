@@ -66,7 +66,7 @@ Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
 }
 ```
 
-**CRITICAL**: After configuring `firebase.json`, you MUST deploy the auth configuration to the Firebase backend. This is essential for features like Google Sign-In to auto-generate the necessary OAuth clients for your app platforms. Run:
+**CRITICAL**: After configuring `firebase.json`, you MUST deploy the auth configuration to the Firebase backend. This is essential for auth providers like Google Sign-In, email/password, etc. to auto-generate the necessary OAuth clients for your app platforms. Run:
 ```bash
 npx -y firebase-tools@latest deploy --only auth
 ```
