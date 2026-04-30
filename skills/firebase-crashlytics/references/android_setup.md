@@ -57,23 +57,6 @@ plugins {
 
 ## Follow up Steps
 
-The following optional steps are recommended, but don't necessarily apply to all projects.
-
-### Optional: Link with Google Analytics
-
-Integrating Firebase Crashlytics with Google Analytics provides a more comprehensive view of your app's stability and user behavior. When linked, Crashlytics can log Analytics events leading up to a crash, helping you understand the user's journey and actions that might have preceded the issue. Analytics is also required to measure crash-free users and crash-free sessions.
-
-Add the `firebase-analytics-ktx` dependency:
-
- ```kotlin
-    dependencies {
-        // ... other dependencies
-        implementation("com.google.firebase:firebase-analytics-ktx")
-    }
-```
-
-Enabling Google Analytics in your Firebase project is necessary for this integration to function correctly. 
-
 ### Optional: Install the NDK SDK to capture native crashes
 
 If your app uses native code (C/C++), or includes a library with native code, you can configure Crashlytics to report native crashes.
@@ -107,9 +90,9 @@ App-level `build.gradle.kts` (`<project>/<app-module>/build.gradle.kts`)
 
 After these changes, Crashlytics will automatically report crashes in your app's native code.
 
-### Optional: Force a Test Crash
+### Required: Force a Test Crash
 
-To verify that Crashlytics is correctly installed, you can force a test crash.
+To verify that Crashlytics is correctly installed, you need to force a test crash in the app.
 
 1.  Add code to your main activity (e.g., in `onCreate`) to trigger a crash a few seconds after app startup:
 
@@ -127,9 +110,11 @@ To verify that Crashlytics is correctly installed, you can force a test crash.
 
 3.  Restart the app. The Crashlytics SDK will send the crash report to Firebase on the next app launch.
 
-4.  After a few minutes, the crash should be available in Crashlytics.
+4.  After a few minutes, the crash should be available in the Firebase console. Go to **DevOps & Engagement** > **Crashlytics** to view your dashboard and crash reports.
   -  If the Firebase MCP server is installed, use the `get_report` tool to check that a crash was received.
   -  As a fallback, visit the Crashlytics dashboard in the Firebase console to see the new crash report.
+
+5. After verifying that Firebase has received the crash report - either using the `get_report` tool or manually viewing it in the Firebase console - remove the code from step 1 that triggers the crash.  This prevents the application from always crashing on start up after a delay.
 
 ### Optional: Add custom debugging information
 
