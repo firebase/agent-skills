@@ -92,7 +92,7 @@ After these changes, Crashlytics will automatically report crashes in your app's
 
 ### Required: Force a Test Crash
 
-To verify that Crashlytics is correctly installed, you can force a test crash.
+To verify that Crashlytics is correctly installed, you need to force a test crash in the app.
 
 1.  Add code to your main activity (e.g., in `onCreate`) to trigger a crash a few seconds after app startup:
 
