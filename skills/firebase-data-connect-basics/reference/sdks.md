@@ -84,10 +84,15 @@ const newMovie = await createMovie({
 console.log(newMovie.data.movie_insert); // Returns key
 ```
 
-### Subscriptions
+### Subscriptions (Realtime)
+
+Use `subscribe()` instead of `execute()` to receive live updates. This works with queries that use `@refresh` directives and with single-entity lookups that auto-refresh. The subscription yields current data immediately, then pushes delta updates when the server refreshes the query.
+
+See [reference/realtime.md](realtime.md) for how to configure which queries refresh and when.
 
 ```typescript
-import { listMoviesRef, subscribe } from '@movie-app/dataconnect';
+import { listMoviesRef } from '@movie-app/dataconnect';
+import { subscribe } from 'firebase/data-connect';
 
 const unsubscribe = subscribe(listMoviesRef(), {
   onNext: (result) => {
@@ -99,6 +104,29 @@ const unsubscribe = subscribe(listMoviesRef(), {
 });
 
 // Later: unsubscribe();
+```
+
+### Framework Example (React)
+
+```typescript
+import { useEffect, useState } from 'react';
+import { listMoviesRef } from '@movie-app/dataconnect';
+import { subscribe } from 'firebase/data-connect';
+
+function MovieList() {
+  const [movies, setMovies] = useState([]);
+
+  useEffect(() => {
+    const ref = listMoviesRef();
+    const unsubscribe = subscribe(ref, {
+      onNext: (result) => setMovies(result.data.movies),
+      onError: (error) => console.error('Subscription error:', error)
+    });
+    return () => unsubscribe();
+  }, []);
+
+  return <ul>{movies.map(m => <li key={m.id}>{m.title}</li>)}</ul>;
+}
 ```
 
 ### With Authentication
@@ -164,7 +192,9 @@ val newMovie = connector.createMovie.execute(
 )
 ```
 
-### Flow Subscription
+### Flow Subscription (Realtime)
+
+Use `flow()` to receive live updates from `@refresh`-enabled queries and auto-refreshing entity lookups. See [reference/realtime.md](realtime.md) for server-side configuration.
 
 ```kotlin
 connector.listMovies.flow().collect { result ->
@@ -223,21 +253,14 @@ let newMovie = try await connector.createMovie.execute(
 )
 ```
 
-### Combine Publisher
+### Subscriptions (Realtime)
+
+Initiate a real-time subscription to a query reference. Results are automatically published to the `data` property of the query reference, which can be observed in SwiftUI views.
 
 ```swift
-connector.listMovies.publisher
-    .sink(
-        receiveCompletion: { completion in
-            if case .failure(let error) = completion {
-                print("Error: \(error)")
-            }
-        },
-        receiveValue: { result in
-            self.movies = result.data.movies
-        }
-    )
-    .store(in: &cancellables)
+// Initiate realtime subscription to a query ref
+// Results are published to the data var of the query ref
+_ = try await connector.listMovies.ref().subscribe()
 ```
 
 ---

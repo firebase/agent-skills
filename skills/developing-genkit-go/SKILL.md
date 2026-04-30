@@ -55,6 +55,7 @@ Load the appropriate reference based on what you need:
 | Generation | [references/generation.md](references/generation.md) | `Generate`, `GenerateText`, `GenerateData`, streaming, output formats |
 | Prompts | [references/prompts.md](references/prompts.md) | `DefinePrompt`, `DefineDataPrompt`, `.prompt` files, schemas |
 | Tools | [references/tools.md](references/tools.md) | `DefineTool`, tool interrupts, `RestartWith`/`RespondWith` |
+| Middleware | [references/middleware.md](references/middleware.md) | `ai.Middleware`, `ai.WithUse`, `Hooks` (Generate/Model/Tool), built-ins (`Retry`, `Fallback`, `ToolApproval`, `Filesystem`, `Skills`) |
 | Flows & HTTP | [references/flows-and-http.md](references/flows-and-http.md) | `DefineFlow`, `DefineStreamingFlow`, `genkit.Handler`, HTTP serving |
 | Model Providers | [references/providers.md](references/providers.md) | Google AI, Vertex AI, Anthropic, OpenAI-compatible, Ollama setup |
 
@@ -94,4 +95,5 @@ See [references/getting-started.md](references/getting-started.md) for full CLI 
 - **Use `jsonschema:"description=..."` struct tags on output types.** The model uses these descriptions to understand what each field should contain. Without them, structured output quality drops significantly.
 - **Write good tool descriptions.** The model decides which tools to call based on their description string. Vague descriptions lead to missed or incorrect tool calls.
 - **Use `.prompt` files for complex prompts.** They separate prompt content from Go code, support Handlebars templating, and can be iterated on without recompilation. Code-defined prompts are better for simple, single-line cases.
+- **Reach for built-in middleware before writing one.** `Retry`, `Fallback`, `ToolApproval`, `Filesystem`, and `Skills` cover the common cross-cutting needs and compose with each other via `ai.WithUse`. See [references/middleware.md](references/middleware.md). When you do write custom middleware, allocate per-call state in closures captured by `New`, and guard anything that `WrapTool` mutates because tools may run concurrently.
 - **Look up the latest model IDs.** Model names change frequently. Check provider documentation for current model IDs rather than relying on hardcoded names. See [references/providers.md](references/providers.md).

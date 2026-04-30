@@ -1,6 +1,6 @@
 # Examples
 
-Complete, working examples for common Data Connect use cases.
+Complete, working examples for common SQL Connect use cases.
 
 ---
 
@@ -143,6 +143,95 @@ mutation DeleteReview($id: UUID!) @auth(level: USER) {
     }}
   )
 }
+```
+
+### Realtime Queries
+
+```graphql
+# queries.gql (realtime additions)
+
+# Auto-refresh: this single-entity lookup refreshes automatically
+# when any mutation modifies this specific movie. No @refresh needed.
+query GetMovie($id: UUID!) @auth(level: PUBLIC) {
+  movie(id: $id) {
+    id title genre rating releaseYear description
+    metadata: movieMetadata_on_movie { director runtime }
+    reviews: reviews_on_movie(orderBy: [{ createdAt: DESC }], limit: 10) {
+      rating text createdAt
+      user { displayName }
+    }
+  }
+}
+
+# Event-driven: Simple refresh when any movie is added
+query ListMoviesSimple @auth(level: PUBLIC) @refresh(onMutationExecuted: { operation: "AddMovie" }) {
+  movies { id title }
+}
+
+# Counterpart mutation for ListMoviesSimple
+mutation AddMovie($title: String!) @auth(level: USER) {
+  movie_insert(data: { title: $title })
+}
+
+# Event-driven: Refresh only when a movie of the same genre is added
+# Demonstrates the use of 'condition' and 'mutation.variables'
+query ListMoviesByGenre($genre: String!) @auth(level: PUBLIC)
+  @refresh(onMutationExecuted: {
+    operation: "AddMovieWithGenre",
+    condition: "mutation.variables.genre == request.variables.genre"
+  }) {
+  movies(where: { genre: { eq: $genre } }) { id title }
+}
+
+# Counterpart mutation for ListMoviesByGenre
+mutation AddMovieWithGenre($title: String!, $genre: String!) @auth(level: USER) {
+  movie_insert(data: { title: $title, genre: $genre })
+}
+
+# Event-driven: Refresh user profile when updated
+# Demonstrates condition based on auth context
+query MyProfile @auth(level: USER)
+  @refresh(onMutationExecuted: {
+    operation: "UpdateProfile",
+    condition: "mutation.auth.uid == request.auth.uid"
+  }) {
+  user(uid_expr: "auth.uid") { id name }
+}
+
+# Counterpart mutation for MyProfile
+mutation UpdateProfile($name: String!) @auth(level: USER) {
+  user_update(id_expr: "auth.uid", data: { name: $name })
+}
+
+# Time-based: live leaderboard refreshing every 30 seconds
+query MovieLeaderboard
+  @auth(level: PUBLIC)
+  @refresh(every: { seconds: 30 }) {
+  movies(orderBy: [{ rating: DESC }], limit: 10) {
+    id title rating
+  }
+}
+```
+
+```typescript
+import { listMoviesRef, movieLeaderboardRef } from '@movie-app/dataconnect';
+import { subscribe } from 'firebase/data-connect';
+
+// Subscribe to movie list — refreshes when AddReview mutation runs
+const unsubMovies = subscribe(listMoviesRef({ genre: 'Action' }), {
+  onNext: (result) => updateMovieList(result.data.movies),
+  onError: (error) => console.error(error)
+});
+
+// Subscribe to leaderboard — refreshes every 30 seconds
+const unsubLeaderboard = subscribe(movieLeaderboardRef(), {
+  onNext: (result) => updateLeaderboard(result.data.movies),
+  onError: (error) => console.error(error)
+});
+
+// Cleanup
+// unsubMovies();
+// unsubLeaderboard();
 ```
 
 ---

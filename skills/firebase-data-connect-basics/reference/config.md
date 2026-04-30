@@ -29,7 +29,7 @@ project-root/
 
 ## dataconnect.yaml
 
-Main Data Connect service configuration:
+Main SQL Connect service configuration:
 
 ```yaml
 specVersion: "v1"
@@ -99,7 +99,7 @@ generate:
 
 ## Firebase CLI Commands
 
-### Initialize Data Connect
+### Initialize SQL Connect
 
 ```bash
 # Interactive setup
@@ -139,7 +139,7 @@ npx -y firebase-tools@latest dataconnect:sql:migrate
 ### Deployment
 
 ```bash
-# Deploy Data Connect service
+# Deploy SQL Connect service
 npx -y firebase-tools@latest deploy --only dataconnect
 
 # Deploy specific connector
@@ -160,7 +160,7 @@ npx -y firebase-tools@latest emulators:start --only dataconnect
 ```
 
 Default ports:
-- Data Connect: `9399`
+- SQL Connect: `9399`
 - PostgreSQL: `9939` (local PostgreSQL instance)
 
 ### Emulator Configuration (firebase.json)
@@ -216,7 +216,7 @@ npx -y firebase-tools@latest emulators:start --only dataconnect --import=./seed-
 
 ### Schema Migrations
 
-Data Connect auto-generates PostgreSQL migrations:
+SQL Connect auto-generates PostgreSQL migrations:
 
 ```bash
 # Preview migration
@@ -242,7 +242,7 @@ Use `--force` flag to acknowledge breaking changes during deploy.
 
 ```yaml
 # GitHub Actions example
-- name: Deploy Data Connect
+- name: Deploy SQL Connect
   run: |
     npx -y firebase-tools@latest deploy --only dataconnect --token ${{ secrets.FIREBASE_TOKEN }} --force
 ```
@@ -251,7 +251,7 @@ Use `--force` flag to acknowledge breaking changes during deploy.
 
 ## VS Code Extension
 
-Install "Firebase Data Connect" extension for:
+Install "Firebase SQL Connect" extension for:
 - Schema intellisense and validation
 - GraphQL operation testing
 - Emulator integration

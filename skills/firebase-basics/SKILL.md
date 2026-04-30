@@ -7,26 +7,44 @@ description: >-
   environment, authenticating, setting active projects, or setting up `google-services.json`
   or `GoogleService-Info.plist` files.
 ---
+
 # Prerequisites
 
 Complete these setup steps before proceeding:
 
-1. **Local Environment Setup:** Verify the environment is properly set up so we can use Firebase tools:
-   - Run `npx -y firebase-tools@latest --version` to check if the Firebase CLI is installed.
-   - Verify if the Firebase MCP server is installed using your existing tools.
-   - **CRITICAL**: Before configuring any extensions or agent environments below, you MUST read [references/local-env-setup.md](references/local-env-setup.md).
-   - To fully manage Firebase, ensure you have installed the necessary agent skills and MCP server for your environment:
-     - **Gemini CLI**: Review [references/setup/gemini_cli.md](references/setup/gemini_cli.md)
-     - **Antigravity**: Review [references/setup/antigravity.md](references/setup/antigravity.md)
-     - **Claude Code**: Review [references/setup/claude_code.md](references/setup/claude_code.md)
-     - **Cursor**: Review [references/setup/cursor.md](references/setup/cursor.md)
-     - **GitHub Copilot**: Review [references/setup/github_copilot.md](references/setup/github_copilot.md)
-     - **Other Agents**: Review [references/setup/other_agents.md](references/setup/other_agents.md)
+1.  **Local Environment Setup:** Verify the environment is properly set up so we
+    can use Firebase tools:
 
-2. **Authentication:**
-   Ensure you are logged in to Firebase so that commands have the correct permissions. Run `npx -y firebase-tools@latest login`. For environments without a browser (e.g., remote shells), use `npx -y firebase-tools@latest login --no-localhost`.
-   - The command should output the current user. 
-   - If you are not logged in, follow the interactive instructions from this command to authenticate.
+    -   Run `npx -y firebase-tools@latest --version` to check if the Firebase
+        CLI is installed.
+    -   Verify if the Firebase MCP server is installed using your existing
+        tools.
+    -   **CRITICAL**: Before configuring any extensions or agent environments
+        below, you MUST read
+        [references/local-env-setup.md](references/local-env-setup.md).
+    -   To fully manage Firebase, ensure you have installed the necessary agent
+        skills and MCP server for your environment:
+        -   **Gemini CLI**: Review
+            [references/setup/gemini_cli.md](references/setup/gemini_cli.md)
+        -   **Antigravity**: Review
+            [references/setup/antigravity.md](references/setup/antigravity.md)
+        -   **Claude Code**: Review
+            [references/setup/claude_code.md](references/setup/claude_code.md)
+        -   **Cursor**: Review
+            [references/setup/cursor.md](references/setup/cursor.md)
+        -   **GitHub Copilot**: Review
+            [references/setup/github_copilot.md](references/setup/github_copilot.md)
+        -   **Other Agents**: Review
+            [references/setup/other_agents.md](references/setup/other_agents.md)
+
+2.  **Authentication:** Ensure you are logged in to Firebase so that commands
+    have the correct permissions. Run `npx -y firebase-tools@latest login`. For
+    environments without a browser (e.g., remote shells), use `npx -y
+    firebase-tools@latest login --no-localhost`.
+
+    -   The command should output the current user.
+    -   If you are not logged in, follow the interactive instructions from this
+        command to authenticate.
 
 3. **Active Project:**
    Most Firebase tasks require an active project context.
@@ -81,4 +99,5 @@ Adhere to these principles:
 
 # Common Issues
 
-- **Login Issues:** If the browser fails to open during the login step, use `npx -y firebase-tools@latest login --no-localhost` instead.
+-   **Login Issues:** If the browser fails to open during the login step, use
+    `npx -y firebase-tools@latest login --no-localhost` instead.

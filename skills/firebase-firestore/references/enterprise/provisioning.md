@@ -2,12 +2,16 @@
 
 ## Manual Initialization
 
-Initialize the following firebase configuration files manually. Do not use `npx -y firebase-tools@latest init`, as it expects interactive inputs.
+Initialize the following firebase configuration files manually. Do not use `npx
+-y firebase-tools@latest init`, as it expects interactive inputs.
 
-1.  **Create a Firestore Enterprise Database**: Create a Firestore Enterprise database using the Firebase CLI.
-2.  **Create `firebase.json`**: This file contains database configuration for the Firebase CLI.
+1.  **Create a Firestore Enterprise Database**: Create a Firestore Enterprise
+    database using the Firebase CLI.
+2.  **Create `firebase.json`**: This file contains database configuration for
+    the Firebase CLI.
 3.  **Create `firestore.rules`**: This file contains your security rules.
-4.  **Create `firestore.indexes.json`**: This file contains your index definitions.
+4.  **Create `firestore.indexes.json`**: This file contains your index
+    definitions.
 
 ### 1. Create a Firestore Enterprise Database
 
@@ -21,7 +25,10 @@ firebase firestore:databases:create my-database-id \
   --mongodb-compatible-data-access="DISABLED"
 ```
 
-This will create an enterprise database in `nam5` with native mode enabled. A database id is required to create an enterprise database and the database id must not be `(default)`. To enable realtime-updates feature, use `--realtime-updates` flag.
+This will create an enterprise database in `nam5` with native mode enabled. A
+database id is required to create an enterprise database and the database id
+must not be `(default)`. To enable realtime-updates feature, use
+`--realtime-updates` flag.
 
 ```bash
 firebase firestore:databases:create my-database-id \
@@ -34,7 +41,8 @@ firebase firestore:databases:create my-database-id \
 
 ### 2. Create `firebase.json`
 
-Create a file named `firebase.json` in your project root with the following content. If this file already exists, instead append to the existing JSON:
+Create a file named `firebase.json` in your project root with the following
+content. If this file already exists, instead append to the existing JSON:
 
 ```json
 {
@@ -50,7 +58,8 @@ Create a file named `firebase.json` in your project root with the following cont
 
 ### 2. Create `firestore.rules`
 
-Create a file named `firestore.rules`. A good starting point (locking down the database) is:
+Create a file named `firestore.rules`. A good starting point (locking down the
+database) is:
 
 ```
 rules_version = '2';
@@ -62,11 +71,13 @@ service cloud.firestore {
   }
 }
 ```
+
 *See [security_rules.md](security_rules.md) for how to write actual rules.*
 
 ### 3. Create `firestore.indexes.json`
 
-Create a file named `firestore.indexes.json` with an empty configuration to start:
+Create a file named `firestore.indexes.json` with an empty configuration to
+start:
 
 ```json
 {
@@ -77,8 +88,8 @@ Create a file named `firestore.indexes.json` with an empty configuration to star
 
 *See [indexes.md](indexes.md) for how to configure indexes.*
 
-
 ## Deploy rules and indexes
+
 ```bash
 # To deploy all rules and indexes
 firebase deploy --only firestore
@@ -98,4 +109,5 @@ To run Firestore locally for development and testing:
 firebase emulators:start --only firestore
 ```
 
-This starts the Firestore emulator, typically on port 8080. You can interact with it using the Emulator UI (usually at http://localhost:4000/firestore).
+This starts the Firestore emulator, typically on port 8080. You can interact
+with it using the Emulator UI (usually at http://localhost:4000/firestore).
