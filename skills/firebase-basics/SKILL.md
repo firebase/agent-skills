@@ -29,18 +29,27 @@ Complete these setup steps before proceeding:
    - If you are not logged in, follow the interactive instructions from this command to authenticate.
 
 3. **Active Project:**
-   Most Firebase tasks require an active project context. Check the current project by running `npx -y firebase-tools@latest use`.
-   - If the command outputs `Active Project: <project-id>`, you can proceed with your task.
-   - If not, ask the user if they have an existing Firebase Project ID.
-     - If yes: Set it as the active project and add a default alias by running:
-       ```bash
-       npx -y firebase-tools@latest use --add <PROJECT_ID>
-       ```
-     - If no: Follow these steps to create a new Firebase project from the CLI:
-       ```bash
-       npx -y firebase-tools@latest projects:create <project-id> --display-name "<display-name>"
-       ```
-       *Note: The `<project-id>` must be 6-30 characters, lowercase, and can contain digits and hyphens. It must be globally unique.*
+   Most Firebase tasks require an active project context.
+
+   > [!IMPORTANT]
+   > **For Agents:** Before proceeding with project configuration, you MUST pause and ask the developer if they prefer to:
+   > 1. **Provide an existing Firebase Project ID**, or
+   > 2. **Create a new Firebase project**.
+
+   - **If using an existing Project ID:**
+     1. Check the current project by running `npx -y firebase-tools@latest use`.
+     2. If the command outputs `Active Project: <project-id>`, confirm with the user if this is the intended project.
+     3. If not, or if no project is active, set the project provided by the user:
+        ```bash
+        npx -y firebase-tools@latest use <PROJECT_ID>
+        ```
+
+   - **If creating a new project:**
+     Run the following command to create it:
+     ```bash
+     npx -y firebase-tools@latest projects:create <project-id> --display-name "<display-name>"
+     ```
+     *Note: The `<project-id>` must be 6-30 characters, lowercase, and can contain digits and hyphens. It must be globally unique.*
 
 # Firebase Usage Principles
 
