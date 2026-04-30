@@ -58,5 +58,5 @@ corresponding reference guides:
 -   **Provisioning**: Read [provisioning.md](references/enterprise/provisioning.md)
 -   **Data Model**: Read [data_model.md](references/enterprise/data_model.md)
 -   **Security Rules**: Read [security_rules.md](references/enterprise/security_rules.md)
--   **SDK Usage**: Read [web_sdk_usage.md](references/enterprise/web_sdk_usage.md), [python_sdk_usage.md](references/enterprise/python_sdk_usage.md), [android_sdk_usage.md](references/enterprise/android_sdk_usage.md), or [flutter_setup.md](references/enterprise/flutter_setup.md)
+-   **SDK Usage**: Read [web_sdk_usage.md](references/enterprise/web_sdk_usage.md), [python_sdk_usage.md](references/enterprise/python_sdk_usage.md), [android_sdk_usage.md](references/enterprise/android_sdk_usage.md), [ios_setup.md](references/enterprise/ios_setup.md), or [flutter_setup.md](references/enterprise/flutter_setup.md)
 -   **Indexes**: Read [indexes.md](references/enterprise/indexes.md)
