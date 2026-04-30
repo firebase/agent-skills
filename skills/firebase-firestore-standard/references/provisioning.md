@@ -64,7 +64,9 @@ Create a file named `firestore.indexes.json` with an empty configuration to star
 *See [indexes.md](indexes.md) for how to configure indexes.*
 
 
-## Deploy rules and indexes
+## Deploy database, rules and indexes
+
+**CRITICAL**: You MUST deploy the firestore configuration for the database to be provisioned in the cloud and for your rules/indexes to take effect. If you don't run this, your database will not exist.
 ```bash
 # To deploy all rules and indexes
 npx -y firebase-tools@latest deploy --only firestore
