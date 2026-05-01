@@ -40,7 +40,7 @@ Ensure there's at least one app associated with the current project
 
 Initialize AI logic SDK with the init command
 
-`npx -y firebase-tools@latest init # Choose AI logic`
+`npx -y firebase-tools@latest init ailogic`
 
 This will automatically enable the Gemini Developer API in the Firebase console.
 
@@ -64,7 +64,7 @@ To improve the user experience by showing partial results as they arrive (like a
 
 ### Generate Images with Nano Banana
 
-- Start with Gemini for most use cases, and choose Imagen for specialized tasks where image quality and specific styles are critical. (Example: gemini-2.5-flash-image)
+- Start with Gemini for most use cases, and choose Imagen for specialized tasks where image quality and specific styles are critical. (Example: gemini-flash-latest-image)
 - Requires an upgraded Blaze pay-as-you-go billing plan.
 
 ### Search Grounding with the built in googleSearch tool
@@ -108,7 +108,7 @@ Consider that you do not need to hardcode model names (e.g., `gemini-flash-lite-
 | iOS (Swift) | Gemini Developer API | [ios_setup.md](references/ios_setup.md) |
 | Flutter (Dart) | Gemini Developer API | [flutter_setup.md](references/flutter_setup.md) |
 
-**Always use the most recent version of Gemini (gemini-2.5-flash) unless another model is requested by the docs or the user. DO NOT USE gemini-1.5-flash. **
+**Always use the most recent version of Gemini (gemini-flash-latest) unless another model is requested by the docs or the user. DO NOT USE gemini-1.5-flash. **
 
 ## References
 

@@ -48,7 +48,7 @@ void main() async {
 Use `FirebaseAI.googleAI` for the **Gemini Developer API**.
 
 > [!IMPORTANT]
-> **Model Selection:** Always use **`gemini-2.5-flash`**. DO NOT USE `gemini-1.5-flash`.
+> **Model Selection:** Always use **`gemini-flash-latest`**. DO NOT USE `gemini-1.5-flash`.
 
 > [!IMPORTANT]
 > **Choose the Right API Provider:** Always use `FirebaseAI.googleAI` (Gemini Developer API) as the default for prototyping and standard use. Avoid using the Vertex AI Gemini API unless your application specifically requires enterprise-grade scalability and is configured for the Blaze plan.
@@ -63,7 +63,7 @@ Future<String> generateText(String prompt) async {
   final googleAI = FirebaseAI.googleAI(auth: FirebaseAuth.instance);
   
   // Use the latest Gemini Flash model
-  final model = googleAI.generativeModel(model: 'gemini-2.5-flash');
+  final model = googleAI.generativeModel(model: 'gemini-flash-latest');
 
   final response = await model.generateContent([Content.text(prompt)]);
   return response.text ?? 'No response';
