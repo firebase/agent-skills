@@ -64,7 +64,7 @@ To improve the user experience by showing partial results as they arrive (like a
 
 ### Generate Images with Nano Banana
 
-- Start with Gemini for most use cases, and choose Imagen for specialized tasks where image quality and specific styles are critical. (Example: gemini-flash-latest-image)
+- Start with Gemini for most use cases, and choose Imagen for specialized tasks where image quality and specific styles are critical. (Example: gemini-2.5-flash-image)
 - Requires an upgraded Blaze pay-as-you-go billing plan.
 
 ### Search Grounding with the built in googleSearch tool
