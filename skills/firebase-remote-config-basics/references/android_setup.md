@@ -50,8 +50,8 @@ plugins {
         implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
 
         // Add the dependencies for Remote Config and Analytics
-        implementation("com.google.firebase:firebase-config-ktx")
-        implementation("com.google.firebase:firebase-analytics-ktx")
+        implementation("com.google.firebase:firebase-config")
+        implementation("com.google.firebase:firebase-analytics")
     }
     ```
 

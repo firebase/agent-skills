@@ -1,4 +1,4 @@
-# Firebase Crashlytics iOS Setup Guide
+# Firebase Remote Config iOS Setup Guide
 
 Important references:
 

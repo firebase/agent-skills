@@ -14,7 +14,7 @@ Provisioning Remote Config requires both a Firebase project and a Firebase app, 
 
 ## SDK Setup
 
-To learn how to setup Remote Config in your application code, choose your platform:
+To learn how to set up Remote Config in your application code, choose your platform:
 
 *   **Android**: [android_setup.md](references/android_setup.md)
 *   **iOS**: [ios_setup.md](references/ios_setup.md)
