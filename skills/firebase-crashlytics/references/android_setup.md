@@ -20,7 +20,7 @@ These changes are made to your Android project's Gradle files.
 
 ### Project-level `build.gradle.kts` (`<project>/build.gradle.kts`)
 
-Add the latest version of the Crashlytics Gradle plugin to the `plugins` block. Fetch the latest version from https://firebase.google.com/docs/crashlytics/android/get-started#add-plugin before adding this. 
+Add the latest version of the Crashlytics Gradle plugin to the `plugins` block. Fetch the [latest version from the Google Maven repository](https://maven.google.com/web/index.html?q=firebase-crashlytics-gradle#com.google.firebase:firebase-crashlytics-gradle) before adding this. 
 
 ```kotlin
 plugins {
@@ -40,7 +40,7 @@ plugins {
     }
     ```
 
-2.  Add the Firebase Crashlytics dependency to the `dependencies` block. It is recommended to use the Firebase Bill of Materials (BoM) to manage SDK versions. Fetch the latest available BoM version from https://firebase.google.com/support/release-notes/android before adding this.
+2.  Add the Firebase Crashlytics dependency to the `dependencies` block. It is recommended to use the Firebase Bill of Materials (BoM) to manage SDK versions. Fetch the [latest version from the Google Maven repository](https://maven.google.com/web/index.html?q=firebase-bom#com.google.firebase:firebase-bom) before adding this.
 
     ```kotlin
     dependencies {
@@ -118,5 +118,5 @@ To verify that Crashlytics is correctly installed, you need to force a test cras
 
 ### Optional: Add custom debugging information
 
-Customize reports to help you better understand what's happening in your app and the circumstances around events reported to Crashlytics. See [Customize Crash Reports for Android](https://firebase.google.com/docs/crashlytics/android/customize-crash-reports).
+Customize reports to help you better understand what's happening in your app and the circumstances around events reported to Crashlytics. See [Customize Crash Reports for Android](https://firebase.google.com/docs/crashlytics/android/customize-crash-reports.md).
 
