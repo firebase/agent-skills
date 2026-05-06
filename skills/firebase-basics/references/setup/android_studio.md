@@ -9,7 +9,7 @@ Gemini in Android Studio expects skills to be located at `~/.agents/skills`.
 To install all Firebase skills, run the following command in your terminal:
 
 ```bash
-npx skills add firebase/agent-skills --skill "*"
+npx -y skills add firebase/agent-skills --skill "*" --yes
 ```
 
 Ensure that the skills are installed or linked to the `~/.agents/skills` directory.
