@@ -42,7 +42,7 @@ firebase firestore:databases:create my-database-id \
 ### 2. Create `firebase.json`
 
 Create a file named `firebase.json` in your project root with the following
-content. If this file already exists, instead append to the existing JSON:
+content (edit `database` and `location` to match the ones you created above). If this file already exists, instead append to the existing JSON:
 
 ```json
 {

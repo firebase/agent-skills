@@ -33,11 +33,17 @@ firebase-tools@latest firestore:databases:list`
 
 ### B. No Instance Found (or New Requested)
 
-If no databases exist or the user requests a new one, default to provisioning an
-**Enterprise** edition database: `bash npx -y firebase-tools@latest
-firestore:databases:create <database-id> --edition="enterprise"
---location="nam5"` - Proceed with using the guides under
-`references/enterprise/`.
+If no databases exist or the user requests a new one, default to provisioning an **Enterprise** edition database.
+
+**CRITICAL**: You MUST ask the user what location to use.
+1.  Run `npx -y firebase-tools@latest firestore:locations` to get the list of options.
+2.  Check `firebase.json` if it already exists to see if there are locations set for other parts of the stack (e.g., `hosting` or `functions`).
+3.  Ask the user which location to use, suggesting colocation if you found a location in step 2.
+
+Once the location is determined, create the database:
+`bash npx -y firebase-tools@latest firestore:databases:create <database-id> --edition="enterprise" --location="<selected-location>"`
+
+Proceed with using the guides under `references/enterprise/`.
 
 --------------------------------------------------------------------------------
 
