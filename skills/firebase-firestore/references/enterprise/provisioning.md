@@ -15,7 +15,9 @@ Initialize the following firebase configuration files manually. Do not use `npx
 
 ### 1. Create a Firestore Enterprise Database
 
-**CRITICAL**: You MUST ask the user what location to use. Run `npx -y firebase-tools@latest firestore:locations` to get the list of options. Suggest colocating with other resources if applicable.
+If the user needs to create a new database, ask the user what location to use.
+Run `npx -y firebase-tools@latest firestore:locations` to get the list of options.
+Suggest colocating with other resources if applicable.
 
 Use the following command to create a Firestore Enterprise database:
 

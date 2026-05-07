@@ -25,14 +25,13 @@ content. If this file already exists, instead append to the existing JSON:
 ```
 
 This will use the default database with the Standard edition. To use a different
-database, specify the database ID and location.
+database, specify the database ID and location:
+1.  Run `npx -y firebase-tools@latest firestore:locations` to get the list of locations.
+2.  Ask the user which location to use, suggesting colocation if other parts of the app already have a region selected.
 
-**CRITICAL**: You MUST ask the user what location to use if they are creating a new database or need to specify one.
-1.  Run `npx -y firebase-tools@latest firestore:locations` to get the list of options.
-2.  Check `firebase.json` if it already exists to see if there are locations set for other parts of the stack (e.g., `hosting` or `functions`).
-3.  Ask the user which location to use, suggesting colocation if you found a location in step 2.
+You can check the list of available databases using `npx -y firebase-tools@latest firestore:databases:list`.
 
-You can check the list of available databases using `npx -y firebase-tools@latest firestore:databases:list`. If the database does not exist, it will be created when you deploy with the specified configuration:
+If the database does not exist, it will be created when you deploy with the specified configuration:
 
 ```json
 {
