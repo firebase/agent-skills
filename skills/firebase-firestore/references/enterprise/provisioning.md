@@ -15,24 +15,26 @@ Initialize the following firebase configuration files manually. Do not use `npx
 
 ### 1. Create a Firestore Enterprise Database
 
+**CRITICAL**: You MUST ask the user what location to use. Run `npx -y firebase-tools@latest firestore:locations` to get the list of options. Suggest colocating with other resources if applicable.
+
 Use the following command to create a Firestore Enterprise database:
 
 ```bash
 firebase firestore:databases:create my-database-id \
-  --location="nam5" \
+  --location="<selected-location>" \
   --edition="enterprise" \
   --firestore-data-access="ENABLED" \
   --mongodb-compatible-data-access="DISABLED"
 ```
 
-This will create an enterprise database in `nam5` with native mode enabled. A
+This will create an enterprise database in the selected location with native mode enabled. A
 database id is required to create an enterprise database and the database id
 must not be `(default)`. To enable realtime-updates feature, use
 `--realtime-updates` flag.
 
 ```bash
 firebase firestore:databases:create my-database-id \
-  --location="nam5" \
+  --location="<selected-location>" \
   --edition="enterprise" \
   --firestore-data-access="ENABLED" \
   --mongodb-compatible-data-access="DISABLED" \
@@ -51,7 +53,7 @@ content (edit `database` and `location` to match the ones you created above). If
     "indexes": "firestore.indexes.json",
     "edition": "enterprise",
     "database": "my-database-id",
-    "location": "nam5"
+    "location": "<selected-location>"
   }
 }
 ```
