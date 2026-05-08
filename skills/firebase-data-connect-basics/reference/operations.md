@@ -64,11 +64,11 @@ query GetMovie($id: UUID!) @auth(level: PUBLIC) {
 query ListMovies($genre: String, $minRating: Int) @auth(level: PUBLIC) {
   movies(
     where: {
-      genre: { eq: $genre },
+      genre: { eq: $genre }
       rating: { ge: $minRating }
-    },
-    orderBy: [{ releaseYear: DESC }, { title: ASC }],
-    limit: 20,
+    }
+    orderBy: [{ releaseYear: DESC }, { title: ASC }]
+    limit: 20
     offset: 0
   ) {
     id title genre rating
@@ -116,13 +116,13 @@ query RecentPosts @auth(level: PUBLIC) {
 query ComplexFilter($genre: String, $minRating: Int) @auth(level: PUBLIC) {
   movies(where: {
     _or: [
-      { genre: { eq: $genre }},
+      { genre: { eq: $genre }}
       { rating: { ge: $minRating }}
-    ],
+    ]
     _and: [
-      { releaseYear: { ge: 2000 }},
+      { releaseYear: { ge: 2000 }}
       { status: { ne: "hidden" }}
-    ],
+    ]
     _not: { genre: { eq: "Horror" }}
   }) { id title }
 }
@@ -183,7 +183,7 @@ query CompareRatings($genre: String!) @auth(level: PUBLIC) {
 ```graphql
 mutation CreateMovie($title: String!, $genre: String) @auth(level: USER) {
   movie_insert(data: {
-    title: $title,
+    title: $title
     genre: $genre
   })
 }
@@ -197,7 +197,7 @@ mutation CreatePost($title: String!, $content: String!) @auth(level: USER) {
     authorUid_expr: "auth.uid",         # Current user
     id_expr: "uuidV4()",                 # Auto-generate UUID
     createdAt_expr: "request.time",      # Server timestamp
-    title: $title,
+    title: $title
     content: $content
   })
 }
@@ -208,10 +208,10 @@ mutation CreatePost($title: String!, $content: String!) @auth(level: USER) {
 ```graphql
 mutation UpdateMovie($id: UUID!, $title: String, $genre: String) @auth(level: USER) {
   movie_update(
-    id: $id,
+    id: $id
     data: {
-      title: $title,
-      genre: $genre,
+      title: $title
+      genre: $genre
       updatedAt_expr: "request.time"
     }
   )
@@ -248,8 +248,8 @@ mutation AddTag($id: UUID!, $tag: String!) @auth(level: USER) {
 ```graphql
 mutation UpsertUser($email: String!, $name: String!) @auth(level: USER) {
   user_upsert(data: {
-    uid_expr: "auth.uid",
-    email: $email,
+    uid_expr: "auth.uid"
+    email: $email
     name: $name
   })
 }
@@ -264,7 +264,7 @@ mutation DeleteMovie($id: UUID!) @auth(level: USER) {
 
 mutation DeleteOldDrafts @auth(level: USER) {
   post_deleteMany(where: {
-    status: { eq: "draft" },
+    status: { eq: "draft" }
     createdAt: { lt_time: { now: true, sub: { days: 30 }}}
   })
 }
@@ -276,9 +276,9 @@ mutation DeleteOldDrafts @auth(level: USER) {
 mutation UpdateMyPost($id: UUID!, $content: String!) @auth(level: USER) {
   post_update(
     first: { where: {
-      id: { eq: $id },
+      id: { eq: $id }
       authorUid: { eq_expr: "auth.uid" }  # Only own posts
-    }},
+    }}
     data: { content: $content }
   )
 }
@@ -326,12 +326,12 @@ mutation CreateUserWithProfile($name: String!, $bio: String!)
   @transaction {
   # Step 1: Create user
   user_insert(data: {
-    uid_expr: "auth.uid",
+    uid_expr: "auth.uid"
     name: $name
   })
   # Step 2: Create profile (uses response from step 1)
   userProfile_insert(data: {
-    userId_expr: "response.user_insert.uid",
+    userId_expr: "response.user_insert.uid"
     bio: $bio
   })
 }
@@ -346,7 +346,7 @@ mutation CreateTodoWithItem($listName: String!, $itemText: String!)
   @auth(level: USER) 
   @transaction {
   todoList_insert(data: {
-    id_expr: "uuidV4()",
+    id_expr: "uuidV4()"
     name: $listName
   })
   todoItem_insert(data: {

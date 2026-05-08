@@ -9,7 +9,7 @@ the result set, not the size of the database.
 
 In Standard Edition, Firestore **automatically creates** a single-field index
 for every field in a document (and subfields in maps). * **Support**: Simple
-equality queries (`==`) and single-field range/sort queries (`<`, `<=`,
+equality queries (`==`) and single-field range/sort queries (`<`, `<=`
 `orderBy`). * **Behavior**: You generally don't need to manage these unless you
 want to *exempt* a field.
 
@@ -25,7 +25,7 @@ define them manually or via the console/CLI.
 ### What is Automatic?
 
 *   Indexes for simple queries.
-*   Merging of single-field indexes for multiple equality filters (e.g.,
+*   Merging of single-field indexes for multiple equality filters (e.g.
     `where("state", "==", "CA").where("country", "==", "USA")`).
 
 ### When Do I Need to Act?
@@ -95,14 +95,14 @@ Your indexes should be defined in `firestore.indexes.json` (pointed to by
 {
   "indexes": [
     {
-      "collectionGroup": "cities",
-      "queryScope": "COLLECTION",
+      "collectionGroup": "cities"
+      "queryScope": "COLLECTION"
       "fields": [
-        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "country", "order": "ASCENDING" }
         { "fieldPath": "population", "order": "DESCENDING" }
       ]
     }
-  ],
+  ]
   "fieldOverrides": []
 }
 ```

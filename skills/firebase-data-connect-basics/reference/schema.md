@@ -255,8 +255,8 @@ Map custom SQL queries to GraphQL types:
 ```graphql
 type MovieStats @view(sql: """
   SELECT
-    movie_id,
-    COUNT(*) as review_count,
+    movie_id
+    COUNT(*) as review_count
     AVG(rating) as avg_rating
   FROM review
   GROUP BY movie_id

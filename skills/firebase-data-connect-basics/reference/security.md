@@ -96,9 +96,9 @@ query MyPosts @auth(level: USER) {
 mutation UpdateMyPost($id: UUID!, $title: String!) @auth(level: USER) {
   post_update(
     first: { where: {
-      id: { eq: $id },
+      id: { eq: $id }
       authorUid: { eq_expr: "auth.uid" }
-    }},
+    }}
     data: { title: $title }
   )
 }
@@ -172,7 +172,7 @@ mutation MustDeleteMovie($id: UUID!) @auth(level: USER) @transaction {
 # Create with owner
 mutation CreatePost($content: String!) @auth(level: USER) {
   post_insert(data: {
-    authorUid_expr: "auth.uid",
+    authorUid_expr: "auth.uid"
     content: $content
   })
 }
@@ -187,7 +187,7 @@ query MyPosts @auth(level: USER) {
 # Update own data only
 mutation UpdatePost($id: UUID!, $content: String!) @auth(level: USER) {
   post_update(
-    first: { where: { id: { eq: $id }, authorUid: { eq_expr: "auth.uid" }}},
+    first: { where: { id: { eq: $id }, authorUid: { eq_expr: "auth.uid" }}}
     data: { content: $content }
   )
 }
@@ -224,7 +224,7 @@ mutation AdminAction($id: UUID!) @auth(level: USER) @transaction {
 ```graphql
 query PublicPosts @auth(level: PUBLIC) {
   posts(where: {
-    visibility: { eq: "public" },
+    visibility: { eq: "public" }
     publishedAt: { lt_expr: "request.time" }
   }) {
     id title content

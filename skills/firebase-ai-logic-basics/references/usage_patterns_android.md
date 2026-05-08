@@ -125,7 +125,7 @@ Maintain chat history automatically:
 ```kotlin
 val chat = model.startChat(
     history = listOf(
-        content("user") { text("Hello, I am a software engineer.") },
+        content("user") { text("Hello, I am a software engineer.") }
         content("model") { text("Hello! How can I help you today?") }
     )
 )

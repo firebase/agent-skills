@@ -33,24 +33,24 @@ The MCP server allows Cursor to interact directly with Firebase projects.
    **Example valid configurations**:
    ```json
    "firebase": {
-     "command": "npx",
+     "command": "npx"
      "args": ["-y", "firebase-tools@latest", "mcp"]
    }
    ```
    OR
    ```json
    "firebase": {
-     "command": "firebase",
+     "command": "firebase"
      "args": ["mcp"]
    }
    ```
 3. **Add or Update Configuration**: If the `firebase` block is missing or incorrect, add it to the `mcpServers` object:
    ```json
    "firebase": {
-     "command": "npx",
+     "command": "npx"
      "args": [
-       "-y",
-       "firebase-tools@latest",
+       "-y"
+       "firebase-tools@latest"
        "mcp"
      ]
    }

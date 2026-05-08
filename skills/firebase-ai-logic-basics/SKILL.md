@@ -90,7 +90,7 @@ Hybrid on-device inference for web apps, where the Firebase Javascript SDK autom
 > [!WARNING]
 > **Critical Safety Requirement:** In order to use AI Logic safely, you MUST set up App Check on your app. This prevents unauthorized clients from using your API quota and accessing your backend resources.
 
-See [App Check with reCAPTCHA Enterprise](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider.md.txt) for setup instructions.
+See  for setup instructions.
 
 ### Remote Config
 
@@ -105,16 +105,16 @@ Consider that you do not need to hardcode model names (e.g., `gemini-flash-lite-
 | Language, Framework, Platform | Gemini API provider | Context URL |
 | :---- | :---- | :---- |
 | Web Modular API | Gemini Developer API (Developer API) | firebase://docs/ai-logic/get-started  |
-| iOS (Swift) | Gemini Developer API | [ios_setup.md](references/ios_setup.md) |
-| Flutter (Dart) | Gemini Developer API | [flutter_setup.md](references/flutter_setup.md) |
+| iOS (Swift) | Gemini Developer API |  |
+| Flutter (Dart) | Gemini Developer API |  |
 
 **Always use the most recent version of Gemini (gemini-flash-latest) unless another model is requested by the docs or the user. DO NOT USE gemini-1.5-flash. **
 
 ## References
 
-[Web SDK code examples and usage patterns](references/usage_patterns_web.md)
-[iOS SDK code examples and usage patterns](references/ios_setup.md)
-[Flutter SDK code examples and usage patterns](references/flutter_setup.md)
+
+
+
 
 
 [Android (Kotlin) SDK usage patterns](references/usage_patterns_android.md)

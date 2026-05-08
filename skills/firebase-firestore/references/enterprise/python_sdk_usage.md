@@ -15,8 +15,8 @@ city_ref = db.collection("cities").document("LA")
 
 # Create/Overwrite
 city_ref.set({
-    "name": "Los Angeles",
-    "state": "CA",
+    "name": "Los Angeles"
+    "state": "CA"
     "country": "USA"
 })
 
@@ -31,7 +31,7 @@ automatically generate one.
 
 ```python
 update_time, city_ref = db.collection("cities").add({
-    "name": "Tokyo",
+    "name": "Tokyo"
     "country": "Japan"
 })
 print("Document written with ID: ", city_ref.id)

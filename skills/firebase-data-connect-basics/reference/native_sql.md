@@ -37,7 +37,7 @@ Use these root fields in `query` or `mutation` operations:
     ```graphql
     query GetMovies($genre: String!) @auth(level: PUBLIC) {
       movies: _select(
-        sql: "SELECT id, title FROM movie WHERE genre = $1",
+        sql: "SELECT id, title FROM movie WHERE genre = $1"
         params: [$genre]
       )
     }
@@ -59,7 +59,7 @@ Use these root fields in `query` or `mutation` operations:
     ```graphql
     mutation UpdateRating($id: UUID!, $rating: Float!) @auth(level: USER) {
       _execute(
-        sql: "UPDATE movie SET rating = $2 WHERE id = $1",
+        sql: "UPDATE movie SET rating = $2 WHERE id = $1"
         params: [$id, $rating]
       )
     }
@@ -68,7 +68,7 @@ Use these root fields in `query` or `mutation` operations:
     ```graphql
     mutation DeleteUserReviews($uid: String!) @auth(level: USER) {
       deletedReviews: _executeReturning(
-        sql: "DELETE FROM review WHERE user_id = $1 RETURNING id, rating",
+        sql: "DELETE FROM review WHERE user_id = $1 RETURNING id, rating"
         params: [{_expr: "auth.uid"}]
       )
     }
@@ -81,7 +81,7 @@ Use these root fields in `query` or `mutation` operations:
           UPDATE review SET text = $2 
           WHERE movie_id = $1 AND user_id = $3 
           RETURNING id, text
-        """,
+        """
         params: [$movieId, $text, {_expr: "auth.uid"}]
       )
     }

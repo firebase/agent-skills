@@ -17,7 +17,6 @@ Provisioning Crashlytics requires both a Firebase project and a Firebase app, ei
 To learn how to setup Crashlytics in your application code, choose your platform:
 
 *   **Android**: [android_setup.md](references/android_setup.md)
-*   **iOS**: [ios_setup.md](references/ios_setup.md)
 
 ## SDK Usage
 
@@ -31,4 +30,3 @@ The SDK provides a number of features to make crash reports more actionable.
 To learn how to customize crash reports and add additional debugging data, consult the documentation for your platform.
 
 *   **Android**: [Customize Crash Reports for Android](https://firebase.google.com/docs/crashlytics/android/customize-crash-reports.md)
-*   **iOS**: [Customize Crash Reports for Apple Platforms](https://firebase.google.com/docs/crashlytics/ios/customize-crash-reports.md)

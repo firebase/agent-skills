@@ -77,10 +77,10 @@ query ListMovies($genre: String, $minRating: Float, $limit: Int)
   @auth(level: PUBLIC) {
   movies(
     where: {
-      genre: { eq: $genre },
+      genre: { eq: $genre }
       rating: { ge: $minRating }
-    },
-    orderBy: [{ rating: DESC }],
+    }
+    orderBy: [{ rating: DESC }]
     limit: $limit
   ) {
     id title genre rating releaseYear posterUrl
@@ -117,8 +117,8 @@ query MyReviews @auth(level: USER) {
 # User: Create/update profile on first login
 mutation UpsertUser($email: String!, $displayName: String) @auth(level: USER) {
   user_upsert(data: {
-    uid_expr: "auth.uid",
-    email: $email,
+    uid_expr: "auth.uid"
+    email: $email
     displayName: $displayName
   })
 }
@@ -127,9 +127,9 @@ mutation UpsertUser($email: String!, $displayName: String) @auth(level: USER) {
 mutation AddReview($movieId: UUID!, $rating: Int!, $text: String) 
   @auth(level: USER) {
   review_upsert(data: {
-    movie: { id: $movieId },
-    user: { uid_expr: "auth.uid" },
-    rating: $rating,
+    movie: { id: $movieId }
+    user: { uid_expr: "auth.uid" }
+    rating: $rating
     text: $text
   })
 }
@@ -138,7 +138,7 @@ mutation AddReview($movieId: UUID!, $rating: Int!, $text: String)
 mutation DeleteReview($id: UUID!) @auth(level: USER) {
   review_delete(
     first: { where: {
-      id: { eq: $id },
+      id: { eq: $id }
       user: { uid: { eq_expr: "auth.uid" }}
     }}
   )
@@ -177,7 +177,7 @@ mutation AddMovie($title: String!) @auth(level: USER) {
 # Demonstrates the use of 'condition' and 'mutation.variables'
 query ListMoviesByGenre($genre: String!) @auth(level: PUBLIC)
   @refresh(onMutationExecuted: {
-    operation: "AddMovieWithGenre",
+    operation: "AddMovieWithGenre"
     condition: "mutation.variables.genre == request.variables.genre"
   }) {
   movies(where: { genre: { eq: $genre } }) { id title }
@@ -192,7 +192,7 @@ mutation AddMovieWithGenre($title: String!, $genre: String!) @auth(level: USER) 
 # Demonstrates condition based on auth context
 query MyProfile @auth(level: USER)
   @refresh(onMutationExecuted: {
-    operation: "UpdateProfile",
+    operation: "UpdateProfile"
     condition: "mutation.auth.uid == request.auth.uid"
   }) {
   user(uid_expr: "auth.uid") { id name }
@@ -219,13 +219,13 @@ import { subscribe } from 'firebase/data-connect';
 
 // Subscribe to movie list — refreshes when AddReview mutation runs
 const unsubMovies = subscribe(listMoviesRef({ genre: 'Action' }), {
-  onNext: (result) => updateMovieList(result.data.movies),
+  onNext: (result) => updateMovieList(result.data.movies)
   onError: (error) => console.error(error)
 });
 
 // Subscribe to leaderboard — refreshes every 30 seconds
 const unsubLeaderboard = subscribe(movieLeaderboardRef(), {
-  onNext: (result) => updateLeaderboard(result.data.movies),
+  onNext: (result) => updateLeaderboard(result.data.movies)
   onError: (error) => console.error(error)
 });
 
@@ -300,8 +300,8 @@ type OrderItem @table {
 # Public: Browse products
 query ListProducts($category: String, $search: String) @auth(level: PUBLIC) {
   products(where: {
-    category: { eq: $category },
-    name: { contains: $search },
+    category: { eq: $category }
+    name: { contains: $search }
     stock: { gt: 0 }
   }) {
     id name price stock imageUrl
@@ -319,8 +319,8 @@ query MyCart @auth(level: USER) {
 # User: Add to cart
 mutation AddToCart($productId: UUID!, $quantity: Int!) @auth(level: USER) {
   cartItem_upsert(data: {
-    user: { uid_expr: "auth.uid" },
-    product: { id: $productId },
+    user: { uid_expr: "auth.uid" }
+    product: { id: $productId }
     quantity: $quantity
   })
 }
@@ -339,8 +339,8 @@ mutation Checkout($shippingAddress: String!)
   }
   # Create order (in real app, calculate total from cart)
   order_insert(data: {
-    user: { uid_expr: "auth.uid" },
-    shippingAddress: $shippingAddress,
+    user: { uid_expr: "auth.uid" }
+    shippingAddress: $shippingAddress
     total: 0  # Calculate in app logic
   })
 }
@@ -408,7 +408,7 @@ type Comment @table {
 # Public: Read published posts
 query PublishedPosts @auth(level: PUBLIC) {
   posts(
-    where: { status: { eq: PUBLISHED }},
+    where: { status: { eq: PUBLISHED }}
     orderBy: [{ publishedAt: DESC }]
   ) {
     id title content publishedAt
@@ -428,8 +428,8 @@ mutation CreatePost($title: String!, $content: String!)
     }
   }
   post_insert(data: {
-    author: { uid_expr: "auth.uid" },
-    title: $title,
+    author: { uid_expr: "auth.uid" }
+    title: $title
     content: $content
   })
 }
@@ -444,7 +444,7 @@ mutation PublishPost($id: UUID!)
     }
   }
   post_update(id: $id, data: {
-    status: PUBLISHED,
+    status: PUBLISHED
     publishedAt_expr: "request.time"
   })
 }
@@ -459,7 +459,7 @@ mutation GrantRole($userUid: String!, $role: UserRole!)
     }
   }
   blogPermission_upsert(data: {
-    user: { uid: $userUid },
+    user: { uid: $userUid }
     role: $role
   })
 }
@@ -482,7 +482,7 @@ query GetMoviesByGenre($genre: String!, $limit: Int!) @auth(level: PUBLIC) {
       WHERE genre = $1
       ORDER BY release_year DESC
       LIMIT $2
-    """,
+    """
     params: [$genre, $limit]
   )
 }
@@ -497,7 +497,7 @@ mutation UpdateMovieRating($movieId: UUID!, $newRating: Float!) @auth(level: USE
       UPDATE movie
       SET rating = $2
       WHERE id = $1
-    """,
+    """
     params: [$movieId, $newRating]
   )
 }
@@ -510,14 +510,14 @@ query GetMoviesRankedByRating @auth(level: PUBLIC) {
   _select(
     sql: """
       SELECT
-        id,
-        title,
-        rating,
+        id
+        title
+        rating
         RANK() OVER (ORDER BY rating DESC) as rank
       FROM movie
       WHERE rating IS NOT NULL
       LIMIT 20
-    """,
+    """
     params: []
   )
 }
@@ -533,7 +533,7 @@ mutation UpdateMyReviewText($movieId: UUID!, $newText: String!) @auth(level: USE
       SET text = $2
       WHERE movie_id = $1 AND user_uid = $3
       RETURNING movie_id, user_uid, rating, text
-    """,
+    """
     params: [$movieId, $newText, {_expr: "auth.uid"}]
   )
 }
@@ -553,7 +553,7 @@ mutation CreateMovieCTE($movieId: UUID!, $userUid: String!, $reviewId: UUID!) @a
         VALUES ($2, 'auto@example.com', 'Auto-Generated User')
         ON CONFLICT (uid) DO NOTHING
         RETURNING uid
-      ),
+      )
       movie AS (
         INSERT INTO movie (id, title, poster_url, release_year, genre)
         VALUES ($1, 'Auto-Generated Movie', 'https://placeholder.com', 2025, 'Sci-Fi')
@@ -562,14 +562,14 @@ mutation CreateMovieCTE($movieId: UUID!, $userUid: String!, $reviewId: UUID!) @a
       )
       INSERT INTO review (id, movie_id, user_uid, rating, text, created_at)
       VALUES (
-        $3,
-        $1,
-        $2,
-        5,
-        'Good!',
+        $3
+        $1
+        $2
+        5
+        'Good!'
         NOW()
       )
-    """,
+    """
     params: [$movieId, $userUid, $reviewId]
   )
 }
@@ -582,11 +582,11 @@ Because `mutation` operations are single requests, you can chain multiple `_exec
 ```graphql
 mutation SafeTransfer($from: UUID!, $to: UUID!, $amount: Float!) @auth(level: USER) @transaction {
   deduct: _execute(
-    sql: "UPDATE account SET balance = balance - $2 WHERE id = $1", 
+    sql: "UPDATE account SET balance = balance - $2 WHERE id = $1"
     params: [$from, $amount]
   )
   add: _execute(
-    sql: "UPDATE account SET balance = balance + $2 WHERE id = $1", 
+    sql: "UPDATE account SET balance = balance + $2 WHERE id = $1"
     params: [$to, $amount]
   )
 }
@@ -604,24 +604,24 @@ query GetNearbyActiveRestaurants($userLong: Float!, $userLat: Float!, $maxDistan
   nearby: _select(
     sql: """
       SELECT 
-        id, 
-        name,
-        tags,
+        id
+        name
+        tags
         ST_Distance(
-          ST_MakePoint((metadata->>'longitude')::float, (metadata->>'latitude')::float)::geography, 
+          ST_MakePoint((metadata->>'longitude')::float, (metadata->>'latitude')::float)::geography
           ST_MakePoint($1, $2)::geography
         ) as distance_meters
       FROM restaurant
       WHERE active = true
         AND metadata ? 'longitude' AND metadata ? 'latitude'
         AND ST_DWithin(
-          ST_MakePoint((metadata->>'longitude')::float, (metadata->>'latitude')::float)::geography, 
-          ST_MakePoint($1, $2)::geography, 
+          ST_MakePoint((metadata->>'longitude')::float, (metadata->>'latitude')::float)::geography
+          ST_MakePoint($1, $2)::geography
           $3
         )
       ORDER BY distance_meters ASC
       LIMIT 10
-    """,
+    """
     params: [$userLong, $userLat, $maxDistanceMeters]
   )
 }

@@ -37,27 +37,27 @@ The MCP server allows GitHub Copilot to interact directly with Firebase projects
    **Example valid configurations**:
    ```json
    "firebase": {
-     "type": "stdio",
-     "command": "npx",
+     "type": "stdio"
+     "command": "npx"
      "args": ["-y", "firebase-tools@latest", "mcp"]
    }
    ```
    OR
    ```json
    "firebase": {
-     "type": "stdio",
-     "command": "firebase",
+     "type": "stdio"
+     "command": "firebase"
      "args": ["mcp"]
    }
    ```
 3. **Add or Update Configuration**: If the `firebase` block is missing or incorrect, add it to the `mcp.servers` object:
    ```json
    "firebase": {
-     "type": "stdio",
-     "command": "npx",
+     "type": "stdio"
+     "command": "npx"
      "args": [
-       "-y",
-       "firebase-tools@latest",
+       "-y"
+       "firebase-tools@latest"
        "mcp"
      ]
    }

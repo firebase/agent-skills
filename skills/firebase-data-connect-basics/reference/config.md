@@ -261,7 +261,7 @@ Install "Firebase SQL Connect" extension for:
 
 ```json
 {
-  "firebase.dataConnect.autoGenerateSdk": true,
+  "firebase.dataConnect.autoGenerateSdk": true
   "firebase.dataConnect.emulator.port": 9399
 }
 ```

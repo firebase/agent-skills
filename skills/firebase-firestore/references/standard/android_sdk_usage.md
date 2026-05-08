@@ -91,8 +91,8 @@ Add a new document with a generated ID using `add()`:
 ```kotlin
 // Create a new user with a first and last name
 val user = hashMapOf(
-    "first" to "Ada",
-    "last" to "Lovelace",
+    "first" to "Ada"
+    "last" to "Lovelace"
     "born" to 1815
 )
 
@@ -111,8 +111,8 @@ Or set a document with a specific ID using `set()`:
 
 ```kotlin
 val city = hashMapOf(
-    "name" to "Los Angeles",
-    "state" to "CA",
+    "name" to "Los Angeles"
+    "state" to "CA"
     "country" to "USA"
 )
 

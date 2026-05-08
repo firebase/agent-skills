@@ -77,15 +77,15 @@ Define a dense index:
 {
   "indexes": [
     {
-      "collectionGroup": "cities",
-      "queryScope": "COLLECTION",
-      "density": "DENSE",
+      "collectionGroup": "cities"
+      "queryScope": "COLLECTION"
+      "density": "DENSE"
       "fields": [
-        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "country", "order": "ASCENDING" }
         { "fieldPath": "population", "order": "DESCENDING" }
       ]
     }
-  ],
+  ]
   "fieldOverrides": []
 }
 ```
@@ -96,15 +96,15 @@ Define a sparse-any index:
 {
   "indexes": [
     {
-      "collectionGroup": "cities",
-      "queryScope": "COLLECTION",
-      "density": "SPARSE_ANY",
+      "collectionGroup": "cities"
+      "queryScope": "COLLECTION"
+      "density": "SPARSE_ANY"
       "fields": [
-        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "country", "order": "ASCENDING" }
         { "fieldPath": "population", "order": "DESCENDING" }
       ]
     }
-  ],
+  ]
   "fieldOverrides": []
 }
 ```
@@ -115,16 +115,16 @@ Define a unique index:
 {
   "indexes": [
     {
-      "collectionGroup": "cities",
-      "queryScope": "COLLECTION",
-      "density": "SPARSE_ANY",
-      "unique": true,
+      "collectionGroup": "cities"
+      "queryScope": "COLLECTION"
+      "density": "SPARSE_ANY"
+      "unique": true
       "fields": [
-        { "fieldPath": "country", "order": "ASCENDING" },
+        { "fieldPath": "country", "order": "ASCENDING" }
         { "fieldPath": "population", "order": "DESCENDING" }
       ]
     }
-  ],
+  ]
   "fieldOverrides": []
 }
 ```

@@ -20,7 +20,7 @@ These changes are made to your Android project's Gradle files.
 
 ### Project-level `build.gradle.kts` (`<project>/build.gradle.kts`)
 
-Add the latest version of the Crashlytics Gradle plugin to the `plugins` block. Fetch the [latest version from the Google Maven repository](https://maven.google.com/web/index.html?q=firebase-crashlytics-gradle#com.google.firebase:firebase-crashlytics-gradle) before adding this. 
+Add the latest version of the Crashlytics Gradle plugin to the `plugins` block. Fetch the  before adding this. 
 
 ```kotlin
 plugins {
@@ -40,7 +40,7 @@ plugins {
     }
     ```
 
-2.  Add the Firebase Crashlytics dependency to the `dependencies` block. It is recommended to use the Firebase Bill of Materials (BoM) to manage SDK versions. Fetch the [latest version from the Google Maven repository](https://maven.google.com/web/index.html?q=firebase-bom#com.google.firebase:firebase-bom) before adding this.
+2.  Add the Firebase Crashlytics dependency to the `dependencies` block. It is recommended to use the Firebase Bill of Materials (BoM) to manage SDK versions. Fetch the  before adding this.
 
     ```kotlin
     dependencies {

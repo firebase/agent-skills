@@ -45,8 +45,8 @@ const adminApp = initializeApp();
 const adminDc = getDataConnect(connectorConfig);
 
 const songs = await getSongs(
-  adminDc,
-  { limit: 4 },
+  adminDc
+  { limit: 4 }
   { impersonate: { unauthenticated: true } }
 );
 ```
@@ -65,8 +65,8 @@ export const callableExample = onCall(async (req) => {
     }
 
     const favoriteSongs = await getMyFavoriteSongs(
-        adminDc,
-        undefined,
+        adminDc
+        undefined
         { impersonate: { authClaims } }
     );
 
@@ -99,8 +99,8 @@ export const httpExample = onRequest(async (req, res) => {
     }
 
     const favoriteSongs = await getMyFavoriteSongs(
-        adminDc,
-        undefined,
+        adminDc
+        undefined
         { impersonate: { authClaims } }
     );
 
@@ -115,7 +115,7 @@ Omit the `impersonate` parameter to run with full admin access. Only do this for
 import { upsertSong } from "@dataconnect/admin-generated";
 
 await upsertSong(adminDc, {
-  title: "New Song",
+  title: "New Song"
   genre: "Rock"
 });
 ```

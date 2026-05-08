@@ -18,7 +18,7 @@ content. If this file already exists, instead append to the existing JSON:
 ```json
 {
   "firestore": {
-    "rules": "firestore.rules",
+    "rules": "firestore.rules"
     "indexes": "firestore.indexes.json"
   }
 }
@@ -36,9 +36,9 @@ If the database does not exist, it will be created when you deploy with the spec
 ```json
 {
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json",
-    "database": "my-database-id",
+    "rules": "firestore.rules"
+    "indexes": "firestore.indexes.json"
+    "database": "my-database-id"
     "location": "<selected-location>"
   }
 }
@@ -69,7 +69,7 @@ start:
 
 ```json
 {
-  "indexes": [],
+  "indexes": []
   "fieldOverrides": []
 }
 ```

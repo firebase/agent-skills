@@ -54,11 +54,11 @@ Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
 {
   "auth": {
     "providers": {
-      "anonymous": true,
-      "emailPassword": true,
+      "anonymous": true
+      "emailPassword": true
       "googleSignIn": {
-        "oAuthBrandDisplayName": "Your Brand Name",
-        "supportEmail": "support@example.com",
+        "oAuthBrandDisplayName": "Your Brand Name"
+        "supportEmail": "support@example.com"
         "authorizedRedirectUris": ["https://example.com"]
       }
     }
@@ -82,10 +82,10 @@ Enable other providers in the Firebase Console.
 ### 2. Client Setup & Usage
 
 **Web**
-See [references/client_sdk_web.md](references/client_sdk_web.md).
+See .
 
 **Flutter**
-See [references/flutter_setup.md](references/flutter_setup.md).
+See .
 **Android (Kotlin)**
 See [references/client_sdk_android.md](references/client_sdk_android.md).
 

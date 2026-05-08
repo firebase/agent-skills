@@ -55,9 +55,9 @@ result.data.movies.forEach { movie ->
 #### Mutation
 ```kotlin
 val newMovie = connector.createMovie.execute(
-    title = "Empire Strikes Back",
-    releaseYear = 1980,
-    genre = "Sci-Fi",
+    title = "Empire Strikes Back"
+    releaseYear = 1980
+    genre = "Sci-Fi"
     rating = 5
 )
 ```

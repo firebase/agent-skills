@@ -58,7 +58,7 @@ Trigger a query refresh when a specific mutation executes. This is the most comm
 # Example with condition (refreshes only when the condition is met)
 query ChatRoom($roomId: UUID!) @auth(level: PUBLIC)
   @refresh(onMutationExecuted: {
-    operation: "SendMessage",
+    operation: "SendMessage"
     condition: "mutation.variables.roomId == request.variables.roomId"
   }) {
   messages(where: {roomId: {eq: $roomId}}, orderBy: [{createTime: DESC}], limit: 50) {
@@ -92,7 +92,7 @@ Since `@refresh` is repeatable, you can combine strategies on a single query:
 query ActiveOrders($userId: UUID!)
   @auth(level: USER)
   @refresh(onMutationExecuted: {
-    operation: "UpdateOrderStatus",
+    operation: "UpdateOrderStatus"
     condition: "request.variables.userId == mutation.variables.userId"
   })
   @refresh(every: { seconds: 60 }) {

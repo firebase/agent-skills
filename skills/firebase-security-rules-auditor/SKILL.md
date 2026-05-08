@@ -32,13 +32,13 @@ The admin bootstrapping process is limited in this app. If the rules use a singl
 
 Return your assessment in JSON format using the following structure:
 {
-  "score": 1-5,
-  "summary": "overall assessment",
+  "score": 1-5
+  "summary": "overall assessment"
   "findings": [
     {
-      "check": "checklist item",
-      "severity": "critical|major|moderate|minor",
-      "issue": "description",
+      "check": "checklist item"
+      "severity": "critical|major|moderate|minor"
+      "issue": "description"
       "recommendation": "fix"
     }
   ]

@@ -51,10 +51,10 @@ content (edit `database` and `location` to match the ones you created above). If
 ```json
 {
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json",
-    "edition": "enterprise",
-    "database": "my-database-id",
+    "rules": "firestore.rules"
+    "indexes": "firestore.indexes.json"
+    "edition": "enterprise"
+    "database": "my-database-id"
     "location": "<selected-location>"
   }
 }
@@ -85,7 +85,7 @@ start:
 
 ```json
 {
-  "indexes": [],
+  "indexes": []
   "fieldOverrides": []
 }
 ```

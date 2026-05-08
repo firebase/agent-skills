@@ -91,8 +91,8 @@ The operations are identical to standard Firestore.
 
 ```kotlin
 val user = hashMapOf(
-    "first" to "Alan",
-    "last" to "Turing",
+    "first" to "Alan"
+    "last" to "Turing"
     "born" to 1912
 )
 

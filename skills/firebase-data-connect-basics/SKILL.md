@@ -78,14 +78,9 @@ Configure SDK generation in `connector.yaml`:
 ```yaml
 connectorId: my-connector
 generate:
-  javascriptSdk:
-    outputDir: "../web-app/src/lib/dataconnect"
-    package: "@movie-app/dataconnect"
   kotlinSdk:
     outputDir: "../android-app/app/src/main/kotlin/com/example/dataconnect"
     package: "com.example.dataconnect"
-  swiftSdk:
-    outputDir: "../ios-app/DataConnect"
 ```
 
 Generate SDKs:
@@ -94,13 +89,8 @@ npx -y firebase-tools@latest dataconnect:sdk:generate
 ```
 
 For platform-specific instructions on how to use the generated SDKs, read:
-*   **Web (TypeScript)**: [reference/sdk_web.md](reference/sdk_web.md)
 *   **Android (Kotlin)**: [reference/sdk_android.md](reference/sdk_android.md)
-*   **iOS (Swift)**: [reference/sdk_ios.md](reference/sdk_ios.md)
 *   **Admin (Node.js)**: [reference/sdk_admin_node.md](reference/sdk_admin_node.md)
-*   **Flutter (Dart)**: [reference/sdk_flutter.md](reference/sdk_flutter.md)
-
-
 
 ---
 

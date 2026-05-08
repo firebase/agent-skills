@@ -15,7 +15,7 @@ values. Each document is identified by a name. A document can contain complex
 nested objects in addition to basic data types like strings, numbers, and
 booleans. Documents are limited to a maximum size of 1 MiB.
 
-Example document (e.g., in a `users` collection): `json { "first": "Ada",
+Example document (e.g., in a `users` collection): `json { "first": "Ada"
 "last": "Lovelace", "born": 1815 }`
 
 ### Collections
@@ -40,7 +40,7 @@ Data path example: `users/user1/messages/message1`
 
 ## Collection Group Support
 
-A **collection group** consists of all collections with the same ID. By default,
+A **collection group** consists of all collections with the same ID. By default
 queries retrieve results from a single collection in your database. Use a
 collection group query to retrieve documents from a collection group instead of
 from a single collection.

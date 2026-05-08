@@ -32,10 +32,10 @@ Use `_embed` server value to auto-generate embeddings via Vertex AI:
 mutation CreateMovieWithEmbedding($title: String!, $description: String!) 
   @auth(level: USER) {
   movie_insert(data: {
-    title: $title,
-    description: $description,
+    title: $title
+    description: $description
     descriptionEmbedding_embed: {
-      model: "textembedding-gecko@003",
+      model: "textembedding-gecko@003"
       text: $description
     }
   })
@@ -49,7 +49,7 @@ SQL Connect generates `_similarity` fields for Vector columns:
 ```graphql
 query SearchMovies($query: String!) @auth(level: PUBLIC) {
   movies_descriptionEmbedding_similarity(
-    compare_embed: { model: "textembedding-gecko@003", text: $query },
+    compare_embed: { model: "textembedding-gecko@003", text: $query }
     method: L2,         # L2, COSINE, or INNER_PRODUCT
     within: 2.0,        # Max distance threshold
     limit: 5
@@ -84,8 +84,8 @@ mutation StoreCustomEmbedding($id: UUID!, $embedding: Vector!) @auth(level: USER
 
 query SearchWithCustomVector($vector: Vector!) @auth(level: PUBLIC) {
   movies_descriptionEmbedding_similarity(
-    compare: $vector,
-    method: COSINE,
+    compare: $vector
+    method: COSINE
     limit: 10
   ) { id title }
 }
@@ -114,7 +114,7 @@ SQL Connect generates `_search` fields:
 ```graphql
 query SearchMovies($query: String!) @auth(level: PUBLIC) {
   movies_search(
-    query: $query,
+    query: $query
     queryFormat: QUERY,  # QUERY, PLAIN, PHRASE, or ADVANCED
     limit: 20
   ) {
@@ -138,9 +138,9 @@ query SearchMovies($query: String!) @auth(level: PUBLIC) {
 ```graphql
 query SearchWithThreshold($query: String!) @auth(level: PUBLIC) {
   movies_search(
-    query: $query,
+    query: $query
     relevanceThreshold: 0.05,  # Min relevance score
-    where: { genre: { eq: "Action" }},
+    where: { genre: { eq: "Action" }}
     orderBy: [{ releaseYear: DESC }]
   ) { id title }
 }
@@ -164,11 +164,11 @@ import { logger } from "firebase-functions";
 
 export const onUserCreate = onMutationExecuted(
   {
-    service: "myService",
-    connector: "default",
-    operation: "CreateUser",
+    service: "myService"
+    connector: "default"
+    operation: "CreateUser"
     region: "us-central1"  # Must match SQL Connect location
-  },
+  }
   (event) => {
     const variables = event.data.payload.variables;
     const returnedData = event.data.payload.data;
@@ -185,8 +185,8 @@ export const onUserCreate = onMutationExecuted(
 from firebase_functions import dataconnect_fn, logger
 
 @dataconnect_fn.on_mutation_executed(
-  service="myService",
-  connector="default",
+  service="myService"
+  connector="default"
   operation="CreateUser"
 )
 def on_user_create(event: dataconnect_fn.Event):
@@ -210,13 +210,13 @@ def on_user_create(event: dataconnect_fn.Event):
 ```typescript
 // Trigger on all User* mutations
 export const onUserMutation = onMutationExecuted(
-  { operation: "User*" },
+  { operation: "User*" }
   (event) => { /* ... */ }
 );
 
 // Capture operation name
 export const onAnyMutation = onMutationExecuted(
-  { service: "myService", operation: "{operationName}" },
+  { service: "myService", operation: "{operationName}" }
   (event) => {
     console.log("Operation:", event.params.operationName);
   }
@@ -241,8 +241,8 @@ export const onAnyMutation = onMutationExecuted(
 ```graphql
 mutation SeedMovies @transaction {
   movie_insertMany(data: [
-    { id: "uuid-1", title: "Movie 1", genre: "Action" },
-    { id: "uuid-2", title: "Movie 2", genre: "Drama" },
+    { id: "uuid-1", title: "Movie 1", genre: "Action" }
+    { id: "uuid-2", title: "Movie 2", genre: "Drama" }
     { id: "uuid-3", title: "Movie 3", genre: "Comedy" }
   ])
 }
@@ -253,7 +253,7 @@ mutation SeedMovies @transaction {
 ```graphql
 mutation ResetData {
   movie_upsertMany(data: [
-    { id: "uuid-1", title: "Movie 1", genre: "Action" },
+    { id: "uuid-1", title: "Movie 1", genre: "Action" }
     { id: "uuid-2", title: "Movie 2", genre: "Drama" }
   ])
 }
@@ -277,7 +277,7 @@ const app = initializeApp();
 const dc = getDataConnect({ location: "us-central1", serviceId: "my-service" });
 
 const movies = [
-  { id: "uuid-1", title: "Movie 1", genre: "Action" },
+  { id: "uuid-1", title: "Movie 1", genre: "Action" }
   { id: "uuid-2", title: "Movie 2", genre: "Drama" }
 ];
 
