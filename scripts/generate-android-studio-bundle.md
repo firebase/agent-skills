@@ -1,6 +1,6 @@
 # Generating Android Studio Skills Bundle
 
-This guide covers the process of generating a limited version of Firebase skills for Android Studio and publishing them to the `android-studio-bundle` branch.
+This guide covers the process of generating a limited version of Firebase skills for Android Studio and publishing them to the `platform/android-studio` branch.
 
 ## Instructions for the Operator (Human or AI)
 
@@ -35,9 +35,9 @@ Here is the file content:
 Apply this to all `.md` files in `android-skills/` that need cleanup (especially `SKILL.md` files).
 
 ### 3. Prepare the Branch
-1. Check out a new branch from `android-studio-bundle` (or create it if it doesn't exist):
+1. Check out a new branch from `platform/android-studio` (or create it if it doesn't exist):
    ```bash
-   git checkout android-studio-bundle
+   git checkout platform/android-studio
    git checkout -b update-android-bundle
    ```
 2. Replace the content of the `skills/` directory with the content of `android-skills/`:
@@ -56,7 +56,7 @@ Apply this to all `.md` files in `android-skills/` that need cleanup (especially
    ```bash
    git push origin update-android-bundle
    ```
-2. Open a Pull Request against the `android-studio-bundle` branch.
+2. Open a Pull Request against the `platform/android-studio` branch.
 
 ---
-Note: The script `generate_android_skills.js` and this guide live on the `main` branch. The generated content lives on the `android-studio-bundle` branch in the `skills/` directory.
+Note: The script `generate_android_skills.js` and this guide live on the `main` branch. The generated content lives on the `platform/android-studio` branch in the `skills/` directory.
