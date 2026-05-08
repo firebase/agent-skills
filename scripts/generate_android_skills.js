@@ -9,7 +9,9 @@ const EXCLUDED_SKILLS = [
     'developing-genkit-go',
     'developing-genkit-js',
     'developing-genkit-python',
-    'xcode-project-setup'
+    'xcode-project-setup',
+    'firebase-hosting-basics',
+    'firebase-app-hosting-basics'
 ];
 
 const EXCLUDED_FILE_PATTERNS = [
