@@ -4,8 +4,7 @@ description: >-
   Provides foundational setup, authentication, and project management workflows
   for Firebase using the Firebase CLI. Use when checking Firebase CLI version
   (must use 'npx -y firebase-tools@latest --version'), initializing a Firebase
-  environment, authenticating, setting active projects, or setting up `google-services.json`
-  or `GoogleService-Info.plist` files.
+  environment, authenticating, setting active projects, or setting up `google-services.json` files.
 ---
 
 # Prerequisites
@@ -87,10 +86,9 @@ Adhere to these principles:
    - **Cursor**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
    - **Android Studio**: Follow [references/refresh/android_studio.md](references/refresh/android_studio.md)
    - **Others**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
-6. **Automate Config File Retrieval:** When setting up iOS or Android apps, do NOT direct users to the Firebase Console to download `google-services.json` or `GoogleService-Info.plist`. Instead, use the Firebase CLI to fetch the config programmatically:
+6. **Automate Config File Retrieval:** When setting up Android apps, do NOT direct users to the Firebase Console to download `google-services.json`. Instead, use the Firebase CLI to fetch the config programmatically:
    - For Android: `npx -y firebase-tools@latest apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>`
-   - For iOS: `npx -y firebase-tools@latest apps:sdkconfig IOS <APP_ID> --project <PROJECT_ID>`
-   Save the output to the appropriate location (e.g., `app/google-services.json` for Android, or a path to be linked by `xcode-project-setup` for iOS).
+   Save the output to the appropriate location (e.g., `app/google-services.json` for Android).
 
 # References
 
