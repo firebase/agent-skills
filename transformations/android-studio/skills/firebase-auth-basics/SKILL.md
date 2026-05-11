@@ -81,6 +81,11 @@ Enable other providers in the Firebase Console.
 
 ### 2. Client Setup & Usage
 
+**Web**
+See .
+
+**Flutter**
+See .
 **Android (Kotlin)**
 See [references/client_sdk_android.md](references/client_sdk_android.md).
 
