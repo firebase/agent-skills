@@ -18,7 +18,7 @@ Use the `firebase-tools` CLI to set up the project if necessary.
 
 ## Add Swift Package Dependencies
 
-Install the Remote Config and Analytics SDKs using the Swift package manager, or the script in the `xcode-project-setup` skill.
+Install the Remote Config and Analytics SDKs using the Swift package manager.
 
 Install the `FirebaseRemoteConfig` and `FirebaseAnalytics` packages from the [https://github.com/firebase/firebase-ios-sdk.git](https://github.com/firebase/firebase-ios-sdk.git) repository.
 
