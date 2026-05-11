@@ -21,10 +21,21 @@ transformations/
 ### Components
 
 - **`generator/`**: Contains the scripts used to perform the transformation and any guides or prompts used to polish the output.
-- **`skills/`**: Contains the actual generated skills. This directory should be gitignored if the content is large or frequently regenerated, or checked in if it's meant to be served directly (as in the case of `android-studio`).
-  *Note: For `android-studio`, we are checking in the generated skills to make them easily accessible.*
+- **`skills/`**: Contains the actual generated skills.
 
-## How to Add a New Transformation
+## How to Install a Transformation
+
+To install a specific transformation using the `skills` CLI, use the GitHub URL pointing to the generated skills directory:
+
+```bash
+npx skills add https://github.com/firebase/agent-skills/tree/main/transformations/[transformation-name]/skills
+```
+
+For example, to install the Android Studio bundle:
+
+```bash
+npx skills add https://github.com/firebase/agent-skills/tree/main/transformations/android-studio/skills
+```
 
 To add a new transformation, follow these steps:
 
