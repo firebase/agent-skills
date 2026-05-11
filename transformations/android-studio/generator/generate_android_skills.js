@@ -1,10 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-// Target branch for the generated bundle: platform/android-studio
-
-const SOURCE_DIR = path.join(__dirname, '../skills');
-const TARGET_DIR = path.join(__dirname, '../android-skills');
+const SOURCE_DIR = path.join(__dirname, '../../../skills');
+const TARGET_DIR = path.join(__dirname, '../skills');
 
 const EXCLUDED_SKILLS = [
     'developing-genkit-dart',
