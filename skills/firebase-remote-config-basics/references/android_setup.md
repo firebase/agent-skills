@@ -63,6 +63,7 @@ The following steps cover the essential patterns for using Remote Config effecti
 ### Set In-App Defaults
 Define default values so your app has functional logic before it ever fetches a template from the server. Create an XML file (e.g., `res/xml/remote_config_defaults.xml`):
     ```xml
+    <!-- Example Remote Config Defaults File -->
     <?xml version="1.0" encoding="utf-8"?>
     <defaultsMap>
         <entry>
