@@ -233,6 +233,19 @@ describe('countTokens', () => {
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error counting tokens'), 'API error');
     consoleSpy.mockRestore();
   });
+
+  it('returns 0 and logs error when called before initModel', async () => {
+    // Reset the module-level model by calling initModel with a value that produces null model,
+    // then overwrite _model via a fresh import cycle — simplest: spy on the module state
+    // by calling initModel with a mock that produces no model, then reset
+    const { GoogleGenerativeAI } = await import('@google/generative-ai');
+    GoogleGenerativeAI.mockReturnValue({ getGenerativeModel: vi.fn(() => null) });
+    initModel('fake-key'); // _model = null (mock returns null from getGenerativeModel)
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(await countTokens('some text')).toBe(0);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not been initialized'));
+    consoleSpy.mockRestore();
+  });
 });
 
 // ─── analyzeSkill ─────────────────────────────────────────────────────────────

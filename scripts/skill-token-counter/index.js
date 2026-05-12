@@ -16,6 +16,10 @@ export function initModel(apiKey) {
 
 export async function countTokens(text) {
   if (!text || text.trim().length === 0) return 0;
+  if (!_model) {
+    console.error('Error: Generative model has not been initialized. Call initModel(apiKey) first.');
+    return 0;
+  }
   try {
     const response = await _model.countTokens(text);
     return response.totalTokens;
