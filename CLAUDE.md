@@ -11,7 +11,7 @@ The primary content is Markdown — each skill is a `SKILL.md` file with YAML fr
 ## Repository Structure
 
 ```
-agent-skills/
+firebase-skills/
 ├── skills/                          # All agent skills (primary content)
 │   ├── firebase-basics/
 │   ├── firebase-auth-basics/
@@ -149,7 +149,7 @@ npx skills add https://github.com/firebase/skills/tree/<branch-name>
 **Option B — Live symlink for active development (changes reflected immediately):**
 ```bash
 # Example for Cursor
-ln -s /path/to/agent-skills/skills /path/to/test-project/.cursor/rules
+ln -s /path/to/firebase-skills/skills /path/to/test-project/.cursor/rules
 ```
 
 **Automated evals** are run externally in the [firebase-tools](https://github.com/firebase/firebase-tools/tree/main/scripts/agent-evals) repository. When adding a new skill, add matching test cases there to verify:
@@ -195,7 +195,7 @@ Both branches are protected and require PR review. Most users consume skills fro
 - **What it does:**
   1. Prunes skills deleted from `genkit-ai/skills` (script: `.github/scripts/prune-skills.sh`). Identified by `metadata.genkit-managed: true` in frontmatter.
   2. Copies updated skills from `genkit-ai/skills` and stamps them with `metadata.genkit-managed: true` using `yq` (script: `.github/scripts/sync-skills.sh`).
-  3. Opens an automated PR using a bot account (`firebase-oss-bot@google.com`) with reviewers `joehan` and `ssbushi`.
+  3. Opens an automated PR using a bot account (`firebase-oss-bot@google.com`) with the designated repository maintainers as reviewers.
 
 **Do not manually edit Genkit-managed skills** (`developing-genkit-{js,python,go,dart}/`) — changes will be overwritten.
 
