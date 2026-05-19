@@ -8,12 +8,9 @@ Firebase App Hosting allows you to choose a specific runtime environment (e.g., 
 
 > [!IMPORTANT]
 > **CRITICAL RUNTIME COMPATIBILITY INSTRUCTION FOR CODING AGENTS (AI ASSISTANTS):**
-> 1. **ALWAYS CHECK `package.json` FIRST**: Before recommending a runtime version or running backend creation commands, you **MUST** read the user's `package.json` file and inspect the `engines.node` field:
->    - *Example*: If `package.json` has `"engines": { "node": ">=22.0.0" }`, you **MUST** select `nodejs22` or `nodejs24`.
-> 2. **PREVENT MISMATCH FAILURES**: If you create a backend with a runtime version that is incompatible with the `engines` field of their `package.json`, the deployment **will fail** during the Cloud Build phase.
-> 3. **WARN ON DEFAULT RUNTIME**: If the default unversioned `nodejs` runtime is used:
->    - Warn the developer that **ABIU is completely disabled**, leaving their container without automated security patches.
->    - Advise the developer to migrate to a versioned runtime (like `nodejs22`) to receive automatic security updates.
+> 1. **Inspect package.json first**: Before recommending a runtime version or running backend creation commands, you **MUST** read the user's `package.json` file and inspect the `engines.node` field (e.g., if `"engines": { "node": ">=22.0.0" }` is specified, you must select `nodejs22` or `nodejs24`).
+> 2. **Prevent mismatch failures**: Creating a backend with a runtime version that is incompatible with the `engines` field will trigger a build failure during the Cloud Build phase.
+> 3. **Warn on default runtime**: If the default unversioned `nodejs` runtime is used, warn the developer that ABIU is completely disabled (leaving their container without automated security updates) and recommend migrating to a versioned runtime (e.g. `nodejs22`).
 
 ---
 

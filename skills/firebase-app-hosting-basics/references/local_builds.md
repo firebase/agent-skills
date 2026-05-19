@@ -79,16 +79,14 @@ Before adopting local builds, you must be aware of the following strict limitati
 
 ### 1. Host Platform Restrictions
 The pre-compiled Universal Maker build binary only supports a subset of operating systems and architectures:
-- **macOS**: Only macOS Apple Silicon (`darwin_arm64`) is supported. macOS Intel (`darwin_x64`) is **not** supported.
-- **Linux**: Only Linux x86-64 (`linux_x64`) is supported. Linux ARM (`linux_arm64`) is **not** supported.
-- **Windows**: Windows (`win32`) is **not** supported. Windows developers must deploy from source or run the CLI inside a WSL (Windows Subsystem for Linux) environment.
+- **macOS**: Only macOS Apple Silicon (`darwin_arm64`) is supported. macOS Intel (`darwin_x64`) is not supported.
+- **Linux**: Only Linux x86-64 (`linux_x64`) is supported. Linux ARM (`linux_arm64`) is not supported.
+- **Windows**: Windows (`win32`) is not supported. Windows developers must deploy from source or run the CLI inside a WSL (Windows Subsystem for Linux) environment.
 
-### 2. Framework Restrictions (Next.js Hardcoding)
-The current local build implementation has Next.js-specific output directory path assumptions. Other frameworks (like Angular or SvelteKit) may fail or produce packaging errors during the rollout phase unless they compile into an identical standalone folder structure.
+### 2. Security & Secret Exposure Caveats
+If your build depends on secrets marked for `BUILD` availability, the CLI fetches the raw, unencrypted values from Cloud Secret Manager and sets them as environment variables in the build context.
+- **General Build-Time Risk**: Developers must be extremely cautious when using build-available secrets. Ensure your application code and build scripts do not accidentally expose or embed these sensitive values into client-side bundles, compiled files, or public assets. This risk is universal and is equally critical whether you compile locally or remotely on Google Cloud Build.
 
-### 3. Security & Secret Exposure Caveats
-If your build depends on secrets marked for `BUILD` availability, the CLI downloads the raw, unencrypted values from Cloud Secret Manager to inject them into the local process.
-- Depending on your bundler configuration (e.g., Next.js's `NEXT_PUBLIC_` variable prefix), **sensitive raw secrets may get compiled/embedded directly into your client-side Javascript bundles**, exposing them in public files. Use build-time secrets with extreme caution.
-
-### 4. Local Directory Collisions
-If a local build is force-quit or crashes mid-execution, the temporary folder `.local_build_<backendId>` remains in your workspace. Future deployments will fail immediately with a directory collision error until you manually delete this folder.
+### 3. Local Directory Collisions & Artifact Leftovers
+The local build pipeline creates intermediate workspace directories (such as `.local_build_<backendId>`) during the compilation process.
+- **Interrupted Cleanup**: While the CLI is designed to automatically delete these intermediate folders upon a successful build, **if the build process is interrupted, force-quit, or crashes mid-execution, these artifacts may be left on your system**. You will need to manually delete these leftover directories to secure any cached environment variables and to prevent subsequent `firebase deploy` commands from blocking due to directory collisions.
