@@ -1,0 +1,172 @@
+suite_name: "firebase_data_connect_basics"
+timeout_seconds: 600
+
+cases {
+  name: "app_creation_from_scratch"
+  prompt: "I want to build a task management web application. Users should be able to create projects, create tasks within projects, assign tasks to other users, and track whether a task is completed. Please set up the Firebase SQL Connect schema in `schema/schema.gql` and the necessary GraphQL queries and mutations in `connector/` for this app, and configure the JavaScript SDK to be generated in `../frontend/src/lib/dataconnect` with package `@task-app/db`.\n\n**Validation Note:** Since you are running in a hermetic Google3 CitC evaluation workspace, do NOT run standard npm/npx commands. Instead, build the local emulator CLI using `blaze build //third_party/firebase/dataconnect/emulator/cli:cli` and validate your GraphQL schemas and queries by running `blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect` to check and correct syntax errors before ending your turn."
+  expectations: "The agent designs a valid relational schema in schema.gql including User, Project, and Task types with appropriate relationships and @table directives."
+  expectations: "The agent defines essential CRUD queries and mutations in connector files."
+  expectations: "The agent configures connector.yaml to generate the JavaScript SDK in ../frontend/src/lib/dataconnect with package @task-app/db."
+  setup {
+    commands: "blaze build //third_party/firebase/dataconnect/emulator/cli:cli"
+    files {
+      key: "dataconnect/dataconnect.yaml"
+      value: "specVersion: \"v1\"\nserviceId: \"task-service\"\nlocation: \"us-central1\"\nschema:\n  source: \"./schema\"\n  datasource:\n    postgresql:\n      database: \"taskdb\"\nconnectorDirs: [\"./connector\"]"
+    }
+    files {
+      key: "dataconnect/connector/connector.yaml"
+      value: "connectorId: \"default\""
+    }
+  }
+  script_validators: "blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect"
+}
+
+cases {
+  name: "secure_transactionable_checkout"
+  prompt: "We need a secure checkout operation called `BuyProduct` for our store inside `connector/mutations.gql`. When a user buys a product, the system should check if there is enough stock available (and show a friendly error if not), create a new order linked to the logged-in user, deduct the purchased quantity from the product's stock, and record the order item. Make sure this entire process is atomic and only accessible to logged-in users.\n\n**Validation Note:** Since you are running in a hermetic Google3 CitC evaluation workspace, do NOT run standard npm/npx commands. Instead, build the local emulator CLI using `blaze build //third_party/firebase/dataconnect/emulator/cli:cli` and validate your GraphQL schemas and queries by running `blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect` to check and correct syntax errors before ending your turn."
+  expectations: "The agent creates a BuyProduct mutation using the @transaction directive to ensure atomicity."
+  expectations: "The mutation verifies stock availability using @check and @redact with a custom error message."
+  expectations: "The mutation inserts an Order linked to the authenticated user (e.g. using auth.uid)."
+  expectations: "The mutation inserts an OrderItem and correctly binds the new order ID from the previous step."
+  expectations: "The mutation decrements product stock."
+  expectations: "The mutation restricts access using @auth(level: USER)."
+  setup {
+    commands: "blaze build //third_party/firebase/dataconnect/emulator/cli:cli"
+    files {
+      key: "dataconnect/dataconnect.yaml"
+      value: "specVersion: \"v1\"\nserviceId: \"my-service\"\nlocation: \"us-central1\"\nschema:\n  source: \"./schema\"\n  datasource:\n    postgresql:\n      database: \"fdcdb\"\nconnectorDirs: [\"./connector\"]"
+    }
+    files {
+      key: "dataconnect/schema/schema.gql"
+      value: "type User @table(key: \"uid\") {\n  uid: String! @default(expr: \"auth.uid\")\n  name: String!\n}\n\ntype Product @table {\n  title: String!\n  stock: Int!\n}\n\ntype Order @table {\n  author: User!\n  createdAt: Timestamp! @default(expr: \"request.time\")\n}\n\ntype OrderItem @table(key: [\"order\", \"product\"]) {\n  order: Order!\n  product: Product!\n  quantity: Int!\n}"
+    }
+    files {
+      key: "dataconnect/connector/connector.yaml"
+      value: "connectorId: \"default\""
+    }
+  }
+  script_validators: "blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect"
+}
+
+cases {
+  name: "realtime_chat_subscription"
+  prompt: "I'm building a live chat room feature. I need a GraphQL subscription called `SubscribeToMessages` inside `connector/queries.gql` that fetches messages for a specific chat room. It should update in real-time whenever a new message is sent to that specific room, but as a backup, it should also automatically poll for new messages every 30 seconds. Anyone should be able to access this.\n\n**Validation Note:** Since you are running in a hermetic Google3 CitC evaluation workspace, do NOT run standard npm/npx commands. Instead, build the local emulator CLI using `blaze build //third_party/firebase/dataconnect/emulator/cli:cli` and validate your GraphQL schemas and queries by running `blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect` to check and correct syntax errors before ending your turn."
+  expectations: "The agent defines a SubscribeToMessages query with @auth(level: PUBLIC)."
+  expectations: "The query uses the @refresh directive configured with onMutationExecuted to listen for message creation."
+  expectations: "The refresh trigger includes a CEL filter ensuring it only triggers for the matching room."
+  expectations: "The query includes a secondary @refresh directive for 30-second periodic polling."
+  setup {
+    commands: "blaze build //third_party/firebase/dataconnect/emulator/cli:cli"
+    files {
+      key: "dataconnect/dataconnect.yaml"
+      value: "specVersion: \"v1\"\nserviceId: \"my-service\"\nlocation: \"us-central1\"\nschema:\n  source: \"./schema\"\n  datasource:\n    postgresql:\n      database: \"fdcdb\"\nconnectorDirs: [\"./connector\"]"
+    }
+    files {
+      key: "dataconnect/schema/schema.gql"
+      value: "type User @table(key: \"uid\") {\n  uid: String! @default(expr: \"auth.uid\")\n  name: String!\n}\n\ntype ChatRoom @table {\n  name: String!\n}\n\ntype Message @table {\n  room: ChatRoom!\n  author: User!\n  content: String!\n  createTime: Timestamp! @default(expr: \"request.time\")\n}"
+    }
+    files {
+      key: "dataconnect/connector/connector.yaml"
+      value: "connectorId: \"default\""
+    }
+  }
+  script_validators: "blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect"
+}
+
+cases {
+  name: "vector_semantic_search"
+  prompt: "We want to add an AI-powered semantic search feature to our movie database. Please update our schema inside `schema/schema.gql` so each movie can store a description embedding. Then, add a mutation inside `connector/mutations.gql` to create a movie that automatically generates this embedding from the description, and a query inside `connector/queries.gql` to search for the top 5 most semantically similar movies to a user's search query, filtering for movies with a similarity distance of at most 0.3.\n\n**Validation Note:** Since you are running in a hermetic Google3 CitC evaluation workspace, do NOT run standard npm/npx commands. Instead, build the local emulator CLI using `blaze build //third_party/firebase/dataconnect/emulator/cli:cli` and validate your GraphQL schemas and queries by running `blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect` to check and correct syntax errors before ending your turn."
+  expectations: "The agent updates Movie in schema.gql to include a Vector field with @col(size: 768)."
+  expectations: "The agent writes a mutation using the _embed server value to auto-generate description embeddings (e.g. using textembedding-gecko@003)."
+  expectations: "The agent writes a similarity search query utilizing compare_embed with COSINE similarity and appropriate distance thresholds."
+  setup {
+    commands: "blaze build //third_party/firebase/dataconnect/emulator/cli:cli"
+    files {
+      key: "dataconnect/dataconnect.yaml"
+      value: "specVersion: \"v1\"\nserviceId: \"my-service\"\nlocation: \"us-central1\"\nschema:\n  source: \"./schema\"\n  datasource:\n    postgresql:\n      database: \"fdcdb\"\nconnectorDirs: [\"./connector\"]"
+    }
+    files {
+      key: "dataconnect/schema/schema.gql"
+      value: "type Movie @table {\n  title: String!\n  description: String\n}"
+    }
+    files {
+      key: "dataconnect/connector/connector.yaml"
+      value: "connectorId: \"default\""
+    }
+  }
+  script_validators: "blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect"
+}
+
+cases {
+  name: "native_sql_role_stats"
+  prompt: "We need a highly optimized administrative query called `GetRoleStats` inside `connector/queries.gql` that counts the total number of users assigned to each role directly from our legacy Postgres table `UserRole`, filtering for roles that have more than a specified minimum number of users (passed as an input parameter `minCount`). This query must be secure: only logged-in corporate admins whose verified email addresses end with `@company.com` should be permitted to execute it.\n\n**Validation Note:** Since you are running in a hermetic Google3 CitC evaluation workspace, do NOT run standard npm/npx commands. Instead, build the local emulator CLI using `blaze build //third_party/firebase/dataconnect/emulator/cli:cli` and validate your GraphQL schemas and queries by running `blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect` to check and correct syntax errors before ending your turn."
+  expectations: "The agent defines a Native SQL query GetRoleStats using the _select root field."
+  expectations: "The query enforces security with a custom CEL expression in @auth checking email verification and the @company.com domain."
+  expectations: "The underlying SQL query correctly quotes the table name (\"UserRole\") and uses positional parameters ($1, etc.) mapped in the params block."
+  setup {
+    commands: "blaze build //third_party/firebase/dataconnect/emulator/cli:cli"
+    files {
+      key: "dataconnect/dataconnect.yaml"
+      value: "specVersion: \"v1\"\nserviceId: \"my-service\"\nlocation: \"us-central1\"\nschema:\n  source: \"./schema\"\n  datasource:\n    postgresql:\n      database: \"fdcdb\"\nconnectorDirs: [\"./connector\"]"
+    }
+    files {
+      key: "dataconnect/schema/schema.gql"
+      value: "type UserRole @table(name: \"UserRole\") {\n  id: UUID! @default(expr: \"uuidV4()\")\n  userId: String!\n  roleName: String!\n}"
+    }
+    files {
+      key: "dataconnect/connector/connector.yaml"
+      value: "connectorId: \"default\""
+    }
+  }
+  script_validators: "blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect"
+}
+
+cases {
+  name: "configure_sdk_generation"
+  prompt: "We want to generate type-safe client SDKs for our movie application so our frontend developers can use them. Please configure SDK generation in `connector/connector.yaml` for three platforms:\n1. JavaScript SDK outputting to `../frontend/src/lib/dataconnect` with package name `@movie-app/dataconnect`.\n2. Kotlin SDK outputting to `../android/app/src/main/kotlin/com/movie/db` with package name `com.movie.db`.\n3. Swift SDK outputting to `../ios/MovieApp/DataConnect`.\nMake sure you preserve the existing `connectorId: \"default\"`.\n\n**Validation Note:** Since you are running in a hermetic Google3 CitC evaluation workspace, do NOT run standard npm/npx commands. Instead, build the local emulator CLI using `blaze build //third_party/firebase/dataconnect/emulator/cli:cli` and validate your GraphQL schemas and queries by running `blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect` to check and correct syntax errors before ending your turn."
+  expectations: "The agent correctly adds a javascriptSdk generation block under generate in connector.yaml with correct outputDir and package."
+  expectations: "The agent correctly adds a kotlinSdk generation block under generate in connector.yaml with correct outputDir and package."
+  expectations: "The agent correctly adds a swiftSdk generation block under generate in connector.yaml with correct outputDir."
+  expectations: "The agent preserves the existing connectorId in connector.yaml."
+  setup {
+    commands: "blaze build //third_party/firebase/dataconnect/emulator/cli:cli"
+    files {
+      key: "dataconnect/dataconnect.yaml"
+      value: "specVersion: \"v1\"\nserviceId: \"my-service\"\nlocation: \"us-central1\"\nschema:\n  source: \"./schema\"\n  datasource:\n    postgresql:\n      database: \"fdcdb\"\nconnectorDirs: [\"./connector\"]"
+    }
+    files {
+      key: "dataconnect/schema/schema.gql"
+      value: "type Movie @table {\n  title: String!\n}"
+    }
+    files {
+      key: "dataconnect/connector/connector.yaml"
+      value: "connectorId: \"default\""
+    }
+  }
+  script_validators: "blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect"
+}
+
+cases {
+  name: "breaking_migration_workflow"
+  prompt: "We need to clean up our database schema by deleting the obsolete `legacyId` column from the `Customer` table in `schema/schema.gql`. Please make this schema change, explain any potential risks this removal poses to our existing production data, and outline the exact Firebase CLI commands we should run to verify the SQL diff and deploy this breaking change to production.\n\n**Validation Note:** Since you are running in a hermetic Google3 CitC evaluation workspace, do NOT run standard npm/npx commands. Instead, build the local emulator CLI using `blaze build //third_party/firebase/dataconnect/emulator/cli:cli` and validate your GraphQL schemas and queries by running `blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect` to check and correct syntax errors before ending your turn."
+  expectations: "The agent successfully removes the legacyId column from the Customer table in schema.gql."
+  expectations: "The agent explains the risks of a breaking change (e.g. data loss of existing legacyId values in production)."
+  expectations: "The agent provides the correct deployment or migration command for breaking changes (e.g. using dataconnect:sql:migrate or deploy --only dataconnect --force)."
+  setup {
+    commands: "blaze build //third_party/firebase/dataconnect/emulator/cli:cli"
+    files {
+      key: "dataconnect/dataconnect.yaml"
+      value: "specVersion: \"v1\"\nserviceId: \"my-service\"\nlocation: \"us-central1\"\nschema:\n  source: \"./schema\"\n  datasource:\n    postgresql:\n      database: \"fdcdb\"\nconnectorDirs: [\"./connector\"]"
+    }
+    files {
+      key: "dataconnect/schema/schema.gql"
+      value: "type Customer @table {\n  name: String!\n  legacyId: String!\n}"
+    }
+    files {
+      key: "dataconnect/connector/connector.yaml"
+      value: "connectorId: \"default\""
+    }
+  }
+  script_validators: "blaze-bin/third_party/firebase/dataconnect/emulator/cli/cli build --config_dir=dataconnect"
+}
+
