@@ -59,12 +59,18 @@ Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
       "googleSignIn": {
         "oAuthBrandDisplayName": "Your Brand Name",
         "supportEmail": "support@example.com",
-        "authorizedRedirectUris": ["https://example.com"]
+        "authorizedRedirectUris": ["https://example.com", "http://localhost"]
       }
     }
   }
 }
 ```
+
+> [!NOTE]
+> If the Google Sign-In popup opens and immediately closes with the error `[firebase_auth/unauthorized-domain]`, it means the domain is not authorized.
+> For local development, ensure `http://localhost` is included in `authorizedRedirectUris`.
+> **CRITICAL**: Do NOT include the port number in `authorizedRedirectUris` (e.g., use `http://localhost`, NOT `http://localhost:9090`).
+
 
 **CRITICAL**: After configuring `firebase.json`, you MUST deploy the auth configuration to the Firebase backend for the changes to take effect. This is essential for auth providers like Google Sign-In, email/password, etc. to auto-generate the necessary OAuth clients for your app platforms. Run:
 ```bash
