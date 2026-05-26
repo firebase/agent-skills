@@ -15,6 +15,12 @@ values. Each document is identified by a name. A document can contain complex
 nested objects in addition to basic data types like strings, numbers, and
 booleans. Documents are limited to a maximum size of 1 MiB.
 
+*   **CRITICAL: Do NOT store images, videos, or other large binary media
+    directly in Firestore documents (especially as base64 data URLs).** Doing so
+    will quickly exceed the 1MB limit, trigger write errors (e.g., "Write stream
+    exhausted"), and rapidly consume your quota. Store media in Firebase Storage
+    instead.
+
 Example document (e.g., in a `users` collection): `json { "first": "Ada",
 "last": "Lovelace", "born": 1815 }`
 
