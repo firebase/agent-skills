@@ -34,7 +34,7 @@ export const processOrder = onMessagePublished("orders", ({ message, context }) 
 
 ### 🧠 Why This Works
 
-The Firebase Functions SDK has been updated to provide **Lazy Getters** on the `CloudEvent` object for standard event triggers. When you attempt to destructure `{ message, context }` from the event, the SDK transparently maps the V2 event properties back into V1-compatible objects on the fly!
+The Firebase Functions SDK uses a utility called `addV1Compat` to attach these properties via **Lazy Getters** on the `CloudEvent` object for standard event triggers. When you attempt to destructure `{ message, context }` from the event, the SDK transparently maps the V2 event properties back into V1-compatible objects on the fly! This feature is available in modern V2 environments supported by the SDK.
 
 ---
 
@@ -90,3 +90,11 @@ Here are the exact destructuring patterns for every supported V2 provider:
 4.  **HTTPS Callables (Flattened Context)**: Unlike event triggers, Callables do **not** use `V1Compat` or a `context` object. Instead, all context properties are flattened onto the request object. 
     *   **V1 Priority**: `(data, context) => { ... }`
     *   **V2 Equivalent**: `({ data, auth, app }) => { ... }`
+
+---
+
+## 🔗 Related Migrations
+
+Migrating event signatures is only one part of moving from V1 to V2. If your functions use `functions.config()`, you should also migrate to the new parameterized configuration system (`defineString`, `defineSecret`, etc.).
+
+For more details on how to migrate configuration parameters, refer to the documentation in PR #67 or the `firebase-functions-params-refactor` skill.
