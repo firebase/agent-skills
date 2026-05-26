@@ -95,6 +95,25 @@ Here are the exact destructuring patterns for every supported V2 provider:
 
 ## 🔗 Related Migrations
 
-Migrating event signatures is only one part of moving from V1 to V2. If your functions use `functions.config()`, you should also migrate to the new parameterized configuration system (`defineString`, `defineSecret`, etc.).
+Migrating event signatures is only one part of moving from V1 to V2. Another critical area is configuration management.
 
-For more details on how to migrate configuration parameters, refer to the documentation in PR #67 or the `firebase-functions-params-refactor` skill.
+### Parameterized Configuration
+If your functions use `functions.config()`, you should migrate to the new **Parameterized Configuration** system in V2. The destructuring shim handles event signatures, but it does not shim `functions.config()`.
+
+#### How to Migrate:
+1.  **Identify Usages**: Search for `functions.config().path.to.value`.
+2.  **Define Parameters**: At the top of your file, define the parameter using the appropriate primitive from `firebase-functions/params` (available types include `defineString`, `defineSecret`, `defineInt`, `defineBoolean`, `defineList`, and `defineJSON`):
+    ```typescript
+    import { defineString, defineSecret } from "firebase-functions/params";
+    
+    const stripeKey = defineSecret("STRIPE_KEY");
+    const apiDomain = defineString("API_DOMAIN");
+    ```
+3.  **Access Values**: Replace the V1 call with the `.value()` method of the defined parameter:
+    *   **V1**: `const key = functions.config().stripe.key;`
+    *   **V2**: `const key = stripeKey.value();`
+
+> [!NOTE]
+> When you migrate a function to V2 (even with the destructuring shim), `functions.config()` will return `undefined` unless you have explicitly set up environment variables or are running in a specific emulation mode. Parameterized configuration is the standard and recommended way to handle this in V2.
+
+For a complete guide and deterministic rules on how to migrate configurations, refer to [configuration-migration.md](configuration-migration.md).
