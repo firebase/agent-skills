@@ -69,6 +69,13 @@ signInWithPopup(auth, provider)
   });
 ```
 
+> [!IMPORTANT]
+> **Troubleshooting `auth/unauthorized-domain`**:
+> If the popup opens and immediately closes with error `[firebase_auth/unauthorized-domain]`, it means the domain hosting your app is not authorized for OAuth operations in your Firebase project.
+> - **Fix**: Add your domain (e.g., `localhost` for local testing) to the Authorized Domains list in the Firebase Console (Authentication > Settings > Authorized domains) or in your `firebase.json` auth config.
+> - **CRITICAL**: Do NOT include the protocol or port number when adding the domain (e.g., use `localhost`, NOT `http://localhost:9090`).
+
+
 ## Sign In with Facebook (Popup)
 
 ```javascript
