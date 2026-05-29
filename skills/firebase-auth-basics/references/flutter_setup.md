@@ -102,6 +102,6 @@ class AuthService {
 When running Flutter Web locally and using `signInWithPopup`, you might encounter a situation where the Google Sign-In popup opens and immediately closes.
 - **Symptom**: The console shows `Sign-in failed: [firebase_auth/unauthorized-domain] This domain is not authorized for OAuth operation for your Firebase project.`
 - **Cause**: The domain (usually `localhost` during local testing) is not listed in the Authorized Domains in the Firebase Console.
-- **Solution**: Add `http://localhost` to the Authorized Domains list in the Firebase Console (Authentication > Settings > Authorized domains) or in your `firebase.json` auth config.
-- **CRITICAL**: Do NOT include the port number when adding the domain (e.g., use `http://localhost`, NOT `http://localhost:9090`). Flutter Web often runs on random ports or specific ports, but Firebase Auth only cares about the domain.
+- **Solution**: Add `localhost` to the Authorized Domains list in the Firebase Console (Authentication > Settings > Authorized domains) or in your `firebase.json` auth config.
+- **CRITICAL**: Do NOT include the protocol or port number when adding the domain (e.g., use `localhost`, NOT `http://localhost:9090`). Flutter Web often runs on random ports or specific ports, but Firebase Auth only cares about the domain.
 
