@@ -97,8 +97,8 @@ When querying related data (e.g., articles and their author profiles), perform t
 *   Assign variable and field aliases using `.alias(...)` (note: while the Web SDK uses `.as()`, the Kotlin SDK uses `.alias()` to avoid keyword conflicts with Kotlin's `as` operator).
 
 ```kotlin
-import com.google.firebase.firestore.pipeline.Expression.Companion.field
-import com.google.firebase.firestore.pipeline.Expression.Companion.variable
+import com.google.firebase.firestore.pipeline.Expression.field
+import com.google.firebase.firestore.pipeline.Expression.variable
 
 // Fetch articles and join the associated author Profile side-by-side
 val articlesWithAuthProfile = db.pipeline().collection("articles")
