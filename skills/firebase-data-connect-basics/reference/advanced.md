@@ -236,38 +236,94 @@ export const onAnyMutation = onMutationExecuted(
 
 ## Data Seeding & Bulk Operations
 
-### Local Prototyping with _insertMany
+### Local Prototyping with `seed_data.gql`
+
+Write seed mutations to `dataconnect/seed_data.gql` (project root, not inside `connector/`).
+This file is excluded from SDK generation and production deploys — local emulator only.
 
 ```graphql
-mutation SeedMovies @transaction {
+# dataconnect/seed_data.gql
+mutation SeedDemoData @transaction {
+
+  # Insert parent tables before child/join tables (FK order)
   movie_insertMany(data: [
-    { id: "uuid-1", title: "Movie 1", genre: "Action" },
-    { id: "uuid-2", title: "Movie 2", genre: "Drama" },
-    { id: "uuid-3", title: "Movie 3", genre: "Comedy" }
+    { id: "m-1", title: "Inception", genre: "sci-fi" },
+    { id: "m-2", title: "The Matrix", genre: "action" }
+  ])
+
+  actor_insertMany(data: [
+    { id: "a-1", name: "Leonardo DiCaprio" },
+    { id: "a-2", name: "Keanu Reeves" }
+  ])
+
+  # Join table last — parent rows must already exist
+  movieActor_insertMany(data: [
+    { movieId: "m-1", actorId: "a-1" },
+    { movieId: "m-2", actorId: "a-2" }
   ])
 }
 ```
 
-### Reset Data with _upsertMany
+#### Seed data into related tables using nested operations
+
+**To seed related tables atomically, perform a nested relational insert using literal payloads.** This creates the parent record and its associated child records in a single operation without requiring manual foreign key correlation.
+
+**Do not specify the parent foreign key** (e.g., `movieId` in nested reviews) in the nested child payload; it is automatically resolved and assigned.
 
 ```graphql
-mutation ResetData {
-  movie_upsertMany(data: [
-    { id: "uuid-1", title: "Movie 1", genre: "Action" },
-    { id: "uuid-2", title: "Movie 2", genre: "Drama" }
-  ])
+# Nested insert for Movie and Review (1 movie and 2 reviews shown)
+mutation SeedNestedDemoData @transaction {
+  movie_insert(data: {
+    id: "550e8400-e29b-41d4-a716-446655440000",
+    title: "Inception",
+    genre: "sci-fi",
+    reviews_on_movie: [
+      {
+        id: "123e4567-e89b-12d3-a456-426614174002",
+        rating: 5,
+        reviewText: "Amazing concept!",
+        user: { id: "user-uuid-123" }
+      },
+      {
+        id: "123e4567-e89b-12d3-a456-426614174003",
+        rating: 4,
+        reviewText: "A bit confusing, but great.",
+        user: { id: "user-uuid-456" }
+      }
+    ]
+  })
 }
 ```
 
-### Clear All Data
+### Reset Data
+
+**Option A — delete then re-seed** (reverse FK order):
 
 ```graphql
-mutation ClearMovies {
+mutation ResetDemoData @transaction {
+  movieActor_deleteMany(all: true)
+  actor_deleteMany(all: true)
   movie_deleteMany(all: true)
+  # Then re-run SeedDemoData
+}
+```
+
+**Option B — upsertMany** (idempotent; re-running seeds and resets in one shot):
+
+```graphql
+mutation SeedDemoData @transaction {
+  movie_upsertMany(data: [
+    { id: "m-1", title: "Inception", genre: "sci-fi" },
+    { id: "m-2", title: "The Matrix", genre: "action" }
+  ])
 }
 ```
 
 ### Production: Admin SDK Bulk Operations
+
+**Use the Admin SDK for bulk data operations on production databases.**
+
+The SDK provides direct methods for working with bulk data. From the provided arguments, each method constructs and executes a GraphQL mutation behind the scenes.
 
 ```typescript
 import { initializeApp } from 'firebase-admin/app';
@@ -276,20 +332,44 @@ import { getDataConnect } from 'firebase-admin/data-connect';
 const app = initializeApp();
 const dc = getDataConnect({ location: "us-central1", serviceId: "my-service" });
 
-const movies = [
-  { id: "uuid-1", title: "Movie 1", genre: "Action" },
-  { id: "uuid-2", title: "Movie 2", genre: "Drama" }
+// Methods of the bulk operations API
+// dc is a Data Connect admin instance from getDataConnect
+
+const data = [
+  { id: "m-1", title: "Inception", genre: "sci-fi" },
+  { id: "m-2", title: "The Matrix", genre: "action" }
 ];
 
-// Bulk insert
-await dc.insertMany("movie", movies);
+const resp1 = await dc.insert("movie" /*table name*/, data[0]);
+const resp2 = await dc.insertMany("movie" /*table name*/, data);
+const resp3 = await dc.upsert("movie" /*table name*/, data[0]);
+const resp4 = await dc.upsertMany("movie" /*table name*/, data);
+```
 
-// Bulk upsert
-await dc.upsertMany("movie", movies);
+#### Support for Nested Relational Operations (1:Many)
 
-// Single operations
-await dc.insert("movie", movies[0]);
-await dc.upsert("movie", movies[0]);
+**The specialized bulk APIs natively support nested relational inserts (1:Many relationships).**
+
+Use this approach to atomically insert parent and child records in a single database round-trip without manual foreign key correlation.
+
+```typescript
+// Example of inserting a movie with nested reviews
+const moviesData = [
+  {
+    title: "Interstellar",
+    genre: "Sci-Fi",
+    reviews_on_movie: [
+      {
+        rating: 5,
+        reviewText: "Visually stunning and emotionally powerful.",
+        user: { id: "user-789" }
+      }
+    ]
+  }
+];
+
+// Atomically insert movies and their reviews in a single database round-trip.
+const response = await dc.insertMany("movie", moviesData);
 ```
 
 ### Emulator Data Persistence

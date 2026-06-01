@@ -15,6 +15,7 @@ Firebase SQL Connect is a relational database service using Cloud SQL for Postgr
 ```text
 dataconnect/
 ├── dataconnect.yaml      # Service configuration
+├── seed_data.gql         # LOCAL ONLY — prototype/test data
 ├── schema/
 │   └── schema.gql        # Data model (types with @table)
 └── connector/
@@ -138,9 +139,10 @@ Follow these patterns based on your current task:
 
 1.  Start the emulator: `npx -y firebase-tools@latest emulators:start --only dataconnect`.
 2.  Write schema and operations.
-3.  Run `npx -y firebase-tools@latest dataconnect:compile` or `npx -y firebase-tools@latest dataconnect:sdk:generate` to
+3.  Seed local test data into `seed_data.gql`. Read [reference/advanced.md](reference/advanced.md#data-seeding--bulk-operations).
+4.  Run `npx -y firebase-tools@latest dataconnect:compile` or `npx -y firebase-tools@latest dataconnect:sdk:generate` to
     validate them.
-4.  Use the operations in your app and build it.
+5.  Use the operations in your app and build it.
 
 ### How to deploy SQL Connect to Cloud SQL
 
