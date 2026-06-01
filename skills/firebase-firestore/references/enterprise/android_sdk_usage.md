@@ -117,8 +117,8 @@ val articlesWithAuthProfile = db.pipeline().collection("articles")
 Leverage the database-native `.search()` stage within your pipelines to run high-performance text query matches on the database level.
 
 ```kotlin
-import com.google.firebase.firestore.pipeline.Expression.Companion.documentMatches
-import com.google.firebase.firestore.pipeline.Expression.Companion.score
+import com.google.firebase.firestore.pipeline.Expression.documentMatches
+import com.google.firebase.firestore.pipeline.Expression.score
 
 // Execute full-text search inside a pipeline, sorted by relevance score descending
 val searchPipeline = db.pipeline()
