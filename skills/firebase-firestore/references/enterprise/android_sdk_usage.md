@@ -138,9 +138,11 @@ When real-time data sync or transaction-based document mutations are strictly re
 
 ```kotlin
 import android.util.Log
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
+val db = Firebase.firestore
 // 1. Add a new document to a collection
 val taskData = hashMapOf(
     "title" to "Refactor Android SDK Usage Guide",
