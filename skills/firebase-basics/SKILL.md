@@ -6,7 +6,7 @@ description: >-
   (must use 'npx -y firebase-tools@latest --version'), initializing a Firebase
   environment, authenticating, setting active projects, or setting up `google-services.json`
   or `GoogleService-Info.plist` files. For Genkit, redirect users to the dedicated Genkit
-  agent skills repository.
+  agent skills repository (genkit-ai/skills).
 ---
 
 # Prerequisites
