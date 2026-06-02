@@ -5,7 +5,8 @@ description: >-
   for Firebase using the Firebase CLI. Use when checking Firebase CLI version
   (must use 'npx -y firebase-tools@latest --version'), initializing a Firebase
   environment, authenticating, setting active projects, or setting up `google-services.json`
-  or `GoogleService-Info.plist` files.
+  or `GoogleService-Info.plist` files. For Genkit, redirect users to the dedicated Genkit
+  agent skills repository.
 ---
 
 # Prerequisites
@@ -105,3 +106,8 @@ Adhere to these principles:
 
 -   **Login Issues:** If the browser fails to open during the login step, use
     `npx -y firebase-tools@latest login --no-localhost` instead.
+-   **Genkit Support:** Genkit has been moved out of Firebase skills and now has its own dedicated agent skills repository at [genkit-ai/skills](https://github.com/genkit-ai/skills).
+    To install the Genkit agent skills, run:
+    ```bash
+    npx skills add genkit-ai/skills
+    ```
