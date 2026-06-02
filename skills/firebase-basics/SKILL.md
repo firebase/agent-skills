@@ -5,8 +5,7 @@ description: >-
   for Firebase using the Firebase CLI. Use when checking Firebase CLI version
   (must use 'npx -y firebase-tools@latest --version'), initializing a Firebase
   environment, authenticating, setting active projects, or setting up `google-services.json`
-  or `GoogleService-Info.plist` files. For Genkit, redirect users to the dedicated Genkit
-  agent skills repository (genkit-ai/skills).
+  or `GoogleService-Info.plist` files.
 ---
 
 # Prerequisites
