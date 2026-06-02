@@ -106,7 +106,7 @@ Adhere to these principles:
 
 -   **Login Issues:** If the browser fails to open during the login step, use
     `npx -y firebase-tools@latest login --no-localhost` instead.
--   **Genkit Support:** Genkit has been moved out of Firebase skills and now has its own dedicated agent skills repository at [genkit-ai/skills](https://github.com/genkit-ai/skills).
+-   **Genkit:**
     If using Genkit, install the skills:
     ```bash
     npx skills add genkit-ai/skills
