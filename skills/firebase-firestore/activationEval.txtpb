@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_firestore_activation"
+timeout_seconds: 600
+
+# Firestore Activation Cases (Should activate)
+cases {
+  name: "should_activate_create_db"
+  prompt: "Please set up a new Firestore database instance for my project."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_security_rules"
+  prompt: "I need to write Firestore security rules in standard mode to restrict reads and writes to authenticated users."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_data_model"
+  prompt: "Please configure a Firestore Enterprise Native mode data model for our shopping cart application."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_web_sdk_query"
+  prompt: "How do I run a query in Cloud Firestore using the Web SDK to find users who signed up in the last week?"
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_create_index"
+  prompt: "Create a compound index for Firestore in native mode for my collections."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_ios_setup"
+  prompt: "I want to set up Firestore for my iOS application (Swift/Objective-C)."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_python_sdk"
+  prompt: "Help me write a Python script to query documents from our Enterprise native mode Firestore database."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_list_databases"
+  prompt: "List all current Firestore databases in my Firebase project."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_flutter_setup"
+  prompt: "Set up Cloud Firestore in Flutter for my cross-platform app."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_activate_android_sdk"
+  prompt: "Add an Android Firestore SDK integration to fetch users where status is active."
+  expectations: "The agent activated the 'firebase-firestore' skill."
+}
+
+# Non-activation Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_hosting"
+  prompt: "I want to deploy my static web application to Firebase Hosting."
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_data_connect"
+  prompt: "Please set up a new Firebase Data Connect schema in schema/schema.gql."
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_gcs"
+  prompt: "How do I integrate Google Cloud Storage (GCS) bucket in my Node.js application to upload images?"
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_auth"
+  prompt: "Configure Firebase Authentication to allow Google and Email/Password sign-in."
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_crashlytics"
+  prompt: "How do I track app crashes using Firebase Crashlytics?"
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_general_project"
+  prompt: "Create a new Firebase project using the Firebase CLI."
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_functions"
+  prompt: "Write a Cloud Function that sends a welcome email to new users when they register."
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_remote_config"
+  prompt: "How do I set up Firebase Remote Config to toggle a feature flag?"
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_analytics"
+  prompt: "I need to analyze my app's traffic using Firebase Analytics."
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}
+
+cases {
+  name: "should_not_activate_bigquery"
+  prompt: "How do I write standard SQL queries against BigQuery tables?"
+  expectations: "The agent did not activate the 'firebase-firestore' skill."
+}

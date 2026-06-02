@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_ai_logic_basics_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_init_ailogic"
+  prompt: "How do I initialize Firebase AI Logic in my project using the CLI?"
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_gemini_api"
+  prompt: "I want to call the Gemini Developer API directly from my React client app using Firebase."
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_multimodal_input"
+  prompt: "How can I send an image along with a text prompt to Gemini in Firebase?"
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_chat_session"
+  prompt: "Explain how to implement a multi-turn chat session using Vertex AI for Firebase client SDK."
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_streaming"
+  prompt: "How do I stream responses from Gemini in my web application so it renders as typing text?"
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_structured_json"
+  prompt: "How do I configure the Gemini model to return structured JSON output matching a specific schema in Firebase?"
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_hybrid_nano"
+  prompt: "Tell me how to set up hybrid on-device inference using Gemini Nano in Chrome with the Firebase SDK."
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_app_check_security"
+  prompt: "Why do I need Firebase App Check for Vertex AI for Firebase, and how do I set it up?"
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_remote_config_model"
+  prompt: "How do I use Remote Config to update the model name dynamically for Firebase AI Logic?"
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_activate_flutter_vertex"
+  prompt: "How do I set up Vertex AI for Firebase in my Flutter application to connect to Gemini?"
+  expectations: "The agent activated the 'firebase-ai-logic-basics' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_static_hosting"
+  prompt: "Deploy a static website to Firebase Hosting."
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_auth"
+  prompt: "Configure email and password authentication for my Firebase project."
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore"
+  prompt: "Write a query to fetch all documents from the users collection in Firestore."
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_data_connect"
+  prompt: "Define a GraphQL schema with a User table in Firebase Data Connect."
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_crashlytics"
+  prompt: "How do I check crash reports and stack traces in Firebase Crashlytics?"
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_security_rules"
+  prompt: "Write secure security rules for my Cloud Storage buckets."
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_remote_config_basics"
+  prompt: "How do I fetch and activate Remote Config values in my app for standard configurations?"
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_xcode"
+  prompt: "How do I add Firebase SDK to my Xcode project using Swift Package Manager?"
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_cli_login"
+  prompt: "How do I log in to the Firebase CLI using my Google account?"
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_app_hosting_deploy"
+  prompt: "Deploy my Next.js application to Firebase App Hosting."
+  expectations: "The agent did not activate the 'firebase-ai-logic-basics' skill."
+}

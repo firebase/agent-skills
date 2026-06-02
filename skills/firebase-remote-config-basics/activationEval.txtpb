@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_remote_config_basics_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_template_get"
+  prompt: "How do I download my current Firebase Remote Config template as a JSON file using the CLI?"
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_deploy_remoteconfig"
+  prompt: "Show me how to deploy my local remote_config.json changes to Firebase."
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_android_sdk_setup"
+  prompt: "How do I initialize Remote Config in my Android app code and fetch values?"
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_ios_sdk_setup"
+  prompt: "Please guide me on setting up Remote Config Swift SDK in my iOS application."
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_in_app_defaults"
+  prompt: "How do I set in-app default values for Remote Config in my application?"
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_fetch_and_activate"
+  prompt: "Explain the differences between fetching, activating, and using fetchAndActivate() in the SDK."
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_loading_strategies"
+  prompt: "What are the recommended loading strategies for Remote Config to ensure a smooth user experience?"
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_realtime_listener"
+  prompt: "How do I implement a real-time listener to get config updates instantly without a manual fetch?"
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_history_list"
+  prompt: "How can I view the version history of my Remote Config template updates using the command line?"
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_activate_feature_flagging"
+  prompt: "I want to set up a feature flag condition in Remote Config based on a user group or percentage rollout."
+  expectations: "The agent activated the 'firebase-remote-config-basics' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_static_deploy"
+  prompt: "Deploy my HTML/CSS files to Firebase Hosting."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_auth"
+  prompt: "Set up Google Sign-In using Firebase Auth."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore"
+  prompt: "How do I add a new document to a collection in Firestore?"
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_dataconnect"
+  prompt: "Write GraphQL mutations to insert database records in Data Connect."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_gemini"
+  prompt: "Call the Gemini model directly client-side with Vertex AI for Firebase."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_crashlytics"
+  prompt: "Report caught errors to Crashlytics on iOS."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_rules_audit"
+  prompt: "Audit my Firestore rules for open read/write access."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_xcode"
+  prompt: "Setup Xcode target configuration."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_cli_login"
+  prompt: "Log in to Firebase CLI via browser."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_app_hosting"
+  prompt: "Configure Next.js SSG deploying to App Hosting."
+  expectations: "The agent did not activate the 'firebase-remote-config-basics' skill."
+}

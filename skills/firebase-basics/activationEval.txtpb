@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_basics_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_install_cli"
+  prompt: "Help me install and configure the Firebase CLI on my computer."
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_cli_login"
+  prompt: "How do I log in to my Firebase account using the CLI?"
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_login_no_localhost"
+  prompt: "I need to log in to Firebase from a remote server where I don't have a browser."
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_create_project"
+  prompt: "Please show me how to create a new Firebase project using the CLI."
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_use_project"
+  prompt: "How do I switch the active project in my Firebase CLI environment to 'my-prod-project'?"
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_fetch_android_config"
+  prompt: "Please download the google-services.json file for my Android app."
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_fetch_ios_config"
+  prompt: "I need to fetch the GoogleService-Info.plist configuration for my iOS application."
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_cli_version"
+  prompt: "How do I check the version of the Firebase CLI installed?"
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_init_project"
+  prompt: "Please initialize a new Firebase project environment in my local workspace."
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_activate_get_active_project"
+  prompt: "What is the active project currently set in my Firebase CLI?"
+  expectations: "The agent activated the 'firebase-basics' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_security_rules"
+  prompt: "Please add Firestore security rules to restrict reads and writes to authenticated users."
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_auth_setup"
+  prompt: "How do I configure Firebase Authentication to allow Google and Email/Password sign-in?"
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_data_connect"
+  prompt: "Help me set up a new Firebase Data Connect schema in my workspace."
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_deploy_hosting"
+  prompt: "How do I deploy a static website to Firebase Hosting?"
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_xcode_spm"
+  prompt: "Configure my Xcode project to include Firebase dependencies using SPM."
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_app_hosting"
+  prompt: "I want to deploy a Next.js application to Firebase App Hosting."
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_crashlytics_logs"
+  prompt: "How do I log custom events or track crashes in my app using Crashlytics?"
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore_query"
+  prompt: "Write a query in Cloud Firestore to fetch all user profiles created today."
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_rules_audit"
+  prompt: "Audit my Firebase security rules for potential vulnerabilities."
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_remote_config"
+  prompt: "How do I toggle a feature flag dynamically using Remote Config?"
+  expectations: "The agent did not activate the 'firebase-basics' skill."
+}

@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_hosting_basics_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_deploy"
+  prompt: "How do I deploy my static website to Firebase Hosting?"
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_custom_domain"
+  prompt: "Please show me how to configure my custom domain name for my Firebase Hosting site."
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_redirects"
+  prompt: "How do I set up a redirects configuration in firebase.json to redirect /old to /new?"
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_headers"
+  prompt: "I need to add headers to my static files to enable CORS on Firebase Hosting."
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_rewrites"
+  prompt: "Please configure rewrites in firebase.json to route all traffic to my single-page app's index.html."
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_deploy_target"
+  prompt: "What command do I run to deploy only my hosting site using the Firebase CLI?"
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_previews"
+  prompt: "How do I set up preview channels to test my site updates before releasing them to production?"
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_preview_expiry"
+  prompt: "Please configure my Firebase Hosting project to clean up old previews after 7 days."
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_multisite"
+  prompt: "How do I deploy multiple sites (multi-site hosting) in the same Firebase project?"
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_json_config"
+  prompt: "Write a basic hosting configuration block for my firebase.json file."
+  expectations: "The agent activated the 'firebase-hosting-basics' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_auth"
+  prompt: "How do I configure Firebase Authentication for email and password login?"
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore"
+  prompt: "Help me write a Firestore query to get users who are active."
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_app_hosting"
+  prompt: "Please configure a Next.js app using Firebase App Hosting."
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_basics_db"
+  prompt: "Create a database instance and list databases."
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_xcode"
+  prompt: "Configure my Xcode project to include Firebase Auth using Swift package manager."
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_crashlytics"
+  prompt: "How do I get stack traces from Crashlytics?"
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore_rules"
+  prompt: "How do I write security rules in standard mode for Firestore?"
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_data_connect"
+  prompt: "Write a GraphQL schema for Data Connect."
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_rules_audit"
+  prompt: "Audit my Firestore rules for open read/write access."
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_cli_login"
+  prompt: "Log in to the Firebase CLI using no-localhost."
+  expectations: "The agent did not activate the 'firebase-hosting-basics' skill."
+}

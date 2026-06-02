@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_security_rules_auditor_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_audit_rules"
+  prompt: "Audit my Firestore security rules to identify any potential security holes."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_rules_bypass"
+  prompt: "I want a security review of my rules to make sure users cannot update their own role to 'admin'."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_data_integrity"
+  prompt: "Analyze if my Firestore rules prevent a user from corrupting data types or bypassing string length limits."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_audit_json_format"
+  prompt: "Perform a red-team assessment on my security rules and output the findings in the standard JSON format with score."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_storage_abuse"
+  prompt: "Check my Cloud Storage rules to verify if they prevent resource exhaustion or denial of service."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_create_vs_update"
+  prompt: "Review my rules for inconsistencies between create and update operations on my users collection."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_type_safety_check"
+  prompt: "Do my Firestore rules enforce proper type checking (like checking 'is string' or 'is timestamp')?"
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_admin_escalation"
+  prompt: "Check if my admin email validation in rules has a privilege escalation vulnerability."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_field_level_security"
+  prompt: "Analyze if using hasOnly() in my rules leaves data vulnerable because of missing identity-level ownership checks."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_activate_audit_checklist"
+  prompt: "Evaluate my firestore.rules file against the security auditor checklist."
+  expectations: "The agent activated the 'firebase-security-rules-auditor' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_static_deploy"
+  prompt: "Deploy a static website using Firebase Hosting."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_auth"
+  prompt: "Implement anonymous sign-in using Firebase Authentication."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore_query"
+  prompt: "Write a query in Firestore to get all users who logged in today."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_dataconnect"
+  prompt: "Define a GraphQL schema for Data Connect."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_gemini"
+  prompt: "How do I call Gemini Developer API using Vertex AI for Firebase?"
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_crashlytics"
+  prompt: "How do I set up custom keys in Crashlytics?"
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_remote_config"
+  prompt: "Deploy Remote Config feature flags via Firebase CLI."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_xcode"
+  prompt: "Configure Swift Package Manager dependencies for my app."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_cli_login"
+  prompt: "Log in to Firebase CLI."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}
+
+cases {
+  name: "should_not_activate_app_hosting"
+  prompt: "Deploy Next.js application to Firebase App Hosting."
+  expectations: "The agent did not activate the 'firebase-security-rules-auditor' skill."
+}

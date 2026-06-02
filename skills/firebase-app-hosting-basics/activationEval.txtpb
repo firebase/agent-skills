@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_app_hosting_basics_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_nextjs_ssr"
+  prompt: "I want to deploy a full-stack Next.js application using Server-Side Rendering (SSR) to Firebase."
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_angular"
+  prompt: "How do I configure Firebase App Hosting to deploy my Angular web app?"
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_yaml_config"
+  prompt: "Please help me set up the apphosting.yaml file for my backend environment variables."
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_json_block"
+  prompt: "How do I write the apphosting block in my firebase.json config?"
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_secrets"
+  prompt: "What command do I run to set up secrets like API keys safely in Firebase App Hosting?"
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_create_backend"
+  prompt: "How do I create a new App Hosting backend using the Firebase CLI?"
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_github_cicd"
+  prompt: "Please show me how to link my GitHub repository to App Hosting for automated 'git push to deploy' workflows."
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_emulate"
+  prompt: "How do I emulate my Next.js application locally using the Firebase Emulator Suite?"
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_blaze_inquiry"
+  prompt: "Do I need to upgrade my billing plan to Blaze to use Firebase App Hosting?"
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_activate_node_version"
+  prompt: "How do I configure a specific Node.js version for my App Hosting backend?"
+  expectations: "The agent activated the 'firebase-app-hosting-basics' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_static_deploy"
+  prompt: "How do I deploy a completely static HTML/CSS website to Firebase?"
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_auth"
+  prompt: "Configure Firebase Authentication for email and password login."
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore"
+  prompt: "Help me write a Firestore query to find active users."
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_config_download"
+  prompt: "Download the google-services.json config file."
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_xcode"
+  prompt: "Setup Swift package manager in Xcode."
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_crashlytics"
+  prompt: "How do I get crash logs from Crashlytics?"
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_security_rules"
+  prompt: "Audit my security rules for Firestore."
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_cli_login"
+  prompt: "How do I log in to the Firebase CLI?"
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_native_db"
+  prompt: "Create a database instance in Native mode."
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_standard_rules"
+  prompt: "Add standard security rules to restrict database access."
+  expectations: "The agent did not activate the 'firebase-app-hosting-basics' skill."
+}

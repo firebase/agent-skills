@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_auth_basics_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_email_auth"
+  prompt: "Help me set up Firebase Authentication to allow email and password sign-in."
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_google_signin"
+  prompt: "How do I integrate Google Sign-In with Firebase in my web application?"
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_android_signout"
+  prompt: "Please show me how to implement user sign-out in Android using the Firebase Auth SDK."
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_anonymous_auth"
+  prompt: "I need to configure anonymous authentication so guests can use my app without signing in."
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_get_current_user"
+  prompt: "How do I retrieve the currently signed-in user's UID using the Web SDK?"
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_auth_rules"
+  prompt: "Please write security rules to allow users to read and write only their own data based on auth.uid."
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_phone_auth"
+  prompt: "How do I set up Phone Number Authentication with Firebase?"
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_verify_email"
+  prompt: "What is the correct way to verify a user's email address in Firebase Auth?"
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_ios_google_signin"
+  prompt: "Write an iOS Swift snippet to sign in a user with Google credentials."
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_activate_secure_db"
+  prompt: "How do I secure my database collections so only logged-in users can access them?"
+  expectations: "The agent activated the 'firebase-auth-basics' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_hosting"
+  prompt: "How do I deploy my static assets to Firebase Hosting?"
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore_query"
+  prompt: "Create a compound query in Firestore using standard Web SDK."
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_cli_setup"
+  prompt: "Help me set up the Firebase CLI locally and log in."
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_app_hosting"
+  prompt: "I want to configure a Next.js app in App Hosting."
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_data_connect"
+  prompt: "Write a new Data Connect GraphQL schema."
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_rules_audit"
+  prompt: "Audit my firestore.rules file for insecure open access."
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_crash_logs"
+  prompt: "How do I get crash logs from Crashlytics?"
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_remote_config"
+  prompt: "Toggle a feature flag based on user location with Remote Config."
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore_indexes"
+  prompt: "How do I configure compound indexes in Firestore native mode?"
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}
+
+cases {
+  name: "should_not_activate_config_download"
+  prompt: "Download google-services.json for my project."
+  expectations: "The agent did not activate the 'firebase-auth-basics' skill."
+}

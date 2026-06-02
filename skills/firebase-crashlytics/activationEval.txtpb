@@ -1,0 +1,128 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "firebase_crashlytics_activation"
+timeout_seconds: 600
+
+# Positive Cases (Should activate)
+cases {
+  name: "should_activate_ios_setup"
+  prompt: "How do I configure Firebase Crashlytics in my iOS App using Swift?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_android_setup"
+  prompt: "Please guide me on how to add Crashlytics and its Gradle plugin to my Android project."
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_custom_keys"
+  prompt: "How do I set custom keys (like user tier or level) in Crashlytics to help prioritize reports?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_custom_logs"
+  prompt: "Show me how to write custom log messages to Crashlytics that will be sent with the crash report."
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_user_identifiers"
+  prompt: "How do I set a user identifier in Firebase Crashlytics so I can lookup crashes by user ID?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_non_fatal_exceptions"
+  prompt: "How do I report non-fatal exceptions or caught errors to Crashlytics on Android?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_dysm"
+  prompt: "How do I upload dSYM files for iOS Crashlytics to see symbolic stack traces?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_test_crash"
+  prompt: "What is the standard way to force a test crash in my app to verify Crashlytics is working?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_build_id"
+  prompt: "How do I disable Crashlytics mapping file uploads for debug builds in Gradle?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_activate_opt_out"
+  prompt: "How can my users opt out of Crashlytics reporting at runtime (enable/disable collection dynamically)?"
+  expectations: "The agent activated the 'firebase-crashlytics' skill."
+}
+
+# Negative Cases (Should NOT activate)
+cases {
+  name: "should_not_activate_static_hosting"
+  prompt: "Deploy my static site to Firebase Hosting."
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_auth"
+  prompt: "Configure Firebase Authentication for email/password login."
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_firestore_query"
+  prompt: "Write a Firestore query to get users ordered by age."
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_data_connect"
+  prompt: "Define a GraphQL schema for Data Connect."
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_gemini"
+  prompt: "How do I call Gemini Developer API using Vertex AI for Firebase?"
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_security_rules"
+  prompt: "Write secure security rules for my Firestore database."
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_remote_config"
+  prompt: "How do I set up Remote Config feature flags?"
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_xcode_basics"
+  prompt: "Configure my Xcode project workspace."
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_cli_login"
+  prompt: "How do I log in to the Firebase CLI?"
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
+
+cases {
+  name: "should_not_activate_app_hosting"
+  prompt: "Deploy my React application to Firebase App Hosting."
+  expectations: "The agent did not activate the 'firebase-crashlytics' skill."
+}
