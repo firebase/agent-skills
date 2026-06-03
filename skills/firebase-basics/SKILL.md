@@ -105,3 +105,8 @@ Adhere to these principles:
 
 -   **Login Issues:** If the browser fails to open during the login step, use
     `npx -y firebase-tools@latest login --no-localhost` instead.
+-   **Genkit:**
+    If using Genkit, install the skills:
+    ```bash
+    npx skills add genkit-ai/skills
+    ```
