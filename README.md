@@ -46,7 +46,21 @@ Verify the installation:
 claude plugin marketplace list
 ```
 
-### Option 4: Manual Set Up
+### Option 4: Codex Plugin
+
+Add the Firebase marketplace for Codex plugins:
+
+```bash
+codex plugin marketplace add firebase/skills
+```
+
+Install the Firebase plugin:
+
+```bash
+codex plugin add firebase@firebase
+```
+
+### Option 5: Manual Set Up
 
 1. Clone this repository:
 
@@ -59,7 +73,7 @@ git clone https://github.com/firebase/skills.git
    - **Windsurf**: `.windsurfrules/`
    - **GitHub Copilot**: `.github/copilot-instructions.md` (or project-specific instruction files)
 
-### Option 5: Local Path via Agent Skills CLI
+### Option 6: Local Path via Agent Skills CLI
 
 The `skills` CLI also supports installing skills from a local directory. If you have cloned this repository, you can add skills by pointing the CLI to your local folder:
 
@@ -73,7 +87,7 @@ If you make changes to the local skills repository and want to update your proje
 npx skills experimental_install
 ```
 
-### Option 6: Local Development (Live Symlinking)
+### Option 7: Local Development (Live Symlinking)
 
 If you are actively contributing to or developing these skills, using `npx skills add` or copying files means you have to manually update them every time you make a change. Instead, use a symlink so that changes in your local clone are immediately reflected in your test project.
 
