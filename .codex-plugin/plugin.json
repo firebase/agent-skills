@@ -1,0 +1,50 @@
+{
+  "name": "firebase",
+  "version": "1.1.0",
+  "description": "Official Firebase plugin for Codex. Manage projects, add backend services, develop AI features, deploy and host apps, and more.",
+  "author": {
+    "name": "Firebase",
+    "email": "firebase-support@google.com",
+    "url": "https://firebase.google.com"
+  },
+  "homepage": "https://github.com/firebase/agent-skills",
+  "repository": "https://github.com/firebase/agent-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "firebase",
+    "codex",
+    "skills",
+    "mcp",
+    "firestore",
+    "hosting",
+    "auth",
+    "storage",
+    "ailogic",
+    "backend",
+    "cloud-services"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Firebase",
+    "shortDescription": "Build and manage Firebase apps from Codex.",
+    "longDescription": "Use official Firebase skills and the Firebase MCP server to set up projects, configure backend services, query Firestore, manage authentication, deploy hosting, work with AI Logic, and audit security rules from Codex.",
+    "developerName": "Firebase",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Skills",
+      "MCP"
+    ],
+    "websiteURL": "https://firebase.google.com",
+    "privacyPolicyURL": "https://policies.google.com/privacy",
+    "termsOfServiceURL": "https://policies.google.com/terms",
+    "defaultPrompt": [
+      "Set up Firebase in this app.",
+      "Audit my Firestore security rules.",
+      "Deploy this app with Firebase Hosting."
+    ],
+    "brandColor": "#FFCA28",
+    "composerIcon": "./assets/firebase_logo.svg",
+    "logo": "./assets/firebase-agent-skills_logo.svg"
+  }
+}

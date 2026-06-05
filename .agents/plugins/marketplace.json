@@ -1,0 +1,20 @@
+{
+  "name": "firebase",
+  "interface": {
+    "displayName": "Firebase"
+  },
+  "plugins": [
+    {
+      "name": "firebase",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
