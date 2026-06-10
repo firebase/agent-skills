@@ -18,7 +18,7 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize the AI Logic service (defaults to Gemini Developer API)
 // To set the AI provider, set the backend as the second parameter
-const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
+const ai = getAI(app, { backend: new GoogleAIBackend() });
 
 const generationConfig = {
   candidate_count: 1,
@@ -30,7 +30,8 @@ const generationConfig = {
 };
 
 // Specify the config as part of creating the `GenerativeModel` instance
-const model = getGenerativeModel(ai, { model: "gemini-2.5-flash-lite",  generationConfig });
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+const model = getGenerativeModel(ai, { model: "<latest_supported_model>",  generationConfig });
 ```
 
 ## Core Capabilities
@@ -119,7 +120,7 @@ const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
 
 // Create a `GenerativeModel` instance with a model that supports your use case
 const model = getGenerativeModel(ai, {
-  model: "gemini-2.5-flash-image",
+  model: "<latest_supported_image_model>", // [AGENT] Replace with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
   // Configure the model to respond with text and images (required)
   generationConfig: {
     responseModalities: [ResponseModality.TEXT, ResponseModality.IMAGE],
@@ -150,7 +151,7 @@ Enforce a specific JSON schema for the response.
 ```JavaScript
 import { getGenerativeModel, Schema } from "firebase/ai";
 const jsonModel = getGenerativeModel(ai, {
-    model: "gemini-2.5-flash-lite",
+    model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
     generationConfig: {
         responseMimeType: "application/json",
         // Optional: Define a schema

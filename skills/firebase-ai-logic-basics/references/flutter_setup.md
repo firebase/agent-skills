@@ -48,7 +48,7 @@ void main() async {
 Use `FirebaseAI.googleAI` for the **Gemini Developer API**.
 
 > [!IMPORTANT]
-> **Model Selection:** Always use **`gemini-flash-latest`**. DO NOT USE `gemini-1.5-flash`.
+> **Model Selection:** Refer to [Firebase AI Logic Models](https://firebase.google.com/docs/ai-logic/models.md.txt) to find the latest supported model. Do not use old models like `gemini-2.0-pro` or `gemini-2.0-flash`.
 
 > [!IMPORTANT]
 > **Choose the Right API Provider:** Always use `FirebaseAI.googleAI` (Gemini Developer API) as the default for prototyping and standard use. Avoid using the Vertex AI Gemini API unless your application specifically requires enterprise-grade scalability and is configured for the Blaze plan.
@@ -62,8 +62,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 Future<String> generateText(String prompt) async {
   final googleAI = FirebaseAI.googleAI(auth: FirebaseAuth.instance);
   
-  // Use the latest Gemini Flash model
-  final model = googleAI.generativeModel(model: 'gemini-flash-latest');
+  // [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  final model = googleAI.generativeModel(model: '<latest_supported_model>');
 
   final response = await model.generateContent([Content.text(prompt)]);
   return response.text ?? 'No response';
