@@ -2,7 +2,7 @@
 
 Ready-to-use templates for common Firebase SQL Connect patterns.
 
----
+______________________________________________________________________
 
 ## Basic CRUD Schema
 
@@ -49,7 +49,7 @@ mutation DeleteItem($id: UUID!) @auth(level: USER) {
 }
 ```
 
----
+______________________________________________________________________
 
 ## User-Owned Resources
 
@@ -113,7 +113,7 @@ mutation DeleteNote($id: UUID!) @auth(level: USER) {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Many-to-Many Relationship
 
@@ -169,7 +169,7 @@ mutation RemoveTagFromArticle($articleId: UUID!, $tagId: UUID!) @auth(level: USE
 }
 ```
 
----
+______________________________________________________________________
 
 ## dataconnect.yaml Template
 
@@ -187,7 +187,7 @@ schema:
 connectorDirs: ["./connector"]
 ```
 
----
+______________________________________________________________________
 
 ## connector.yaml Template
 
@@ -207,7 +207,7 @@ generate:
     package: myapp_dataconnect
 ```
 
----
+______________________________________________________________________
 
 ## Firebase Init Commands
 
@@ -229,7 +229,7 @@ npx -y firebase-tools@latest dataconnect:sdk:generate
 npx -y firebase-tools@latest deploy --only dataconnect
 ```
 
----
+______________________________________________________________________
 
 ## SDK Initialization (Web)
 
@@ -268,7 +268,7 @@ console.log(data.items);
 await createItem({ name: 'New Item', description: 'Description' });
 ```
 
----
+______________________________________________________________________
 
 ## Realtime Query Templates
 

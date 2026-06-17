@@ -1,20 +1,23 @@
 # Cloud Firestore on Android (Kotlin)
 
-This guide walks you through using Cloud Firestore in your Android app using Kotlin.
+This guide walks you through using Cloud Firestore in your Android app using
+Kotlin.
 
 ### Enable Firestore via CLI
 
-Before adding dependencies in your app, make sure you enable the Firestore service in your Firebase Project using the Firebase CLI:
+Before adding dependencies in your app, make sure you enable the Firestore
+service in your Firebase Project using the Firebase CLI:
 
 ```bash
 npx -y firebase-tools@latest init firestore
 ```
 
- ---
+______________________________________________________________________
 
 ### 1. Add Dependencies
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add the dependency for Cloud Firestore:
+In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
+the dependency for Cloud Firestore:
 
 ```kotlin
 dependencies {
@@ -27,7 +30,7 @@ dependencies {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 2. Initialize Firestore
 
@@ -82,7 +85,7 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 3. Add Data
 
@@ -122,7 +125,7 @@ db.collection("cities").document("LA")
     .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
 ```
 
----
+______________________________________________________________________
 
 ### 4. Read Data
 
@@ -159,11 +162,12 @@ db.collection("cities")
     }
 ```
 
----
+______________________________________________________________________
 
 ### 5. Update Data
 
-Update some fields of a document using `update()` without overwriting the entire document:
+Update some fields of a document using `update()` without overwriting the entire
+document:
 
 ```kotlin
 val washingtonRef = db.collection("cities").document("DC")
@@ -175,7 +179,7 @@ washingtonRef
     .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
 ```
 
----
+______________________________________________________________________
 
 ### 6. Delete Data
 

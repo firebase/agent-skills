@@ -1,12 +1,22 @@
 # iOS SDK
 
-Consult this file when writing iOS application code (Swift) that interacts with the SQL Connect backend.
+Consult this file when writing iOS application code (Swift) that interacts with
+the SQL Connect backend.
 
 ### Best Practices for Agents
-- **Understand Operation Storage**: SQL Connect queries and mutations are stored on the server like Cloud Functions. **Whenever you update operations, you must regenerate the SDK and redeploy services** that use it to avoid breaking clients.
-- **Resilient Enum Handling**: The generated SDK forces handling of unknown values by adding an `._UNKNOWN` case. Swift enforces exhaustive switch statements, so you must handle this case.
-- **Observable Macro**: By default, query refs support the `@Observable` macro (iOS 17+), making them ideal for binding to SwiftUI views. The bindable query results are available in the `data` variable of the query ref.
-- **Handle Errors**: Use `try await` with operation execution as they are asynchronous and may throw errors.
+
+- **Understand Operation Storage**: SQL Connect queries and mutations are stored
+  on the server like Cloud Functions. **Whenever you update operations, you must
+  regenerate the SDK and redeploy services** that use it to avoid breaking
+  clients.
+- **Resilient Enum Handling**: The generated SDK forces handling of unknown
+  values by adding an `._UNKNOWN` case. Swift enforces exhaustive switch
+  statements, so you must handle this case.
+- **Observable Macro**: By default, query refs support the `@Observable` macro
+  (iOS 17+), making them ideal for binding to SwiftUI views. The bindable query
+  results are available in the `data` variable of the query ref.
+- **Handle Errors**: Use `try await` with operation execution as they are
+  asynchronous and may throw errors.
 
 ### Dependencies (Package.swift or SPM)
 
@@ -34,6 +44,7 @@ connector.useEmulator()
 ### Calling Operations
 
 #### Basic Query
+
 ```swift
 let result = try await connector.listMovies.execute()
 for movie in result.data.movies {
@@ -42,6 +53,7 @@ for movie in result.data.movies {
 ```
 
 #### Mutation
+
 ```swift
 let mutationResult = try await connector.createMovieMutation.execute(
   title: "Empire Strikes Back",
@@ -52,6 +64,7 @@ let mutationResult = try await connector.createMovieMutation.execute(
 ```
 
 ### Resilient Enum Handling
+
 Handle generated enums exhaustively, including the `._UNKNOWN` case.
 
 ```swift
@@ -73,7 +86,9 @@ do {
 ```
 
 ### Client-Side Caching
-Enable caching in `connector.yaml` to reduce requests, support offline scenarios, enable realtime support for queries.
+
+Enable caching in `connector.yaml` to reduce requests, support offline
+scenarios, enable realtime support for queries.
 
 ```yaml
 generate:
@@ -86,6 +101,7 @@ generate:
 ```
 
 Use cache policies in code:
+
 ```swift
 try await execute(fetchPolicy: .cacheOnly)
 try await execute(fetchPolicy: .serverOnly)
@@ -132,6 +148,7 @@ struct ListMovieView: View {
 ```
 
 ### Data Type Mapping Reference
+
 - GraphQL `UUID` -> Swift `UUID`
 - GraphQL `Date` -> Swift `FirebaseDataConnect.LocalDate`
 - GraphQL `Timestamp` -> Swift `FirebaseCore.Timestamp`

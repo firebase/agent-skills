@@ -2,13 +2,13 @@
 
 ## Manual Initialization
 
-Initialize the following firebase configuration files manually. Do not use `npx
--y firebase-tools@latest init`, as it expects interactive inputs.
+Initialize the following firebase configuration files manually. Do not use
+`npx -y firebase-tools@latest init`, as it expects interactive inputs.
 
-1.  **Create `firebase.json`**: This file configures the Firebase CLI.
-2.  **Create `firestore.rules`**: This file contains your security rules.
-3.  **Create `firestore.indexes.json`**: This file contains your index
-    definitions.
+1. **Create `firebase.json`**: This file configures the Firebase CLI.
+1. **Create `firestore.rules`**: This file contains your security rules.
+1. **Create `firestore.indexes.json`**: This file contains your index
+   definitions.
 
 ### 1. Create `firebase.json`
 
@@ -26,12 +26,17 @@ content. If this file already exists, instead append to the existing JSON:
 
 This will use the default database with the Standard edition. To use a different
 database, specify the database ID and location:
-1.  Run `npx -y firebase-tools@latest firestore:locations` to get the list of locations.
-2.  Ask the user which location to use, suggesting colocation if other parts of the app already have a region selected.
 
-You can check the list of available databases using `npx -y firebase-tools@latest firestore:databases:list`.
+1. Run `npx -y firebase-tools@latest firestore:locations` to get the list of
+   locations.
+1. Ask the user which location to use, suggesting colocation if other parts of
+   the app already have a region selected.
 
-If the database does not exist, it will be created when you deploy with the specified configuration:
+You can check the list of available databases using
+`npx -y firebase-tools@latest firestore:databases:list`.
+
+If the database does not exist, it will be created when you deploy with the
+specified configuration:
 
 ```json
 {
@@ -78,7 +83,10 @@ start:
 
 ## Deploy database, rules and indexes
 
-**CRITICAL**: You MUST deploy the firestore configuration for the database to be provisioned in the cloud and for your rules/indexes to take effect. If you don't run this, your database will not exist.
+**CRITICAL**: You MUST deploy the firestore configuration for the database to be
+provisioned in the cloud and for your rules/indexes to take effect. If you don't
+run this, your database will not exist.
+
 ```bash
 # To deploy all rules and indexes
 npx -y firebase-tools@latest deploy --only firestore

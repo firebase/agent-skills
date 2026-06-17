@@ -1,16 +1,28 @@
 # Android SDK
 
-Consult this file when writing Android application code (Kotlin) that interacts with the SQL Connect backend.
+Consult this file when writing Android application code (Kotlin) that interacts
+with the SQL Connect backend.
 
 ### Best Practices for Agents
-- **Understand Operation Storage**: SQL Connect queries and mutations are stored on the server like Cloud Functions. **Whenever you update operations, you must regenerate the SDK and redeploy services** that use it to avoid breaking clients.
-- **Resilient Enum Handling**: The generated SDK forces handling of unknown values by wrapping them in `EnumValue`. You must unwrap it into `EnumValue.Known` or `EnumValue.Unknown` to handle schema updates gracefully.
-- **Flow Behavior**: While you can collect a Flow from a query, note that **this Flow is not updated in real-time automatically** by default. It only produces a result when a new query result is retrieved using a call to the query's `execute()` method.
-- **Leverage Coroutines**: Call `.execute()` within a coroutine scope for asynchronous operations.
+
+- **Understand Operation Storage**: SQL Connect queries and mutations are stored
+  on the server like Cloud Functions. **Whenever you update operations, you must
+  regenerate the SDK and redeploy services** that use it to avoid breaking
+  clients.
+- **Resilient Enum Handling**: The generated SDK forces handling of unknown
+  values by wrapping them in `EnumValue`. You must unwrap it into
+  `EnumValue.Known` or `EnumValue.Unknown` to handle schema updates gracefully.
+- **Flow Behavior**: While you can collect a Flow from a query, note that **this
+  Flow is not updated in real-time automatically** by default. It only produces
+  a result when a new query result is retrieved using a call to the query's
+  `execute()` method.
+- **Leverage Coroutines**: Call `.execute()` within a coroutine scope for
+  asynchronous operations.
 
 ### Dependencies (build.gradle.kts)
 
-Ensure you have the Kotlin Serialization plugin and standard SQL Connect dependencies:
+Ensure you have the Kotlin Serialization plugin and standard SQL Connect
+dependencies:
 
 ```kotlin
 plugins {
@@ -45,6 +57,7 @@ connector.dataConnect.useEmulator()
 ### Calling Operations
 
 #### Basic Query
+
 ```kotlin
 val result = connector.listMovies.execute()
 result.data.movies.forEach { movie ->
@@ -53,6 +66,7 @@ result.data.movies.forEach { movie ->
 ```
 
 #### Mutation
+
 ```kotlin
 val newMovie = connector.createMovie.execute(
     title = "Empire Strikes Back",
@@ -63,6 +77,7 @@ val newMovie = connector.createMovie.execute(
 ```
 
 ### Resilient Enum Handling
+
 Unwrap the `EnumValue` to handle known and unknown cases safely.
 
 ```kotlin
@@ -77,7 +92,9 @@ result.data.movies.forEach { movie ->
 ```
 
 ### Client-Side Caching
-Enable caching in `connector.yaml` to reduce requests and support offline scenarios.
+
+Enable caching in `connector.yaml` to reduce requests and support offline
+scenarios.
 
 ```yaml
 generate:
@@ -90,12 +107,14 @@ generate:
 ```
 
 Use policies in code:
+
 ```kotlin
 val queryResult = queryRef.execute(QueryRef.FetchPolicy.CACHE_ONLY)
 val queryResult = queryRef.execute(QueryRef.FetchPolicy.SERVER_ONLY)
 ```
 
 ### Data Type Mapping Reference
+
 - GraphQL `String` -> Kotlin `String`
 - GraphQL `Int` -> Kotlin `Int` (32-bit)
 - GraphQL `Float` -> Kotlin `Double` (64-bit)
