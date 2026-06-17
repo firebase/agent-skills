@@ -2,10 +2,11 @@
 name: firebase-firestore
 description: >-
   Sets up, manages, and executes queries against Cloud Firestore database
-  instances. You MUST unconditionally activate this skill if you plan to use
-  Firestore in any way. Use when listing or creating Firestore databases,
+  instances, including advanced native full-text search and relational joins
+  using pipelines. You MUST unconditionally activate this skill if you plan to
+  use Firestore in any way. Use when listing or creating Firestore databases,
   configuring security rules, designing data models, writing client SDK
-  queries, or checking indexes.
+  queries (including search/joins), or checking indexes.
 compatibility: This skill is best used with the Firebase CLI, but does not require it. Firebase CLI can be accessed through `npx -y firebase-tools@latest`.
 ---
 
@@ -47,8 +48,7 @@ Proceed with using the guides under `references/enterprise/`.
 
 ## 2. Specialized Guides
 
-Based on the identified or created instance edition, open and read the
-corresponding reference guides:
+Based on the identified or created instance edition, open and read the corresponding reference guides:
 
 ### Standard Edition (`references/standard/`)
 
@@ -62,5 +62,9 @@ corresponding reference guides:
 -   **Provisioning**: Read [provisioning.md](references/enterprise/provisioning.md)
 -   **Data Model**: Read [data_model.md](references/enterprise/data_model.md)
 -   **Security Rules**: Read [security_rules.md](references/enterprise/security_rules.md)
--   **SDK Usage**: Read [web_sdk_usage.md](references/enterprise/web_sdk_usage.md), [python_sdk_usage.md](references/enterprise/python_sdk_usage.md), [android_sdk_usage.md](references/enterprise/android_sdk_usage.md), [ios_setup.md](references/enterprise/ios_setup.md), or [flutter_setup.md](references/enterprise/flutter_setup.md)
+-   **SDK Usage**:
+    > [!CRITICAL] **Mandatory Reference Reading**
+    > Before writing or modifying any application code for Firestore Enterprise Edition, you **MUST** read at least one of the relevant reference documents below for the target platform/language to understand specific architectural requirements and pipeline initialization patterns.
+
+    Read [web_sdk_usage.md](references/enterprise/web_sdk_usage.md), [python_sdk_usage.md](references/enterprise/python_sdk_usage.md), [android_sdk_usage.md](references/enterprise/android_sdk_usage.md), [ios_setup.md](references/enterprise/ios_setup.md), or [flutter_setup.md](references/enterprise/flutter_setup.md)
 -   **Indexes**: Read [indexes.md](references/enterprise/indexes.md)
