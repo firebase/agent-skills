@@ -1,17 +1,19 @@
 # Schema Reference
 
 ## Contents
+
 - [Defining Types](#defining-types)
 - [Core Directives](#core-directives)
 - [Relationships](#relationships)
 - [Data Types](#data-types)
 - [Enumerations](#enumerations)
 
----
+______________________________________________________________________
 
 ## Defining Types
 
-Types with `@table` map to PostgreSQL tables. SQL Connect auto-generates an implicit `id: UUID!` primary key.
+Types with `@table` map to PostgreSQL tables. SQL Connect auto-generates an
+implicit `id: UUID!` primary key.
 
 ```graphql
 type Movie @table {
@@ -44,44 +46,49 @@ type User @table(key: "uid") {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Core Directives
 
 ### @table
+
 Defines a database table.
 
-| Argument | Description |
-|----------|-------------|
-| `name` | PostgreSQL table name (snake_case default) |
-| `key` | Primary key field(s), default `["id"]` |
-| `singular` | Singular name for generated fields |
-| `plural` | Plural name for generated fields |
+| Argument   | Description                                |
+| ---------- | ------------------------------------------ |
+| `name`     | PostgreSQL table name (snake_case default) |
+| `key`      | Primary key field(s), default `["id"]`     |
+| `singular` | Singular name for generated fields         |
+| `plural`   | Plural name for generated fields           |
 
 ### @col
+
 Customizes column mapping.
 
-| Argument | Description |
-|----------|-------------|
-| `name` | Column name in PostgreSQL |
+| Argument   | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| `name`     | Column name in PostgreSQL                             |
 | `dataType` | PostgreSQL type: `serial`, `varchar(n)`, `text`, etc. |
-| `size` | Required for `Vector` type |
+| `size`     | Required for `Vector` type                            |
 
 ### @default
+
 Sets default value for inserts.
 
-| Argument | Description |
-|----------|-------------|
-| `value` | Literal value: `@default(value: "draft")` |
-| `expr` | CEL expression: `@default(expr: "uuidV4()")`, `@default(expr: "auth.uid")`, `@default(expr: "request.time")` |
-| `sql` | Raw SQL: `@default(sql: "now()")` |
+| Argument | Description                                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------------------------ |
+| `value`  | Literal value: `@default(value: "draft")`                                                                    |
+| `expr`   | CEL expression: `@default(expr: "uuidV4()")`, `@default(expr: "auth.uid")`, `@default(expr: "request.time")` |
+| `sql`    | Raw SQL: `@default(sql: "now()")`                                                                            |
 
 **Common expressions:**
+
 - `uuidV4()` - Generate UUID
 - `auth.uid` - Current user's Firebase Auth UID
 - `request.time` - Server timestamp
 
 ### @unique
+
 Adds unique constraint.
 
 ```graphql
@@ -98,6 +105,7 @@ type Review @table @unique(fields: ["movie", "user"]) {
 ```
 
 ### @index
+
 Creates database index for query performance.
 
 ```graphql
@@ -108,13 +116,14 @@ type Movie @table @index(fields: ["genre", "releaseYear"], order: [ASC, DESC]) {
 }
 ```
 
-| Argument | Description |
-|----------|-------------|
-| `fields` | Fields for composite index (on @table) |
-| `order` | `[ASC]` or `[DESC]` for each field |
-| `type` | `BTREE` (default), `GIN` (arrays), `HNSW`/`IVFFLAT` (vectors) |
+| Argument | Description                                                   |
+| -------- | ------------------------------------------------------------- |
+| `fields` | Fields for composite index (on @table)                        |
+| `order`  | `[ASC]` or `[DESC]` for each field                            |
+| `type`   | `BTREE` (default), `GIN` (arrays), `HNSW`/`IVFFLAT` (vectors) |
 
 ### @searchable
+
 Enables full-text search on String fields.
 
 ```graphql
@@ -129,7 +138,7 @@ query SearchPosts($q: String!) @auth(level: PUBLIC) {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Relationships
 
@@ -150,6 +159,7 @@ type User @table {
 ```
 
 ### @ref Directive
+
 Customizes foreign key reference.
 
 ```graphql
@@ -159,13 +169,14 @@ type Post @table {
 }
 ```
 
-| Argument | Description |
-|----------|-------------|
-| `fields` | Local FK field name(s) |
-| `references` | Target field(s) in referenced table |
-| `constraintName` | PostgreSQL constraint name |
+| Argument         | Description                         |
+| ---------------- | ----------------------------------- |
+| `fields`         | Local FK field name(s)              |
+| `references`     | Target field(s) in referenced table |
+| `constraintName` | PostgreSQL constraint name          |
 
 **Cascade behavior:**
+
 - Required reference (`User!`): CASCADE DELETE (post deleted when user deleted)
 - Optional reference (`User`): SET NULL (authorId set to null when user deleted)
 
@@ -205,25 +216,25 @@ type MovieActor @table(key: ["movie", "actor"]) {
 # - movie.movieActors_on_movie: [MovieActor!]!
 ```
 
----
+______________________________________________________________________
 
 ## Data Types
 
-| GraphQL Type | PostgreSQL Default | Other PostgreSQL Types |
-|--------------|-------------------|----------------------|
-| `String` | `text` | `varchar(n)`, `char(n)` |
-| `Int` | `int4` | `int2`, `serial` |
-| `Int64` | `bigint` | `bigserial`, `numeric` |
-| `Float` | `float8` | `float4`, `numeric` |
-| `Boolean` | `boolean` | |
-| `UUID` | `uuid` | |
-| `Date` | `date` | |
-| `Timestamp` | `timestamptz` | Stored as UTC |
-| `Any` | `jsonb` | |
-| `Vector` | `vector` | Requires `@col(size: N)` |
-| `[Type]` | Array | e.g., `[String]` → `text[]` |
+| GraphQL Type | PostgreSQL Default | Other PostgreSQL Types      |
+| ------------ | ------------------ | --------------------------- |
+| `String`     | `text`             | `varchar(n)`, `char(n)`     |
+| `Int`        | `int4`             | `int2`, `serial`            |
+| `Int64`      | `bigint`           | `bigserial`, `numeric`      |
+| `Float`      | `float8`           | `float4`, `numeric`         |
+| `Boolean`    | `boolean`          |                             |
+| `UUID`       | `uuid`             |                             |
+| `Date`       | `date`             |                             |
+| `Timestamp`  | `timestamptz`      | Stored as UTC               |
+| `Any`        | `jsonb`            |                             |
+| `Vector`     | `vector`           | Requires `@col(size: N)`    |
+| `[Type]`     | Array              | e.g., `[String]` → `text[]` |
 
----
+______________________________________________________________________
 
 ## Enumerations
 
@@ -241,12 +252,13 @@ type Post @table {
 ```
 
 **Rules:**
+
 - Enum names: PascalCase, no underscores
 - Enum values: UPPER_SNAKE_CASE
 - Values are ordered (for comparison operations)
 - Changing order or removing values is a breaking change
 
----
+______________________________________________________________________
 
 ## Views (Advanced)
 

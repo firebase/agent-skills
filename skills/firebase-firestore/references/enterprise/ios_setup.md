@@ -1,34 +1,50 @@
 # Firestore Enterprise Native Mode on iOS
 
-This guide walks you through using the Cloud Firestore SDK in your iOS app using Swift.
+This guide walks you through using the Cloud Firestore SDK in your iOS app using
+Swift.
 
 # ⛔️ CRITICAL RULE: NO FirebaseFirestoreSwift ⛔️
 
-UNDER NO CIRCUMSTANCES should you import, link against, or configure a project to use `FirebaseFirestoreSwift`. 
+UNDER NO CIRCUMSTANCES should you import, link against, or configure a project
+to use `FirebaseFirestoreSwift`.
 
-As of Firebase SDK v11+, all Swift-specific features (including `@DocumentID`, `@ServerTimestamp`, and `Codable` support) have been fully merged into the main `FirebaseFirestore` module.
+As of Firebase SDK v11+, all Swift-specific features (including `@DocumentID`,
+`@ServerTimestamp`, and `Codable` support) have been fully merged into the main
+`FirebaseFirestore` module.
 
-- NEVER add `.external(name: "FirebaseFirestoreSwift")` or similar to SPM or Xcode configurations.
-- NEVER write `import FirebaseFirestoreSwift` in any Swift file. 
+- NEVER add `.external(name: "FirebaseFirestoreSwift")` or similar to SPM or
+  Xcode configurations.
+- NEVER write `import FirebaseFirestoreSwift` in any Swift file.
 - ONLY use `import FirebaseFirestore`.
 
-This is a zero-tolerance constraint. Using `FirebaseFirestoreSwift` is fundamentally incorrect and unacceptable.
-
+This is a zero-tolerance constraint. Using `FirebaseFirestoreSwift` is
+fundamentally incorrect and unacceptable.
 
 # ⛔️ CRITICAL RULE: NO INLINE INITIALIZATION ⛔️
-NEVER write `let db = Firestore.firestore()` or `Firestore.firestore(database:)` as an inline class or struct property if there is ANY chance the object is instantiated before `FirebaseApp.configure()` executes in the app root.
-- **FATAL CRASH:** `@Observable class DataManager { let db = Firestore.firestore() }` initialized as a `@State` in the App root.
-- **SAFE PATTERN:** Initialize `Firestore.firestore()` lazily (`lazy var db = Firestore.firestore()`) OR explicitly initialize the manager *after* `FirebaseApp.configure()` finishes.
+
+NEVER write `let db = Firestore.firestore()` or `Firestore.firestore(database:)`
+as an inline class or struct property if there is ANY chance the object is
+instantiated before `FirebaseApp.configure()` executes in the app root.
+
+- **FATAL CRASH:**
+  `@Observable class DataManager { let db = Firestore.firestore() }` initialized
+  as a `@State` in the App root.
+- **SAFE PATTERN:** Initialize `Firestore.firestore()` lazily
+  (`lazy var db = Firestore.firestore()`) OR explicitly initialize the manager
+  *after* `FirebaseApp.configure()` finishes.
 
 ## 1. Import and Initialize
 
-Ensure you have installed the `FirebaseFirestore` SDK. Use the `xcode-project-setup` skill to automate adding the SPM dependency to the Xcode project.
+Ensure you have installed the `FirebaseFirestore` SDK. Use the
+`xcode-project-setup` skill to automate adding the SPM dependency to the Xcode
+project.
 
 ```swift
 import FirebaseFirestore
 ```
 
-Initialize an instance of Cloud Firestore. **CRITICAL**: Enterprise databases require a custom database ID and cannot use the `(default)` instance.
+Initialize an instance of Cloud Firestore. **CRITICAL**: Enterprise databases
+require a custom database ID and cannot use the `(default)` instance.
 
 ```swift
 // Replace "your-enterprise-database-id" with your actual database ID
@@ -37,7 +53,8 @@ let db = Firestore.firestore(database: "your-enterprise-database-id")
 
 ## 2. Type-Safe Data Models (Codable)
 
-To leverage modern Swift data modeling, define your data as `Codable` structs. The main `FirebaseFirestore` module automatically supports mapping these types.
+To leverage modern Swift data modeling, define your data as `Codable` structs.
+The main `FirebaseFirestore` module automatically supports mapping these types.
 
 ```swift
 struct User: Codable {
@@ -50,7 +67,8 @@ struct User: Codable {
 
 ## 3. Basic CRUD Operations
 
-The operations are identical to standard Firestore, but ensure you use the `db` instance initialized with your Enterprise database ID.
+The operations are identical to standard Firestore, but ensure you use the `db`
+instance initialized with your Enterprise database ID.
 
 ### Writing Data (Modern Concurrency & Codable)
 
@@ -116,16 +134,25 @@ let results = try await db.pipeline()
 
 ## 5. Realtime Listeners in SwiftUI (Lifecycle Best Practices)
 
-When implementing Firestore realtime listeners (`addSnapshotListener`) within a SwiftUI application, you **MUST** tie the listener lifecycle to the view's identity using `.task(id:)`, NOT `.onDisappear`.
+When implementing Firestore realtime listeners (`addSnapshotListener`) within a
+SwiftUI application, you **MUST** tie the listener lifecycle to the view's
+identity using `.task(id:)`, NOT `.onDisappear`.
 
 ### ⛔️ UNSAFE PATTERN (.onDisappear)
-Presenting a `.sheet` or `.fullScreenCover` can trigger the underlying view's `onDisappear` method. If you stop your listener here, the feed will stop updating while the sheet is open, and won't resume when it's dismissed.
+
+Presenting a `.sheet` or `.fullScreenCover` can trigger the underlying view's
+`onDisappear` method. If you stop your listener here, the feed will stop
+updating while the sheet is open, and won't resume when it's dismissed.
 
 ### ✅ SAFE PATTERN (.task with deinit)
 
-Because `addSnapshotListener` is a synchronous call, placing it inside a `.task` means the task completes immediately. This breaks SwiftUI's automatic cancellation mechanism. 
+Because `addSnapshotListener` is a synchronous call, placing it inside a `.task`
+means the task completes immediately. This breaks SwiftUI's automatic
+cancellation mechanism.
 
-To safely manage traditional Firebase listeners in SwiftUI, you must use **`deinit`** to handle memory cleanup when the view is destroyed, and **`.task(id:)`** to handle data identity changes while the view is active.
+To safely manage traditional Firebase listeners in SwiftUI, you must use
+**`deinit`** to handle memory cleanup when the view is destroyed, and
+**`.task(id:)`** to handle data identity changes while the view is active.
 
 ```swift
 import SwiftUI

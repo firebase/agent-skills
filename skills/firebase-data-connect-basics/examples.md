@@ -2,11 +2,12 @@
 
 Complete, working examples for common SQL Connect use cases.
 
----
+______________________________________________________________________
 
 ## Movie Review App
 
-A complete schema for a movie database with reviews, actors, and user authentication.
+A complete schema for a movie database with reviews, actors, and user
+authentication.
 
 ### Schema
 
@@ -234,7 +235,7 @@ const unsubLeaderboard = subscribe(movieLeaderboardRef(), {
 // unsubLeaderboard();
 ```
 
----
+______________________________________________________________________
 
 ## E-Commerce Store
 
@@ -346,7 +347,7 @@ mutation Checkout($shippingAddress: String!)
 }
 ```
 
----
+______________________________________________________________________
 
 ## Blog with Permissions
 
@@ -465,11 +466,12 @@ mutation GrantRole($userUid: String!, $role: UserRole!)
 }
 ```
 
----
+______________________________________________________________________
 
 ## Native SQL Examples
 
-For scenarios where standard GraphQL cannot express the required database logic, use Native SQL.
+For scenarios where standard GraphQL cannot express the required database logic,
+use Native SQL.
 
 ### Basic SELECT with field aliasing
 
@@ -541,7 +543,8 @@ mutation UpdateMyReviewText($movieId: UUID!, $newText: String!) @auth(level: USE
 
 ### Advanced CTE with upserts (atomic get-or-create)
 
-*Note: Data-modifying CTEs are only supported by `_execute`, not `_executeReturning`.*
+*Note: Data-modifying CTEs are only supported by `_execute`, not
+`_executeReturning`.*
 
 ```graphql
 mutation CreateMovieCTE($movieId: UUID!, $userUid: String!, $reviewId: UUID!) @auth(level: USER) {
@@ -577,7 +580,9 @@ mutation CreateMovieCTE($movieId: UUID!, $userUid: String!, $reviewId: UUID!) @a
 
 ### Multi-statement Transactions
 
-Because `mutation` operations are single requests, you can chain multiple `_execute` commands within a `@transaction` to ensure they all succeed or fail together.
+Because `mutation` operations are single requests, you can chain multiple
+`_execute` commands within a `@transaction` to ensure they all succeed or fail
+together.
 
 ```graphql
 mutation SafeTransfer($from: UUID!, $to: UUID!, $amount: Float!) @auth(level: USER) @transaction {
@@ -594,7 +599,9 @@ mutation SafeTransfer($from: UUID!, $to: UUID!, $amount: Float!) @auth(level: US
 
 ### Use of extensions (e.g. PostGIS for geospatial data)
 
-*Prerequisite:* You must enable the extension on your underlying Cloud SQL instance by connecting to your database as the postgres user and running:
+*Prerequisite:* You must enable the extension on your underlying Cloud SQL
+instance by connecting to your database as the postgres user and running:
+
 ```sql
 CREATE EXTENSION IF NOT EXISTS postgis;
 ```
@@ -626,4 +633,6 @@ query GetNearbyActiveRestaurants($userLong: Float!, $userLat: Float!, $maxDistan
   )
 }
 ```
-*After running the query using a client SDK, the result will be in `data.nearby`.*
+
+*After running the query using a client SDK, the result will be in
+`data.nearby`.*

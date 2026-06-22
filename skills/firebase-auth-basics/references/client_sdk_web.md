@@ -2,7 +2,8 @@
 
 ## Initialization
 
-First, ensure you have initialized the Firebase App (see `firebase-basics` skill). Then, initialize the Auth service:
+First, ensure you have initialized the Firebase App (see `firebase-basics`
+skill). Then, initialize the Auth service:
 
 ```javascript
 import { getAuth } from "firebase/auth";
@@ -14,7 +15,8 @@ export { auth };
 
 ## Connect to Emulator
 
-If you are running the Authentication emulator (usually on port 9099), connect to it immediately after initialization.
+If you are running the Authentication emulator (usually on port 9099), connect
+to it immediately after initialization.
 
 ```javascript
 import { getAuth, connectAuthEmulator } from "firebase/auth";
@@ -69,12 +71,16 @@ signInWithPopup(auth, provider)
   });
 ```
 
-> [!IMPORTANT]
-> **Troubleshooting `auth/unauthorized-domain`**:
-> If the popup opens and immediately closes with error `[firebase_auth/unauthorized-domain]`, it means the domain hosting your app is not authorized for OAuth operations in your Firebase project.
-> - **Fix**: Add your domain (e.g., `localhost` for local testing) to the Authorized Domains list in the Firebase Console (Authentication > Settings > Authorized domains) or in your `firebase.json` auth config.
-> - **CRITICAL**: Do NOT include the protocol or port number when adding the domain (e.g., use `localhost`, NOT `http://localhost:9090`).
-
+> [!IMPORTANT] **Troubleshooting `auth/unauthorized-domain`**: If the popup
+> opens and immediately closes with error `[firebase_auth/unauthorized-domain]`,
+> it means the domain hosting your app is not authorized for OAuth operations in
+> your Firebase project.
+>
+> - **Fix**: Add your domain (e.g., `localhost` for local testing) to the
+>   Authorized Domains list in the Firebase Console (Authentication > Settings >
+>   Authorized domains) or in your `firebase.json` auth config.
+> - **CRITICAL**: Do NOT include the protocol or port number when adding the
+>   domain (e.g., use `localhost`, NOT `http://localhost:9090`).
 
 ## Sign In with Facebook (Popup)
 
@@ -261,7 +267,8 @@ if (isSignInWithEmailLink(auth, window.location.href)) {
 
 ## Observe Auth State
 
-Recommended way to get the current user. This listener triggers whenever the user signs in or out.
+Recommended way to get the current user. This listener triggers whenever the
+user signs in or out.
 
 ```javascript
 import { getAuth, onAuthStateChanged } from "firebase/auth";

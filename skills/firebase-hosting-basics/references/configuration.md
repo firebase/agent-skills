@@ -1,11 +1,14 @@
 # Hosting Configuration (`firebase.json`)
 
-The `hosting` section of `firebase.json` configures how your site is deployed and served.
+The `hosting` section of `firebase.json` configures how your site is deployed
+and served.
 
 ## Key Attributes
 
 ### `public` (Required)
+
 Specifies the directory to deploy to Firebase Hosting.
+
 ```json
 "hosting": {
   "public": "public"
@@ -13,11 +16,14 @@ Specifies the directory to deploy to Firebase Hosting.
 ```
 
 ### `ignore` (Optional)
-Files to ignore on deploy. Uses glob patterns (like `.gitignore`).
-**Default ignores:** `firebase.json`, `**/.*`, `**/node_modules/**`
+
+Files to ignore on deploy. Uses glob patterns (like `.gitignore`). **Default
+ignores:** `firebase.json`, `**/.*`, `**/node_modules/**`
 
 ### `redirects` (Optional)
+
 URL redirects to prevent broken links or shorten URLs.
+
 ```json
 "redirects": [
   {
@@ -29,7 +35,9 @@ URL redirects to prevent broken links or shorten URLs.
 ```
 
 ### `rewrites` (Optional)
+
 Serve the same content for multiple URLs, useful for SPAs or Dynamic Content.
+
 ```json
 "rewrites": [
   {
@@ -51,7 +59,9 @@ Serve the same content for multiple URLs, useful for SPAs or Dynamic Content.
 ```
 
 ### `headers` (Optional)
+
 Custom response headers.
+
 ```json
 "headers": [
   {
@@ -67,13 +77,17 @@ Custom response headers.
 ```
 
 ### `cleanUrls` (Optional)
+
 If `true`, drops `.html` extension from URLs.
+
 ```json
 "cleanUrls": true
 ```
 
 ### `trailingSlash` (Optional)
+
 Controls trailing slashes in static content URLs.
+
 - `true`: Adds trailing slash.
 - `false`: Removes trailing slash.
 

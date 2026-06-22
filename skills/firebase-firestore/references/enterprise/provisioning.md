@@ -2,22 +2,22 @@
 
 ## Manual Initialization
 
-Initialize the following firebase configuration files manually. Do not use `npx
--y firebase-tools@latest init`, as it expects interactive inputs.
+Initialize the following firebase configuration files manually. Do not use
+`npx -y firebase-tools@latest init`, as it expects interactive inputs.
 
-1.  **Create a Firestore Enterprise Database**: Create a Firestore Enterprise
-    database using the Firebase CLI.
-2.  **Create `firebase.json`**: This file contains database configuration for
-    the Firebase CLI.
-3.  **Create `firestore.rules`**: This file contains your security rules.
-4.  **Create `firestore.indexes.json`**: This file contains your index
-    definitions.
+1. **Create a Firestore Enterprise Database**: Create a Firestore Enterprise
+   database using the Firebase CLI.
+1. **Create `firebase.json`**: This file contains database configuration for the
+   Firebase CLI.
+1. **Create `firestore.rules`**: This file contains your security rules.
+1. **Create `firestore.indexes.json`**: This file contains your index
+   definitions.
 
 ### 1. Create a Firestore Enterprise Database
 
 If the user needs to create a new database, ask the user what location to use.
-Run `npx -y firebase-tools@latest firestore:locations` to get the list of options.
-Suggest colocating with other resources if applicable.
+Run `npx -y firebase-tools@latest firestore:locations` to get the list of
+options. Suggest colocating with other resources if applicable.
 
 Use the following command to create a Firestore Enterprise database:
 
@@ -29,9 +29,9 @@ firebase firestore:databases:create my-database-id \
   --mongodb-compatible-data-access="DISABLED"
 ```
 
-This will create an enterprise database in the selected location with native mode enabled. A
-database id is required to create an enterprise database and the database id
-must not be `(default)`. To enable realtime-updates feature, use
+This will create an enterprise database in the selected location with native
+mode enabled. A database id is required to create an enterprise database and the
+database id must not be `(default)`. To enable realtime-updates feature, use
 `--realtime-updates` flag.
 
 ```bash
@@ -46,7 +46,8 @@ firebase firestore:databases:create my-database-id \
 ### 2. Create `firebase.json`
 
 Create a file named `firebase.json` in your project root with the following
-content (edit `database` and `location` to match the ones you created above). If this file already exists, instead append to the existing JSON:
+content (edit `database` and `location` to match the ones you created above). If
+this file already exists, instead append to the existing JSON:
 
 ```json
 {
