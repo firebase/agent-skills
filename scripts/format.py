@@ -3,6 +3,17 @@ import os
 import subprocess
 import sys
 
+EXCLUDE_DIRS = {
+    '.git',
+    'node_modules',
+    '.venv',
+    '.agents',
+    '.claude-plugin',
+    '.codex-plugin',
+    '.cursor-plugin',
+    '.jetskicli',
+}
+
 def main():
     # Determine the directory paths
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -22,34 +33,27 @@ def main():
         md_files = []
         for path in input_paths:
             abs_path = os.path.abspath(path)
-            if os.path.isdir(abs_path):
+            if not os.path.exists(abs_path):
+                print(f"Error: Path '{path}' does not exist.", file=sys.stderr)
+                sys.exit(1)
+            elif os.path.isdir(abs_path):
                 # Walk the directory
-                exclude_dirs = {
-                    '.git', 'node_modules', '.venv', '.agents',
-                    '.claude-plugin', '.codex-plugin', '.cursor-plugin', '.jetskicli'
-                }
                 for root, dirs, files in os.walk(abs_path):
-                    dirs[:] = [d for d in dirs if d not in exclude_dirs]
+                    dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
                     for file in files:
                         if file.endswith('.md'):
                             md_files.append(os.path.join(root, file))
-            elif os.path.isfile(abs_path) and abs_path.endswith('.md'):
-                md_files.append(abs_path)
+            elif os.path.isfile(abs_path):
+                if abs_path.endswith('.md'):
+                    md_files.append(abs_path)
+                else:
+                    print(f"Error: File '{path}' is not a markdown file.", file=sys.stderr)
+                    sys.exit(1)
     else:
         # Walk the entire repository
-        exclude_dirs = {
-            '.git',
-            'node_modules',
-            '.venv',
-            '.agents',
-            '.claude-plugin',
-            '.codex-plugin',
-            '.cursor-plugin',
-            '.jetskicli',
-        }
         md_files = []
         for root, dirs, files in os.walk(root_dir):
-            dirs[:] = [d for d in dirs if d not in exclude_dirs]
+            dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
             for file in files:
                 if file.endswith('.md'):
                     md_files.append(os.path.join(root, file))

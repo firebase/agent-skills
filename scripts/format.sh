@@ -19,9 +19,8 @@ if [ ! -d "$VENV_DIR" ]; then
 fi
 
 # Install mdformat and plugins if not already installed, or ensure they are present
-# We use PyPI index explicitly to ensure it works in all environments
 echo "Ensuring mdformat and plugins are installed..."
-"$VENV_DIR/bin/pip" install --index-url https://pypi.org/simple -q mdformat mdformat-gfm mdformat-frontmatter
+"$VENV_DIR/bin/pip" install -q mdformat mdformat-gfm mdformat-frontmatter
 
 # Run the python formatter script, passing along all arguments
 "$VENV_DIR/bin/python" "$DIR/format.py" "$@"
