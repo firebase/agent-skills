@@ -59,6 +59,18 @@ This is the recommended flow for most users.
    access to secrets.
 1. Run `npx -y firebase-tools@latest deploy` when you are ready to deploy.
 
+### Deploy via Local Builds (Experimental)
+
+If you want faster deployments by bypassing Cloud Build queues, you can compile your full-stack web application locally.
+1. Set up the experiments and configure `"localBuild": true` in your `firebase.json` file.
+2. Run `npx -y firebase-tools@latest deploy --only apphosting` to compile and deploy the pre-built assets.
+
+> [!CAUTION]
+> **SECURITY WARNING FOR CODING AGENTS (AI ASSISTANTS):**
+> - **DO NOT** bypass confirmation using `--allow-local-build-secrets` unless explicitly requested by the developer.
+> - **PAUSE AND WARN** the developer of the severe risk that raw secret values will be downloaded locally and may get permanently compiled into public client-side bundles or cached artifacts.
+> - Review the strict operating system, framework, and security limitations in the [Local Builds Reference](references/local_builds.md).
+
 ### Automated deployment via GitHub (CI/CD)
 
 Alternatively, set up a backend connected to a GitHub repository for automated
@@ -66,6 +78,12 @@ deployments "git push" deployments. This is only recommended for more advanced
 users, and is not required to use App Hosting. See
 [CLI Commands](references/cli_commands.md) for more information on how to set
 this up using CLI commands.
+
+## Runtimes & Automatic Base Image Updates (ABIU)
+
+App Hosting supports versioned Node.js runtimes with Automatic Base Image Updates (ABIU) to apply security patches without redeploys.
+- **CRITICAL**: AI Assistants **MUST** inspect the project's `package.json` and check the `engines.node` field before recommending a runtime version or creating a backend. Mismatched runtimes trigger build-time errors.
+- For a complete guide on setup, CLI flags, and lifecycle management, see [Runtimes & ABIU](references/runtimes_and_abiu.md).
 
 ## Emulation
 
