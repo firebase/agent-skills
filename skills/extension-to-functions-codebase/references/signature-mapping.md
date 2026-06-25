@@ -20,7 +20,7 @@ This reference maps legacy V1 functions to their modern V2 equivalents. It inclu
 | V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
 | :--- | :--- | :--- | :--- |
 | `pubsub.topic().onPublish()` | `onMessagePublished()` | `message` | `({ message, context })` |
-| `pubsub.schedule().onRun()` | `scheduler.onSchedule()` | **N/A** | Access `event` directly |
+| `pubsub.schedule().onRun()` | `onSchedule()` | **N/A** | Access `event` directly |
 
 > [!NOTE]
 > Scheduled functions moved from the `pubsub` namespace to the `scheduler` namespace in V2.
@@ -78,4 +78,4 @@ This reference maps legacy V1 functions to their modern V2 equivalents. It inclu
 
 | V1 Trigger | V2 Equivalent | Shimmed Key | Destructuring Pattern |
 | :--- | :--- | :--- | :--- |
-| `tasks.taskQueue().onDispatch()` | `tasks.onTaskDispatched()` | **N/A** | Access `event` directly |
+| `tasks.taskQueue().onDispatch()` | `onTaskDispatched()` | **N/A** | Access `event` directly |

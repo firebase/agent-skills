@@ -78,7 +78,7 @@ If the extracted functions are written using the legacy Firebase Functions V1 SD
 
 1.  **Imports**: Replace legacy `* as functions` imports with targeted V2 trigger imports from `firebase-functions/v2/...` (e.g. `onDocumentCreated`, `onMessagePublished`).
 2.  **Signature Modernization (Destructuring Shim)**:
-    Use the Destructuring Compatibility Shim to preserve internal V1 business logic. Instead of accepting two parameters `(data, context)`, accept a single `CloudEvent` object and destructure `{ [shimmedKey], context }`.
+    Use the Destructuring Compatibility Shim to preserve internal V1 business logic. Instead of accepting two parameters `(data, context)`, accept a single `CloudEvent` object and destructure `{ shimmedKey, context }`.
     *   *Example (Pub/Sub)*:
         ```typescript
         // V1 Legacy

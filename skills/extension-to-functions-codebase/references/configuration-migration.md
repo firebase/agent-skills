@@ -100,7 +100,7 @@ Follow these rules to ensure a deterministic and safe migration:
 #### Typing
 *   **Numbers**: If the value is used as a number, use `defineNumber`.
 *   **Secrets**: If the key contains "KEY", "SECRET", "TOKEN", or "PASSWORD", use `defineSecret()`.
-    *   *Note*: Secrets MUST be explicitly bound to the function that uses them in the options object (e.g., `{ secrets: [MY_SECRET] }`).
+    *   *Note*: Secrets MUST be explicitly bound to the function that uses them in the options object (e.g., `{ secrets: [myKey] }`).
 *   **Lists**: Use `defineList` for comma-separated lists.
 *   **JSON**: Use `defineJSON` for JSON strings.
 *   **Buckets**: If the param is a storage bucket, set `input: 'BUCKET_PICKER'`.
@@ -119,7 +119,7 @@ Follow these rules to ensure a deterministic and safe migration:
     ```
 
 #### Advanced Interpolation & Logic
-*   **String Interpolation**: Use the `expr` tagged template literal from `firebase-functions/params` (e.g., `expr`every ${period} days``) instead of standard template literals when constructing dynamic strings with parameters. Do NOT call `.value()` inside `expr`.
+*   **String Interpolation**: Use the `expr` tagged template literal from `firebase-functions/params` (e.g., `` `expr`every ${period} days` ``) instead of standard template literals when constructing dynamic strings with parameters. Do NOT call `.value()` inside `expr`.
 *   **Logic Operators**: Use expressions like `projectID.equals('prod').thenElse(1, 0)` for logical operations instead of ternary operators on `.value()`.
 
 #### Built-ins
