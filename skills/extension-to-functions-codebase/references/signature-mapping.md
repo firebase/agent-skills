@@ -1,6 +1,8 @@
 # Firebase Functions V1 vs V2 Signature Mapping
 
-This reference maps legacy V1 functions to their modern V2 equivalents. It includes the **Shimmed Parameter Key** you should use when destructuring the V2 event object to preserve V1 business logic.
+This reference maps legacy V1 functions to their modern V2 equivalents. It
+includes the **Shimmed Parameter Key** you should use when destructuring the V2
+event object to preserve V1 business logic.
 
 ---
 

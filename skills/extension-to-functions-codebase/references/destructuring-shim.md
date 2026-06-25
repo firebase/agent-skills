@@ -1,6 +1,9 @@
 # Architectural Deep Dive: Destructuring Compatibility Shim
 
-The Destructuring Compatibility Shim is a **Zero-Touch Logic Migration** pattern. It allows you to upgrade a function's infrastructure to V2 (and take advantage of GCF 2nd Gen runtimes) without rewriting any of your internal business logic.
+The Destructuring Compatibility Shim is a **Zero-Touch Logic Migration**
+pattern. It allows you to upgrade a function's infrastructure to V2 (and take
+advantage of GCF 2nd Gen runtimes) without rewriting any of your internal
+business logic.
 
 ---
 
@@ -95,10 +98,13 @@ Here are the exact destructuring patterns for every supported V2 provider:
 
 ## 🔗 Related Migrations
 
-Migrating event signatures is only one part of moving from V1 to V2. Another critical area is configuration management.
+Migrating event signatures is only one part of moving from V1 to V2. Another
+critical area is configuration management.
 
 ### Parameterized Configuration
-If your functions use `functions.config()`, you should migrate to the new **Parameterized Configuration** system in V2. The destructuring shim handles event signatures, but it does not shim `functions.config()`.
+If your functions use `functions.config()`, you should migrate to the new
+**Parameterized Configuration** system in V2. The destructuring shim handles
+event signatures, but it does not shim `functions.config()`.
 
 #### How to Migrate:
 1.  **Identify Usages**: Search for `functions.config().path.to.value`.
@@ -116,4 +122,5 @@ If your functions use `functions.config()`, you should migrate to the new **Para
 > [!NOTE]
 > When you migrate a function to V2 (even with the destructuring shim), `functions.config()` will return `undefined` unless you have explicitly set up environment variables or are running in a specific emulation mode. Parameterized configuration is the standard and recommended way to handle this in V2.
 
-For a complete guide and deterministic rules on how to migrate configurations, refer to [configuration-migration.md](configuration-migration.md).
+For a complete guide and deterministic rules on how to migrate configurations,
+refer to [configuration-migration.md](configuration-migration.md).

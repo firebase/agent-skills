@@ -1,8 +1,11 @@
 # Migrating Runtime Configurations (runWith)
 
-In Firebase Functions V1, you configured runtime settings like memory, timeout, and service accounts using `.runWith()`. In V2, `.runWith()` is removed and replaced by a more flexible options system.
+In Firebase Functions V1, you configured runtime settings like memory, timeout,
+and service accounts using `.runWith()`. In V2, `.runWith()` is removed and
+replaced by a more flexible options system.
 
-You can configure V2 functions in two ways: **Globally** (for all functions in a file) or **Per-Function**.
+You can configure V2 functions in two ways: **Globally** (for all functions in a
+file) or **Per-Function**.
 
 ---
 
@@ -44,7 +47,8 @@ export const myFn = onRequest((req, res) => { ... });
 
 ## 🎯 2. Per-Function Configuration
 
-Pass the configuration object as the **first argument** to the V2 trigger function.
+Pass the configuration object as the **first argument** to the V2 trigger
+function.
 
 ### V1 Legacy
 
@@ -91,7 +95,8 @@ export const processOrder = onMessagePublished(
 
 ## 🔐 3. Migrating Environment Configurations (`functions.config()`)
 
-In V1, you used `functions.config()` to access environment configuration. In V2, this is replaced by **Parameterized Configuration**.
+In V1, you used `functions.config()` to access environment configuration. In V2,
+this is replaced by **Parameterized Configuration**.
 
 ### Deterministic Rules for Migration
 

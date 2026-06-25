@@ -7,14 +7,20 @@ description: Skill for converting an installed Firebase Extension (or extension 
 
 ## Overview
 
-This skill guides the agent in migrating a Firebase Extension repository or instance into a standalone, self-owned Cloud Functions for Firebase (CF3) codebase. 
+This skill guides the agent in migrating a Firebase Extension repository or
+instance into a standalone, self-owned Cloud Functions for Firebase (CF3)
+codebase.
 
-It leverages the GA capabilities of the CF3 Fabricator to handle permissions, dependencies, and lifecycle hooks natively in the cloud, and provides instructions for modernizing legacy V1 triggers to V2 using the Destructuring Compatibility Shim.
+It leverages the GA capabilities of the CF3 Fabricator to handle permissions,
+dependencies, and lifecycle hooks natively in the cloud, and provides
+instructions for modernizing legacy V1 triggers to V2 using the Destructuring
+Compatibility Shim.
 
 ---
 
 ## Triggers
-Activate this skill when a user asks to migrate or convert an installed Firebase Extension (or extension source code) into a standalone functions codebase.
+Activate this skill when a user asks to migrate or convert an installed Firebase
+Extension (or extension source code) into a standalone functions codebase.
 
 ---
 
@@ -24,14 +30,14 @@ Activate this skill when a user asks to migrate or convert an installed Firebase
 2.  **In-Place Copying**: If the user asks to copy the code to a new subdirectory within the same repository:
     *   Use `git cp` (or copy files and commit) to copy the extension's source directory to the target functions codebase directory.
     *   Commit immediately with the message:
-        `"Copying [extension-name] extension to [directory] in preparation for rewrite"`
+`"Copying [extension-name] extension to [directory] in preparation for rewrite"`
 
 ---
 
 ## Rules and Constraints
 
 ### 1. Zero-Local-Overhead (CF3 Integration)
-Assume that CF3 Workload Identities and SDK Lifecycle Hooks are fully GA. 
+Assume that CF3 Workload Identities and SDK Lifecycle Hooks are fully GA.
 *   **Do NOT** output instructions or scripts telling the user to run `gcloud` commands or create service accounts.
 *   **Do NOT** write code comments telling the user to manually enable Google APIs in the cloud console.
 *   Instead, use declarative `requiresAPI` and `requiresRole` imports from the SDK.
@@ -74,11 +80,14 @@ When upgrading triggers to V2:
 5. Generate a local `.env` file in the functions folder containing the active parameter values for local execution and deployment.
 
 ### Step 3: Upgrading V1 Functions to V2 (Modernization)
-If the extracted functions are written using the legacy Firebase Functions V1 SDK, upgrade them to V2 to ensure compatibility with CF3 Workload Identities:
+If the extracted functions are written using the legacy Firebase Functions V1
+SDK, upgrade them to V2 to ensure compatibility with CF3 Workload Identities:
 
 1.  **Imports**: Replace legacy `* as functions` imports with targeted V2 trigger imports from `firebase-functions/v2/...` (e.g. `onDocumentCreated`, `onMessagePublished`).
 2.  **Signature Modernization (Destructuring Shim)**:
-    Use the Destructuring Compatibility Shim to preserve internal V1 business logic. Instead of accepting two parameters `(data, context)`, accept a single `CloudEvent` object and destructure `{ shimmedKey, context }`.
+Use the Destructuring Compatibility Shim to preserve internal V1 business logic.
+Instead of accepting two parameters `(data, context)`, accept a single
+`CloudEvent` object and destructure `{ shimmedKey, context }`.
     *   *Example (Pub/Sub)*:
         ```typescript
         // V1 Legacy
@@ -97,7 +106,8 @@ If the extracted functions are written using the legacy Firebase Functions V1 SD
 4.  **Options Migration**: Move trigger configurations (memory, timeouts, secrets) from `.runWith(...)` to the V2 options argument (passed as the first parameter). Refer to [configuration-migration.md](references/configuration-migration.md) for property mapping.
 
 ### Step 4: Declarative Requirements Injection
-Inject the required IAM roles and APIs at the very top of the main entry point file (e.g., `index.ts`):
+Inject the required IAM roles and APIs at the very top of the main entry point
+file (e.g., `index.ts`):
 1. **APIs**: For each service listed in the `apis` field in `extension.yaml`, inject `requiresAPI("service-name.googleapis.com")`.
 2. **Roles**: For each role listed in the `iamRoles` field in `extension.yaml`, inject `requiresRole("roles/role-name")`.
 
@@ -110,7 +120,8 @@ requiresRole("roles/bigquery.dataEditor");
 ```
 
 ### Step 5: Lifecycle Hook Migration
-If `extension.yaml` contains `lifecycleEvents` (such as `onInstall` / `onUpdate` triggers):
+If `extension.yaml` contains `lifecycleEvents` (such as `onInstall` / `onUpdate`
+triggers):
 1. Ensure the backing function is defined using `functions.tasks.taskQueue().onDispatch(...)` (or `onTaskDispatched` in V2).
 2. Inject the declarative lifecycle call at the bottom of the entry point:
    ```typescript
