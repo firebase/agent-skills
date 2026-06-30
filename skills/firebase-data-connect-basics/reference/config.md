@@ -78,13 +78,14 @@ Connector configuration and SDK generation:
 connectorId: "default"
 generate:
   javascriptSdk:
-    outputDir: "../web/src/lib/dataconnect"
+    # Path is relative to THIS connector.yaml file (e.g. dataconnect/connector/)
+    outputDir: "../../web/src/lib/dataconnect"
     package: "@myapp/dataconnect"
   kotlinSdk:
-    outputDir: "../android/app/src/main/kotlin/com/myapp/dataconnect"
+    outputDir: "../../android/app/src/main/kotlin/com/myapp/dataconnect"
     package: "com.myapp.dataconnect"
   swiftSdk:
-    outputDir: "../ios/MyApp/DataConnect"
+    outputDir: "../../ios/MyApp/DataConnect"
 ```
 
 ### SDK Generation Options
@@ -157,7 +158,8 @@ ______________________________________________________________________
 ### Start Emulator
 
 ```bash
-npx -y firebase-tools@latest emulators:start --only dataconnect
+# Starts local emulator (self-contained, no Docker/Java/Cloud SQL needed).
+npx -y firebase-tools@latest emulators:start --only dataconnect --project demo-myapp
 ```
 
 Default ports:

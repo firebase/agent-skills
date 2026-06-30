@@ -24,6 +24,12 @@ this file runs locally to establish a test state and is not an exposed API
 connector endpoint, authorization directives are completely unnecessary and
 should be omitted.
 
+### Running Seeding Mutations
+
+To execute seed mutations locally, send a POST request containing the GraphQL
+mutation payload to the local service endpoint:
+`http://127.0.0.1:9399/v1alpha/projects/emulator/locations/emulator/services/<serviceId>/graphql`
+
 ### Seeding Independent Tables (FK Order)
 
 When executing standard bulk insertions (`_insertMany`) across multiple tables,

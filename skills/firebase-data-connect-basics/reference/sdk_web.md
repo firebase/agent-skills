@@ -100,9 +100,15 @@ generate:
 Use policies in code:
 
 ```typescript
+import { QueryFetchPolicy } from 'firebase/data-connect';
+
 await executeQuery(queryRef, QueryFetchPolicy.CACHE_ONLY);
 await executeQuery(queryRef, QueryFetchPolicy.SERVER_ONLY);
 ```
+
+> **Note**: Queries default to `PREFER_CACHE`. Pass
+ `QueryFetchPolicy.SERVER_ONLY` for fresh reads (e.g. tests, asserts) and use
+ `subscribe()` for realtime updates.
 
 ### Subscriptions (Realtime)
 
