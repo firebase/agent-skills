@@ -39,7 +39,7 @@ Do not use the Firebase Console. Use the CLI to automate setup:
 1. Action: Read the Xcode project (`.pbxproj` or `Info.plist`) to determine the
    iOS bundle ID.
 1. Register the iOS app:
-   `npx -y firebase-tools@latest apps:create IOS <bundle-id>`
+   `npx -y firebase-tools@latest apps:create IOS <bundle-id> --non-interactive`
 1. Fetch the config: `npx -y firebase-tools@latest apps:sdkconfig IOS <App-ID>`
 1. Save the output as `GoogleService-Info.plist` in your Xcode project folder.
    Ensure you remove any non-XML CLI output headers, and ensure the file is
