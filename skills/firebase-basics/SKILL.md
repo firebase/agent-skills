@@ -85,6 +85,7 @@ Adhere to these principles:
    instead of just `firebase`. For example, use
    `npx -y firebase-tools@latest --version`. NEVER suggest the naked `firebase`
    command as an alternative.
+1. **Always use `--non-interactive` for iOS app registration:** When registering iOS apps via the CLI (specifically `apps:create IOS`), you MUST append the `--non-interactive` flag. This prevents the CLI from prompting for the optional App Store ID, which blocks coding agents in non-interactive environments.
 1. **Prioritize official knowledge:** For any Firebase-related knowledge,
    consult the `developerknowledge_search_documents` MCP tool before falling
    back to Google Search or your internal knowledge base. Including "Firebase"
