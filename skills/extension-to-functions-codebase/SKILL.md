@@ -1,147 +1,239 @@
 ---
 name: extension-to-functions-codebase
-description: Skill for converting an installed Firebase Extension (or extension source) to a standalone Cloud Functions for Firebase (CF3) codebase, including upgrading triggers from V1 to V2
+description: Skill for converting an installed Firebase Extension (or extension source) to a standalone Cloud Functions for Firebase (CF3) codebase or publishable npm package, including upgrading triggers from V1 to V2 and configuring lifecycle hooks and declarative security
 ---
 
-# Extension to Functions Codebase Migration
+# Extension to Functions Codebase & npm Package Migration
 
 ## Overview
 
-This skill guides the agent in migrating a Firebase Extension repository or
-instance into a standalone, self-owned Cloud Functions for Firebase (CF3)
-codebase.
+This skill guides the agent in migrating a Firebase Extension repository or instance into either:
+1. **A standalone Cloud Functions for Firebase (CF3) codebase** (for end-user app integration), or
+2. **A publishable npm package / function kit** (for extension publishers distributing reusable V2 functions).
 
-It leverages the GA capabilities of the CF3 Fabricator to handle permissions,
-dependencies, and lifecycle hooks natively in the cloud, and provides
-instructions for modernizing legacy V1 triggers to V2 using the Destructuring
-Compatibility Shim.
+It leverages CF3 GA capabilities to handle permissions, dependencies, and lifecycle hooks natively in code, and provides instructions for modernizing legacy V1 triggers to V2 using the Destructuring Compatibility Shim.
 
 ---
 
 ## Triggers
-Activate this skill when a user asks to migrate or convert an installed Firebase
-Extension (or extension source code) into a standalone functions codebase.
+
+Activate this skill when a user asks to:
+- Migrate or convert an installed Firebase Extension into a standalone functions codebase.
+- Convert an extension repository into a publishable npm package (function kit).
+- Upgrade extension triggers from V1 to V2.
+
+---
+
+## Target Migration Workflows
+
+Before starting, determine the target destination with the developer:
+
+- **Target A: Local Functions Codebase** (End-User App Integration)
+  - Output: Source code placed in the project's `functions/src/` folder.
+  - Configuration: Parameters defined via `defineString`, `defineSecret`, etc. in `.env`.
+  - Deployment: Deployed directly via `firebase deploy --only functions`.
+
+- **Target B: Publishable npm Package / Function Kit** (Publisher Distribution)
+  - Output: Reusable npm package containing exported V2 functions.
+  - Configuration: `package.json` with `exports` map and `peerDependencies: { "firebase-functions": ">=7.0.0" }`.
+  - Usage: End users install the package (`npm i @scope/package`) and re-export functions in their `index.ts`.
 
 ---
 
 ## Getting Started & Git Safety
 
-1.  **Git Status**: Verify the workspace has a clean git status before starting.
-2.  **In-Place Copying**: If the user asks to copy the code to a new subdirectory within the same repository:
-    *   Use `git cp` (or copy files and commit) to copy the extension's source directory to the target functions codebase directory.
-    *   Commit immediately with the message:
-`"Copying [extension-name] extension to [directory] in preparation for rewrite"`
+1. **Git Status**: Verify the workspace has a clean git status before starting.
+2. **In-Place Copying**: If copying code to a new subdirectory within the same repository:
+   - Use `git cp` (or copy files and commit) to copy the extension's source directory to the target directory.
+   - Commit immediately: `"Copying [extension-name] extension to [directory] in preparation for rewrite"`
 
 ---
 
 ## Rules and Constraints
 
 ### 1. Zero-Local-Overhead (CF3 Integration)
-Assume that CF3 Workload Identities and SDK Lifecycle Hooks are fully GA.
-*   **Do NOT** output instructions or scripts telling the user to run `gcloud` commands or create service accounts.
-*   **Do NOT** write code comments telling the user to manually enable Google APIs in the cloud console.
-*   Instead, use declarative `requiresAPI` and `requiresRole` imports from the SDK.
+Assume CF3 Workload Identities, Declarative Security, and SDK Lifecycle Hooks are fully GA.
+- **Do NOT** output instructions or scripts telling users to run manual `gcloud` IAM commands or create service accounts.
+- **Do NOT** write code comments instructing users to manually enable Google APIs in the cloud console.
+- Instead, use declarative `requiresAPI` and `requiresRole` imports from the SDK.
 
 ### 2. Global Parameter Access Restriction
-*   **Never call `.value()` on any parameter at the global scope.**
-*   If a global variable or class instance is initialized using a parameter value, declare the variable globally and initialize it inside the `onInit()` callback:
-    ```typescript
-    const bqDataset = defineString("DATASET_ID");
-    let bqClient: BigQuery;
+- **Never call `.value()` on any parameter at global scope.**
+- If a global variable or class instance is initialized using a parameter value, declare the variable globally and initialize it inside the `onInit()` callback:
+  ```typescript
+  import { defineString } from "firebase-functions/params";
+  import { onInit } from "firebase-functions/v2";
 
-    onInit(() => {
-      bqClient = new BigQuery({ datasetId: bqDataset.value() });
-    });
-    ```
+  const bqDataset = defineString("DATASET_ID");
+  let bqClient: BigQuery;
+
+  onInit(() => {
+    bqClient = new BigQuery({ datasetId: bqDataset.value() });
+  });
+  ```
 
 ### 3. Concurrency & Cost Parity for V2
 When upgrading triggers to V2:
-*   By default, V2 functions enable concurrency (up to 80 requests per instance).
-*   If you want to maintain V1 fractional CPU pricing (and disable concurrency), set `cpu: "gcf_gen1"` in the function's options object.
+- By default, V2 functions enable concurrency (up to 80 requests per instance).
+- If you want to maintain V1 fractional CPU pricing (and disable concurrency), set `cpu: "gcf_gen1"` in the function's options object.
 
 ---
 
 ## Step-by-Step Migration Execution
 
-### Step 1: Code Extraction & Package Merge
-1. Extract the extension's trigger source code (usually located under `functions/src/` or a dedicated source zip) into the targeted codebase directory.
-2. Merge all dependencies and peer dependencies from the extension's `package.json` into the root `package.json` of the functions project.
-3. Align Node engines and dependencies:
-   *   Read the runtime engine specified in the extension's `extension.yaml` (e.g., `nodejs20` maps to `"node": "20"`).
-   *   Update `package.json` `engines` and `tsconfig.json` compiler options to target this runtime version.
+### Step 1: Inventory the Extension & Setup Package Structure
 
-### Step 2: Parameterization Mapping
-1. Read the list of all parameters declared in `extension.yaml`.
-2. Define a matching parameter in the codebase for each one:
-   *   If type is `secret`, use `defineSecret('PARAM_NAME')`.
-   *   Otherwise, use `defineString('PARAM_NAME')` or `defineInt('PARAM_NAME')`.
-3. Locate all `process.env.PARAM_NAME` calls in the code and replace them with `PARAM_NAME.value()`, ensuring the global scope constraint is respected.
-4. **Custom Events**: If the extension emits custom events, list them as a `multiSelect` parameter named `events` with the label `"Events to emit"`. The description should be `"Select the events that this function should emit from the following list:"`, listing the events as options in `*[type]*: [description]\n` format.
-5. Generate a local `.env` file in the functions folder containing the active parameter values for local execution and deployment.
+1. **Inventory `extension.yaml`**:
+   - `params`: Convert to Functions params (`defineString`, `defineSecret`, etc.).
+   - `apis`: Convert to `requiresAPI(...)` declarations.
+   - `roles`: Convert to `requiresRole(...)` declarations.
+   - `lifecycleEvents` (`onInstall`, `onUpdate`, `onConfigure`): Convert to `afterFirstDeploy` and `afterRedeploy` hooks.
+   - `resources`: Convert V1 triggers to V2, and task queue functions to `onTaskDispatched`.
 
-### Step 3: Upgrading V1 Functions to V2 (Modernization)
-If the extracted functions are written using the legacy Firebase Functions V1
-SDK, upgrade them to V2 to ensure compatibility with CF3 Workload Identities:
+2. **Package Configuration (`package.json`)**:
+   - **For Target A (Local Codebase)**: Merge dependencies from `functions/package.json` into project root `package.json`.
+   - **For Target B (npm Package)**:
+     - Set publishable package name (e.g. `@firebase/firestore-bigquery-export` or `@scope/pkg`).
+     - Move `firebase-functions` from `dependencies` to `peerDependencies` (`"firebase-functions": ">=7.0.0"`).
+     - Add `exports` map and engine requirements:
+       ```json
+       {
+         "name": "@scope/extension-pkg",
+         "version": "1.0.0",
+         "main": "lib/index.js",
+         "types": "lib/index.d.ts",
+         "exports": {
+           ".": { "types": "./lib/index.d.ts", "default": "./lib/index.js" }
+         },
+         "engines": { "node": ">=22" },
+         "peerDependencies": { "firebase-functions": ">=7.0.0" }
+       }
+       ```
 
-1.  **Imports**: Replace legacy `* as functions` imports with targeted V2 trigger imports from `firebase-functions/v2/...` (e.g. `onDocumentCreated`, `onMessagePublished`).
-2.  **Signature Modernization (Destructuring Shim)**:
-Use the Destructuring Compatibility Shim to preserve internal V1 business logic.
-Instead of accepting two parameters `(data, context)`, accept a single
-`CloudEvent` object and destructure `{ shimmedKey, context }`.
-    *   *Example (Pub/Sub)*:
-        ```typescript
-        // V1 Legacy
-        export const myFn = functions.pubsub.topic("orders").onPublish((message, context) => {
-          const orderId = message.json.id;
-        });
+### Step 2: Parameterization & Secret Migration
 
-        // V2 + Shim
-        import { onMessagePublished } from "firebase-functions/v2/pubsub";
-        export const myFn = onMessagePublished("orders", ({ message, context }) => {
-          const orderId = message.json.id; // Logic remains untouched!
-        });
-        ```
-    *   Refer to [signature-mapping.md](references/signature-mapping.md) for the exact shimmed keys for each trigger type.
-3.  **HTTP Callables**: Callables do not use the destructuring shim. Rewrite the signature to destructure `({ data, auth })` directly. The legacy `context` object is unavailable in V2 callables.
-4.  **Options Migration**: Move trigger configurations (memory, timeouts, secrets) from `.runWith(...)` to the V2 options argument (passed as the first parameter). Refer to [configuration-migration.md](references/configuration-migration.md) for property mapping.
+1. Read all parameters declared in `extension.yaml`.
+2. Define matching Functions params in code (e.g. `src/config.ts`):
+   - Type `secret` -> `defineSecret('PARAM_NAME')`
+   - Type `string` -> `defineString('PARAM_NAME')`
+   - Type `select` / `multiSelect` -> `defineString('PARAM_NAME')` / `defineList('PARAM_NAME')`
+   - Type `int` -> `defineInt('PARAM_NAME')`
+3. Replace all direct `process.env.PARAM_NAME` calls with `PARAM_NAME.value()`, ensuring the global scope restriction is respected.
+4. **Secret Binding**: For functions using secrets, bind them in the function options:
+   ```typescript
+   const apiKey = defineSecret("API_KEY");
+   export const fn = onRequest({ secrets: [apiKey] }, handler);
+   ```
+   *Note*: Keep exact param and secret names unchanged so that existing user installation values in `.env` or Secret Manager carry over without re-prompting.
 
-### Step 4: Declarative Requirements Injection
-Inject the required IAM roles and APIs at the very top of the main entry point
-file (e.g., `index.ts`):
-1. **APIs**: For each service listed in the `apis` field in `extension.yaml`, inject `requiresAPI("service-name.googleapis.com")`.
-2. **Roles**: For each role listed in the `iamRoles` field in `extension.yaml`, inject `requiresRole("roles/role-name")`.
+### Step 3: Upgrading Functions & Triggers (V1 to V2)
 
-*Example Headers*:
+1. **Imports**: Replace legacy `* as functions` imports with targeted V2 trigger imports from `firebase-functions/v2/...` (e.g. `onDocumentCreated`, `onMessagePublished`, `onValueWritten`, `onObjectFinalized`).
+2. **Signature Modernization (Destructuring Shim)**:
+   Use the Destructuring Compatibility Shim to preserve internal V1 business logic without rewriting function bodies. Instead of `(data, context)`, accept a single `CloudEvent` and destructure `{ shimmedKey, context }`.
+   - *Pub/Sub Example*:
+     ```typescript
+     // V1 Legacy
+     export const myFn = functions.pubsub.topic("orders").onPublish((message, context) => {
+       const orderId = message.json.id;
+     });
+
+     // V2 + Shim
+     import { onMessagePublished } from "firebase-functions/v2/pubsub";
+     export const myFn = onMessagePublished("orders", ({ message, context }) => {
+       const orderId = message.json.id; // Logic remains untouched!
+     });
+     ```
+   - Refer to [signature-mapping.md](references/signature-mapping.md) for full trigger key mappings.
+3. **HTTP Callables**: Callables do not use the destructuring shim. Rewrite the signature to destructure `({ data, auth })` directly.
+4. **Internal Task Queue Enqueue Calls**:
+   If the code enqueues tasks using `getFunctions().taskQueue(...)`:
+   - Replace `process.env.EXT_INSTANCE_ID` with `process.env.KIT_INSTANCE_ID` (or codebase equivalent).
+   - Ensure `firebase-admin` dependency version supports task queue enqueueing in plain codebases.
+
+### Step 4: Declarative Security Injection (IAM Roles & APIs)
+
+Inject declarative security requirements at the top of the main entry file (e.g. `src/index.ts`):
+
 ```typescript
-import { requiresAPI, requiresRole } from "firebase-functions/core";
+import { requiresAPI, requiresRole } from "firebase-functions/v2";
 
-requiresAPI("bigquery.googleapis.com");
+requiresAPI("bigquery.googleapis.com", "Needed to write changelog rows and views");
+
 requiresRole("roles/bigquery.dataEditor");
+requiresRole("roles/datastore.user");
+requiresRole("roles/bigquery.user");
 ```
 
-### Step 5: Lifecycle Hook Migration
-If `extension.yaml` contains `lifecycleEvents` (such as `onInstall` / `onUpdate`
-triggers):
-1. Ensure the backing function is defined using `functions.tasks.taskQueue().onDispatch(...)` (or `onTaskDispatched` in V2).
-2. Inject the declarative lifecycle call at the bottom of the entry point:
-   ```typescript
-   import { afterInstall } from "firebase-functions/lifecycle";
+At deploy time, the Firebase CLI will grant these declared roles to the codebase's managed runtime service account.
 
-   afterInstall({
-     task: { function: "myLifecycleTaskFunction" }
-   });
+### Step 5: Lifecycle Hook Migration (`afterFirstDeploy` & `afterRedeploy`)
+
+If `extension.yaml` declares `lifecycleEvents` (`onInstall`, `onUpdate`, `onConfigure`):
+
+1. **Convert Task Queue Handlers**:
+   Upgrade 1st gen task queue functions to V2 `onTaskDispatched` from `firebase-functions/v2/tasks`:
+   ```typescript
+   import { onTaskDispatched } from "firebase-functions/v2/tasks";
+
+   export const initBigQuerySync = onTaskDispatched(
+     { retryConfig: { maxAttempts: 5 } },
+     async (request) => {
+       await initializeResources(request.data);
+     }
+   );
+   ```
+   *Note*: Remove calls to `getExtensions().runtime().setProcessingState(...)` as lifecycle state is managed by CF3.
+
+2. **Register Lifecycle Hooks**:
+   Inject declarative lifecycle hooks:
+   ```typescript
+   import { afterFirstDeploy, afterRedeploy } from "firebase-functions/v2";
+
+   // Replaces onInstall:
+   afterFirstDeploy({ task: { function: "initBigQuerySync" } });
+
+   // Replaces onUpdate & onConfigure:
+   afterRedeploy({ task: { function: "setupBigQuerySync" } });
    ```
 
-### Step 6: Firebase Integration & Verification
-1. Add the newly created functions codebase configuration under the `functions` block in `firebase.json`.
-2. Run `npm run build` (or `npx tsc`) to verify no compilation or type errors exist.
-3. **Tests**: If unit tests exist in the codebase:
-   *   Run `npm test` to verify compliance.
-   *   *Note*: Upgraded triggers change signature from two arguments `(data, context)` to one destructured object `({ change, context })`. Update test mocks to pass a single object with the correct shimmed key.
+3. **Idempotency & Manual Rerun**:
+   Ensure lifecycle handlers are idempotent. Document that users can manually rerun hooks if needed:
+   `firebase functions:lifecycle:run afterFirstDeploy CODEBASE_NAME`
+
+### Step 6: Package Exporting & Documentation (Publisher Path)
+
+If creating an npm package (Target B):
+
+1. **Re-export Functions in Package Entry (`src/index.ts`)**:
+   Ensure all deployable V2 functions and task queue handlers are exported:
+   ```typescript
+   export { syncV2, initBigQuerySync, setupBigQuerySync } from "./functions";
+   ```
+2. **End-User Re-export Instructions**:
+   Document in `README.md` that end users deploy package functions by re-exporting them in their `functions/src/index.ts`:
+   ```typescript
+   export { syncV2, initBigQuerySync, setupBigQuerySync } from "@scope/extension-pkg";
+   ```
+3. **Package README Checklist**:
+   Include:
+   - Installation (`npm install @scope/extension-pkg`)
+   - Re-export snippet for user's `index.ts`
+   - Required `.env` parameter names & types
+   - IAM roles declared (`requiresRole`)
+   - Lifecycle hooks behavior & manual rerun commands
+   - "What changed" comparison table (Extension vs npm Package)
+
+### Step 7: Build & Verification
+
+1. Run `npm run build` (or `npx tsc`) to ensure no compilation or type errors.
+2. If unit/integration tests exist, run `npm test`.
+   - Update test mocks for upgraded V2 triggers (single destructured object `{ change, context }` instead of two arguments `(data, context)`).
 
 ---
 
 ## References
-*   **Destructuring Shim**: See [destructuring-shim.md](references/destructuring-shim.md) for details on event property translation.
-*   **Trigger Mapping**: See [signature-mapping.md](references/signature-mapping.md) for V1 vs V2 trigger definitions and shim keys.
-*   **Configuration & Parameters**: See [configuration-migration.md](references/configuration-migration.md) for runWith and parameter definition mappings.
+
+- **Destructuring Shim**: See [destructuring-shim.md](references/destructuring-shim.md) for event property translation.
+- **Trigger Mapping**: See [signature-mapping.md](references/signature-mapping.md) for V1 vs V2 trigger definitions and shim keys.
+- **Configuration & Parameters**: See [configuration-migration.md](references/configuration-migration.md) for `runWith` options, params, and secret bindings.
