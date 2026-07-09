@@ -1,6 +1,8 @@
 # Firebase Functions V1 vs V2 Signature Mapping
 
-This reference maps legacy V1 functions to their modern V2 equivalents. It includes the **Shimmed Parameter Key** you should use when destructuring the V2 event object to preserve V1 business logic.
+This reference maps legacy V1 functions to their modern V2 equivalents. It
+includes the **Shimmed Parameter Key** you should use when destructuring the V2
+event object to preserve V1 business logic.
 
 ______________________________________________________________________
 
@@ -22,8 +24,9 @@ ______________________________________________________________________
 | `pubsub.topic().onPublish()` | `onMessagePublished()` | `message`   | `({ message, context })` |
 | `pubsub.schedule().onRun()`  | `onSchedule()`         | **N/A**     | Access `event` directly  |
 
-> [!NOTE]
-> Scheduled functions moved from the `pubsub` namespace to `firebase-functions/v2/scheduler` (`import { onSchedule } from "firebase-functions/v2/scheduler"`).
+> [!NOTE] Scheduled functions moved from the `pubsub` namespace to
+> `firebase-functions/v2/scheduler`
+> (`import { onSchedule } from "firebase-functions/v2/scheduler"`).
 
 ______________________________________________________________________
 
@@ -56,9 +59,10 @@ ______________________________________________________________________
 | `https.onRequest()` | `https.onRequest()` | **N/A**     | Standard Express `(req, res)`  |
 | `https.onCall()`    | `https.onCall()`    | **N/A**     | Destructure `({ data, auth })` |
 
-> [!IMPORTANT]
-> **HTTP Callables do NOT use the Destructuring Shim.**
-> In V2, the handler receives a single `CallableRequest` object (not a `CloudEvent`). You should destructure properties like `data`, `auth`, and `app` directly from it. The traditional `context` object is **unavailable**.
+> [!IMPORTANT] **HTTP Callables do NOT use the Destructuring Shim.** In V2, the
+> handler receives a single `CallableRequest` object (not a `CloudEvent`). You
+> should destructure properties like `data`, `auth`, and `app` directly from it.
+> The traditional `context` object is **unavailable**.
 
 ______________________________________________________________________
 
@@ -69,8 +73,7 @@ ______________________________________________________________________
 | `auth.user().beforeSignIn()` | `identity.beforeUserSignedIn()` | **N/A**     | Access `event` directly |
 | `auth.user().beforeCreate()` | `identity.beforeUserCreated()`  | **N/A**     | Access `event` directly |
 
-> [!NOTE]
-> Auth Blocking triggers moved to the `identity` namespace in V2.
+> [!NOTE] Auth Blocking triggers moved to the `identity` namespace in V2.
 
 ______________________________________________________________________
 
@@ -80,5 +83,6 @@ ______________________________________________________________________
 | :------------------------------- | :------------------- | :---------- | :---------------------- |
 | `tasks.taskQueue().onDispatch()` | `onTaskDispatched()` | **N/A**     | Access `event` directly |
 
-> [!NOTE]
-> Task queue triggers moved from the `tasks` namespace to `firebase-functions/v2/tasks` (`import { onTaskDispatched } from "firebase-functions/v2/tasks"`).
+> [!NOTE] Task queue triggers moved from the `tasks` namespace to
+> `firebase-functions/v2/tasks`
+> (`import { onTaskDispatched } from "firebase-functions/v2/tasks"`).
