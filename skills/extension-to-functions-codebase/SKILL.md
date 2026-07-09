@@ -234,6 +234,6 @@ If creating an npm package (Target B):
 
 ## References
 
-- **Destructuring Shim**: See [destructuring-shim.md](references/destructuring-shim.md) for event property translation.
+- **Destructuring Shim**: See [destructuring-shim.md](references/destructuring-shim.md) for details on event property translation.
 - **Trigger Mapping**: See [signature-mapping.md](references/signature-mapping.md) for V1 vs V2 trigger definitions and shim keys.
 - **Configuration & Parameters**: See [configuration-migration.md](references/configuration-migration.md) for `runWith` options, params, and secret bindings.
