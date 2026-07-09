@@ -1,6 +1,9 @@
 # Architectural Deep Dive: Destructuring Compatibility Shim
 
-The Destructuring Compatibility Shim is a **Zero-Touch Logic Migration** pattern. It allows you to upgrade a function's infrastructure to V2 (and take advantage of GCF 2nd Gen runtimes) without rewriting any of your internal business logic.
+The Destructuring Compatibility Shim is a **Zero-Touch Logic Migration**
+pattern. It allows you to upgrade a function's infrastructure to V2 (and take
+advantage of GCF 2nd Gen runtimes) without rewriting any of your internal
+business logic.
 
 ---
 
@@ -57,7 +60,8 @@ Here are the exact destructuring patterns for every supported V2 provider:
 
 ### 2. Cloud Storage
 
-- **All** triggers (`onObjectFinalized`, `onObjectDeleted`, `onObjectArchived`, `onObjectMetadataUpdated`):
+- **All** triggers (`onObjectFinalized`, `onObjectDeleted`, `onObjectArchived`,
+  `onObjectMetadataUpdated`):
   ```typescript
   export const processFile = onObjectFinalized(({ object, context }) => { ... });
   ```
@@ -84,10 +88,15 @@ Here are the exact destructuring patterns for every supported V2 provider:
 
 ## 🛡️ Best Practices for AI Agents
 
-1. **Do NOT attempt to rewrite variable access inside the body.** It is error-prone and time-consuming.
-2. **Rely on the shim by default.** Only attempt a pure V2 rewrite if the user explicitly asks for "clean-room" modernization.
-3. **Always type-check (`tsc`) after the rewrite.** If the types are wrong, the shim might not be fully supported for that specific provider yet!
-4. **HTTPS Callables (Flattened Context)**: Unlike event triggers, Callables do **not** use `V1Compat` or a `context` object. Instead, all context properties are flattened onto the request object.
+1. **Do NOT attempt to rewrite variable access inside the body.** It is
+  error-prone and time-consuming.
+2. **Rely on the shim by default.** Only attempt a pure V2 rewrite if the user
+  explicitly asks for "clean-room" modernization.
+3. **Always type-check (`tsc`) after the rewrite.** If the types are wrong, the
+  shim might not be fully supported for that specific provider yet!
+4. **HTTPS Callables (Flattened Context)**: Unlike event triggers, Callables do
+  **not** use `V1Compat` or a `context` object. Instead, all context properties
+  are flattened onto the request object.
    - **V1 Priority**: `(data, context) => { ... }`
    - **V2 Equivalent**: `({ data, auth, app }) => { ... }`
 
@@ -95,27 +104,39 @@ Here are the exact destructuring patterns for every supported V2 provider:
 
 ## 🔗 Related Migrations
 
-Migrating event signatures is only one part of moving from V1 to V2. Another critical area is configuration management.
+Migrating event signatures is only one part of moving from V1 to V2. Another
+critical area is configuration management.
 
 ### Parameterized Configuration
 
-If your functions use `functions.config()`, you should migrate to the new **Parameterized Configuration** system in V2. The destructuring shim handles event signatures, but it does not shim `functions.config()`.
+If your functions use `functions.config()`, you should migrate to the new
+**Parameterized Configuration** system in V2. The destructuring shim handles
+event signatures, but it does not shim `functions.config()`.
 
 #### How to Migrate:
 
 1. **Identify Usages**: Search for `functions.config().path.to.value`.
-2. **Define Parameters**: At the top of your file, define the parameter using the appropriate primitive from `firebase-functions/params` (available types include `defineString`, `defineSecret`, `defineInt`, `defineBoolean`, `defineList`, and `defineJSON`):
+2. **Define Parameters**: At the top of your file, define the parameter using
+  the appropriate primitive from `firebase-functions/params` (available types
+  include `defineString`, `defineSecret`, `defineInt`, `defineBoolean`,
+  `defineList`, and `defineJSON`):
    ```typescript
    import { defineString, defineSecret } from "firebase-functions/params";
 
    const stripeKey = defineSecret("STRIPE_KEY");
    const apiDomain = defineString("API_DOMAIN");
    ```
-3. **Access Values**: Replace the V1 call with the `.value()` method of the defined parameter:
+3. **Access Values**: Replace the V1 call with the `.value()` method of the
+  defined parameter:
    - **V1**: `const key = functions.config().stripe.key;`
    - **V2**: `const key = stripeKey.value();`
 
 > [!NOTE]
-> When you migrate a function to V2 (even with the destructuring shim), `functions.config()` will return `undefined` unless you have explicitly set up environment variables or are running in a specific emulation mode. Parameterized configuration is the standard and recommended way to handle this in V2.
+> When you migrate a function to V2 (even with the destructuring shim),
+> `functions.config()` will return `undefined` unless you have explicitly set up
+> environment variables or are running in a specific emulation mode.
+> Parameterized configuration is the standard and recommended way to handle this
+> in V2.
 
-For a complete guide and deterministic rules on how to migrate configurations, refer to [configuration-migration.md](configuration-migration.md).
+For a complete guide and deterministic rules on how to migrate configurations,
+refer to [configuration-migration.md](configuration-migration.md).

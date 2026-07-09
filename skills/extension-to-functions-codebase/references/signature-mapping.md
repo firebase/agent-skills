@@ -1,6 +1,8 @@
 # Firebase Functions V1 vs V2 Signature Mapping
 
-This reference maps legacy V1 functions to their modern V2 equivalents. It includes the **Shimmed Parameter Key** you should use when destructuring the V2 event object to preserve V1 business logic.
+This reference maps legacy V1 functions to their modern V2 equivalents. It
+includes the **Shimmed Parameter Key** you should use when destructuring the V2
+event object to preserve V1 business logic.
 
 ---
 
@@ -23,7 +25,8 @@ This reference maps legacy V1 functions to their modern V2 equivalents. It inclu
 | `pubsub.schedule().onRun()` | `onSchedule()` | **N/A** | Access `event` directly |
 
 > [!NOTE]
-> Scheduled functions moved from the `pubsub` namespace to the `scheduler` namespace in V2.
+> Scheduled functions moved from the `pubsub` namespace to the `scheduler`
+> namespace in V2.
 
 ---
 
@@ -58,7 +61,9 @@ This reference maps legacy V1 functions to their modern V2 equivalents. It inclu
 
 > [!IMPORTANT]
 > **HTTP Callables do NOT use the Destructuring Shim.** 
-> In V2, the handler receives a single `CallableRequest` object (not a `CloudEvent`). You should destructure properties like `data`, `auth`, and `app` directly from it. The traditional `context` object is **unavailable**.
+> In V2, the handler receives a single `CallableRequest` object (not a
+> `CloudEvent`). You should destructure properties like `data`, `auth`, and
+> `app` directly from it. The traditional `context` object is **unavailable**.
 
 ---
 
