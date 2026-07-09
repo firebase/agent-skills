@@ -136,6 +136,11 @@ Create an npm package for the migrated extension code (either at project root or
 in a dedicated workspace directory):
 
 - Set a publishable package name (`name: "<package-name>"`).
+- **Preserve Dev & Test Dependencies**: Preserve all existing `devDependencies`,
+  test runners (`jest`, `ts-jest`, `@types/jest`, `mocha`, `@types/mocha`), and
+  test scripts (`"test": "..."`) from the legacy extension
+  (`functions/package.json` or root `package.json`). Do not drop test frameworks
+  or type definitions.
 - Move `firebase-functions` from `dependencies` to `peerDependencies`:
   ```json
   {
@@ -308,6 +313,22 @@ Write a comprehensive package README containing:
 1. **Multiple Instances & Troubleshooting**: Note separate codebases/prefixing
    for multiple instances, checking re-exports, and rerunning failed lifecycle
    hooks.
+
+### Step 11: Build & Test Verification
+
+1. **Verify Source Compilation**: Run `npm run build` (`tsc`) to ensure no
+   TypeScript compilation errors in `src/`.
+1. **Verify Unit Test Suite & Type Definitions**:
+   - If existing unit tests (`__tests__/`, `test/`) are present in the
+     extension:
+     - Ensure `@types/jest` (or the original test framework types) are present
+       in `devDependencies` so test files type-check cleanly.
+     - Update test invocations for upgraded V2 triggers to pass a single
+       destructured event object
+       (`({ change: mockChange, context: mockContext })` instead of positional
+       arguments `(mockChange, mockContext)`).
+     - Run `npm test` or type-check test files (`npx tsc --noEmit`) to verify
+       zero regressions.
 
 ______________________________________________________________________
 
