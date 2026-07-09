@@ -7,11 +7,12 @@ replaced by a more flexible options system.
 You can configure V2 functions in two ways: **Globally** (for all functions in a
 file) or **Per-Function**.
 
----
+______________________________________________________________________
 
 ## 🌍 1. Global Configuration (`setGlobalOptions`)
 
-Use `setGlobalOptions` at the top of your file to set defaults for all functions defined after it.
+Use `setGlobalOptions` at the top of your file to set defaults for all functions
+defined after it.
 
 ### V1 Legacy
 
@@ -43,7 +44,7 @@ setGlobalOptions({
 export const myFn = onRequest((req, res) => { ... });
 ```
 
----
+______________________________________________________________________
 
 ## 🎯 2. Per-Function Configuration
 
@@ -73,26 +74,25 @@ export const processOrder = onMessagePublished(
 );
 ```
 
-> [!TIP]
-> **Memory Unit Caveat**: V1 accepted `"1GB"`. V2 types strongly prefer IEC
-> units like `"1GiB"`, `"2GiB"`, etc.
+> [!TIP] **Memory Unit Caveat**: V1 accepted `"1GB"`. V2 types strongly prefer
+> IEC units like `"1GiB"`, `"2GiB"`, etc.
 
----
+______________________________________________________________________
 
 ## ⚠️ Common Property Translations
 
-| V1 Property | V2 Property | Notes |
-| :--- | :--- | :--- |
-| `memory` | `memory` | Use `"1GiB"` instead of `"1GB"`. |
-| `timeoutSeconds` | `timeoutSeconds` | Same. |
-| `ingressSettings` | `ingressSettings` | Same. |
-| `vpcConnector` | `vpcConnector` | Same. |
-| `vpcConnectorEgressSettings` | `vpcConnectorEgressSettings` | Same. |
-| `serviceAccount` | `serviceAccount` | Same. |
-| `secrets` | `secrets` | Same. |
-| `failurePolicy` | `retry` | Renamed to boolean `retry: true/false` in V2 Eventarc triggers. |
+| V1 Property                  | V2 Property                  | Notes                                                           |
+| :--------------------------- | :--------------------------- | :-------------------------------------------------------------- |
+| `memory`                     | `memory`                     | Use `"1GiB"` instead of `"1GB"`.                                |
+| `timeoutSeconds`             | `timeoutSeconds`             | Same.                                                           |
+| `ingressSettings`            | `ingressSettings`            | Same.                                                           |
+| `vpcConnector`               | `vpcConnector`               | Same.                                                           |
+| `vpcConnectorEgressSettings` | `vpcConnectorEgressSettings` | Same.                                                           |
+| `serviceAccount`             | `serviceAccount`             | Same.                                                           |
+| `secrets`                    | `secrets`                    | Same.                                                           |
+| `failurePolicy`              | `retry`                      | Renamed to boolean `retry: true/false` in V2 Eventarc triggers. |
 
----
+______________________________________________________________________
 
 ## 🔐 3. Migrating Environment Configurations (`functions.config()`)
 
