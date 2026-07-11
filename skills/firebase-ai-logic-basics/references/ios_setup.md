@@ -14,6 +14,32 @@ let ai = FirebaseAI.firebaseAI()
 let model = ai.generativeModel(modelName: "<latest_supported_model>")
 ```
 
+### Using Limited-Use App Check Tokens
+
+For enhanced security and cost control, you can enable limited-use tokens during instantiation. This restricts each token to a single API call, reducing risk if a token is compromised:
+
+```swift
+import FirebaseAILogic
+
+// Initialize with limited-use tokens enabled
+let ai = FirebaseAI.firebaseAI(
+  backend: .googleAI(),
+  useLimitedUseAppCheckTokens: true
+)
+
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+let model = ai.generativeModel(modelName: "<latest_supported_model>")
+```
+
+**Benefits:**
+- Each App Check token is valid for only one API request
+- Reduces attack surface if a token is intercepted
+- Ideal for production applications with strict security requirements
+
+**Prerequisites:**
+- App Check must be configured in your Firebase project
+- Ensure your app's attestation provider is set up (DeviceCheck for iOS)
+
 ## 2. SwiftUI Integration (Best Practices)
 
 Use the `@Observable` pattern to manage AI state and provide a smooth UX with
@@ -77,6 +103,42 @@ struct AIView: View {
             }
         }
         .padding()
+    }
+}
+```
+
+### With Limited-Use Tokens
+
+For enhanced security in production, use limited-use App Check tokens:
+
+```swift
+import SwiftUI
+import FirebaseAILogic
+
+@MainActor
+@Observable
+final class SecureAIViewModel {
+    // Initialize with limited-use tokens for enhanced security
+    private lazy var model = FirebaseAI.firebaseAI(
+        backend: .googleAI(),
+        useLimitedUseAppCheckTokens: true
+    ).generativeModel(modelName: "<latest_supported_model>")
+    
+    var responseText: String = ""
+    var isFetching: Bool = false
+    var errorMessage: String?
+    
+    func generate(prompt: String) async {
+        isFetching = true
+        errorMessage = nil
+        defer { isFetching = false }
+        
+        do {
+            let response = try await model.generateContent(prompt)
+            self.responseText = response.text ?? "No response"
+        } catch {
+            self.errorMessage = error.localizedDescription
+        }
     }
 }
 ```
