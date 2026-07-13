@@ -1,6 +1,6 @@
 ---
 name: extension-to-functions-codebase
-description: Skill for converting an installed Firebase Extension (or extension source) to a standalone Cloud Functions for Firebase (CF3) codebase or publishable npm package, including upgrading triggers from V1 to V2 and configuring lifecycle hooks and declarative security
+description: Skill for converting an installed Firebase Extension (or extension source) to a standalone Cloud Functions for Firebase codebase or publishable npm package, including upgrading triggers from V1 to V2 and configuring lifecycle hooks and declarative security
 ---
 
 # Extension to Functions Codebase & npm Package Migration
@@ -10,14 +10,15 @@ description: Skill for converting an installed Firebase Extension (or extension 
 This skill guides the agent in migrating a Firebase Extension repository or
 instance into either:
 
-1. **A standalone Cloud Functions for Firebase (CF3) codebase** (for end-user
-   app integration), or
-1. **A publishable npm package / function kit** (for extension publishers
-   distributing reusable V2 functions).
+1. **A standalone Cloud Functions for Firebase codebase** (`firebase-functions`,
+   for end-user app integration), or
+1. **A publishable npm package / shareable open source package** (for extension
+   publishers distributing reusable V2 functions).
 
-It leverages CF3 GA capabilities to handle permissions, dependencies, and
-lifecycle hooks natively in code, and provides instructions for modernizing
-legacy V1 triggers to V2 using the Destructuring Compatibility Shim.
+It leverages native Cloud Functions for Firebase GA capabilities to handle
+permissions, dependencies, and lifecycle hooks natively in code, and provides
+instructions for modernizing legacy V1 triggers to V2 using the Destructuring
+Compatibility Shim.
 
 ______________________________________________________________________
 
@@ -27,7 +28,8 @@ Activate this skill when a user asks to:
 
 - Migrate or convert an installed Firebase Extension into a standalone functions
   codebase.
-- Convert an extension repository into a publishable npm package (function kit).
+- Convert an extension repository into a publishable npm package (shareable open
+  source package).
 - Upgrade extension triggers from V1 to V2.
 
 ______________________________________________________________________
@@ -43,11 +45,11 @@ Before starting, determine the target destination with the developer:
     in `.env`.
   - Deployment: Deployed directly via `firebase deploy --only functions`.
 
-- **Target B: Publishable npm Package / Function Kit** (Publisher Distribution)
+- **Target B: Publishable npm Package / Shareable Open Source Package**
 
   - Output: Reusable npm package containing exported V2 functions.
-  - Configuration: `package.json` with `exports` map and
-    `peerDependencies: { "firebase-functions": "^7.0.0" }`.
+  - Configuration: `package.json` with `exports` map and `firebase-functions`
+    declared in `dependencies` (or `peerDependencies`).
   - Usage: End users install the package (`npm i <package-name>`) and re-export
     functions in their `index.ts`.
 
@@ -67,10 +69,10 @@ ______________________________________________________________________
 
 ## Rules and Constraints
 
-### 1. Zero-Local-Overhead (CF3 Integration)
+### 1. Zero-Local-Overhead (Cloud Functions Integration)
 
-Assume CF3 Workload Identities, Declarative Security, and SDK Lifecycle Hooks
-are fully GA.
+Assume Cloud Functions for Firebase Workload Identities, Declarative Security,
+and SDK Lifecycle Hooks are fully GA.
 
 - **Do NOT** output instructions or scripts telling users to run manual `gcloud`
   IAM commands or create service accounts.
@@ -121,12 +123,13 @@ documents so that nothing is lost during migration:
    - `roles`: Convert to `requiresRole(...)` declarations.
    - `lifecycleEvents` (`onInstall`, `onUpdate`, `onConfigure`): Convert to
      `afterFirstDeploy` and `afterRedeploy` hooks.
-   - `resources`: Convert V1 triggers to V2, and task queue functions to
-     `onTaskDispatched`.
+   - `resources`: Note all function triggers to convert from 1st gen
+     (`firebase-functions/v1`) to 2nd gen (`firebase-functions/v2`), including
+     standard event triggers, HTTP handlers, and task queues
+     (`onTaskDispatched`).
 1. **Inventory Files & Tooling**:
    - `functions/`: Source code, triggers, helpers, and task queue handlers.
-   - Documentation: `README.md`, `PREINSTALL.md`, and `POSTINSTALL.md` (migrate
-     setup warnings and billing notes to package README).
+   - Documentation: `README.md`, `PREINSTALL.md`, and `POSTINSTALL.md`.
    - `scripts/`: Note any backfill, import, or helper scripts shipped with the
      extension.
 
@@ -141,7 +144,9 @@ in a dedicated workspace directory):
   test scripts (`"test": "..."`) from the legacy extension
   (`functions/package.json` or root `package.json`). Do not drop test frameworks
   or type definitions.
-- Move `firebase-functions` from `dependencies` to `peerDependencies`:
+- Declare `firebase-functions` (e.g. `^7.0.0`) in `dependencies` (or
+  `peerDependencies` if creating a lightweight middleware package where the root
+  consumer manages the runtime version):
   ```json
   {
     "name": "<package-name>",
@@ -157,7 +162,8 @@ in a dedicated workspace directory):
     "engines": {
       "node": ">=22"
     },
-    "peerDependencies": {
+    "dependencies": {
+      "firebase-admin": "^12.0.0",
       "firebase-functions": "^7.0.0"
     }
   }
@@ -180,27 +186,36 @@ Move the extension's function source into the package's `src/` folder:
 
 ### Step 4: Upgrade Functions from 1st Gen to 2nd Gen
 
-Convert each exported 1st gen function trigger to its 2nd gen equivalent
-(`firebase-functions/v2/...`):
+Convert each exported 1st gen function trigger (`onWrite`, `onRequest`,
+`tasks.taskQueue().onDispatch`) to its 2nd gen equivalent (`onDocumentWritten`,
+`onRequest`, `onTaskDispatched` from `firebase-functions/v2/...`):
 
 1. **Signatures & Destructuring Shim**: Use the Destructuring Compatibility Shim
    (`{ shimmedKey, context }`) to preserve V1 business logic without rewriting
    function bodies. See [signature-mapping.md](references/signature-mapping.md)
    and [destructuring-shim.md](references/destructuring-shim.md).
 1. **Authentication Triggers Exception**: If your extension uses v1
-   Authentication Triggers (`auth.user().onCreate()`, etc.), keep those specific
-   triggers on **1st gen** for now, as 2nd gen Auth triggers are not yet
-   supported. Call this out clearly in your package README.
+   Authentication Triggers (`auth.user().onCreate()`, `auth.user().onDelete()`),
+   instruct the agent to check live whether a 2nd gen alternative exists in the
+   installed `firebase-functions` package or live documentation. If 2nd gen Auth
+   triggers are not yet supported for those events, warn the user clearly and
+   halt or refuse the migration for those specific triggers until a V2
+   alternative becomes available.
 
 ### Step 5: Replace Extension Params with Functions Params
 
 Each parameter in `extension.yaml` becomes a Parameterized Configuration call:
 
-1. Map parameter types:
-   - Type `string` / `select` -> `defineString("PARAM_NAME", { label: "..." })`
+1. Map parameter primitives and attributes:
+   - Type `string` ->
+     `defineString("PARAM_NAME", { label: "...", description: "...", default: "..." })`
    - Type `secret` -> `defineSecret("PARAM_NAME")`
-   - Type `int` -> `defineInt("PARAM_NAME")`
-   - Type `boolean` -> `defineBoolean("PARAM_NAME")`
+   - Type `int` -> `defineInt("PARAM_NAME", { label: "...", default: 123 })`
+   - Type `boolean` -> `defineBoolean("PARAM_NAME", { default: true })`
+   - Type `select` / `multiSelect` -> map `options` into `input`:
+     `defineString("PARAM_NAME", { input: { select: { options: [{ value: "val", label: "Val" }] } } })`
+   - `validationRegex` -> map into text input options:
+     `defineString("PARAM_NAME", { input: { text: { validationRegex: "^[a-z]+$" } } })`
 1. Read parameter values inside handlers using `paramName.value()`.
 1. **Keep Exact Parameter Names**: Never change parameter names
    (`COLLECTION_PATH`, `DATASET_ID`, etc.) so that existing values carry over
@@ -292,27 +307,20 @@ lifecycle hooks:
 
 ### Step 10: Document Setup for Your Users (`README.md`)
 
-Write a comprehensive package README containing:
+Preserve whatever documentation, secrets, and setup instructions the original
+extension already documented in `README.md` (and `PREINSTALL.md` /
+`POSTINSTALL.md`), updating them as needed:
 
-1. **Installation Step**: `npm install <package-name>`
-1. **Re-export Snippet**: Show the exact snippet users must add to `index.ts`:
-   ```typescript
-   export * from "<package-name>";
-   ```
-1. **`.env` Configuration Table & Sample Block**: List required parameters.
-1. **Secrets & IAM Roles**: List declared secrets and `requiresRole(...)` roles.
-1. **Lifecycle Hooks & Rerun Commands**: Explain setup task and rerun CLI
-   commands.
-1. **What Changed Comparison Table**:
-   | Concern      | As the extension             | As `<package-name>`                    |
-   | :----------- | :--------------------------- | :------------------------------------- |
-   | Install      | Extensions runtime           | `npm install` into Functions codebase  |
-   | Config       | Extension params             | Functions params via `.env`            |
-   | IAM          | Granted by Extensions        | `requiresRole(...)`, applied at deploy |
-   | Provisioning | Lifecycle task by Extensions | `afterFirstDeploy` / `afterRedeploy`   |
-1. **Multiple Instances & Troubleshooting**: Note separate codebases/prefixing
-   for multiple instances, checking re-exports, and rerunning failed lifecycle
-   hooks.
+1. **Update Configuration References**: Replace instructions referencing legacy
+   `extension.yaml` installation prompts or `ext-*.env` files with standard
+   `.env` Parameterized Configuration setup matching the `defineString`
+   parameters.
+1. **Include Re-export Snippet**: Ensure the basic root re-export snippet is
+   shown (`export * from "<package-name>";`) so users know how to expose the
+   functions in their root `index.ts`.
+1. **Avoid Unnecessary Boilerplate**: Do not generate redundant comparison
+   tables or generic installation steps if the setup is self-evident in the code
+   or already covered by existing README sections.
 
 ### Step 11: Build & Test Verification
 
