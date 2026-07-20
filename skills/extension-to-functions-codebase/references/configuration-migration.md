@@ -109,16 +109,25 @@ this is replaced by **Parameterized Configuration**.
 
 Follow these rules to ensure a deterministic and safe migration:
 
-#### Typing
+#### Typing & Exports
 
-- **Numbers**: If the value is used as a number, use `defineNumber`.
+- **Numbers**: If the value is used as a number, use `defineInt` or
+  `defineNumber`.
 - **Secrets**: If the key contains "KEY", "SECRET", "TOKEN", or "PASSWORD", use
-  `defineSecret()`.
+  `defineSecret()` or `defineJsonSecret()`.
   - *Note*: Secrets MUST be explicitly bound to the function that uses them in
-    the options object (e.g., `{ secrets: [myKey] }`).
+    the options object (e.g., `{ secrets: [myKey, myJsonSecret] }`). Both
+    `SecretParam` and `JsonSecretParam` are supported in the `secrets` array.
 - **Lists**: Use `defineList` for comma-separated lists.
 - **JSON**: Use `defineJSON` for JSON strings.
-- **Buckets**: If the param is a storage bucket, set `input: 'BUCKET_PICKER'`.
+- **Buckets**: If the param is a storage bucket, set `input: { text: {} }` or
+  bucket selector.
+- **Input Validation**: Use `nonEmpty: true` inside `input.text` or
+  `input.multiSelect` to enforce non-empty parameter input during CLI prompting
+  (e.g. `defineString("PARAM", { input: { text: { nonEmpty: true } } })`).
+- **Type Annotations**: Import parameter types directly from
+  `firebase-functions/params` (e.g.
+  `import type { StringParam, SecretParam, JsonSecretParam, IntParam } from "firebase-functions/params"`).
 
 #### Initialization & Scope
 

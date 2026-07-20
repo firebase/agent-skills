@@ -216,6 +216,9 @@ Each parameter in `extension.yaml` becomes a Parameterized Configuration call:
      `defineString("PARAM_NAME", { input: { select: { options: [{ value: "val", label: "Val" }] } } })`
    - `validationRegex` -> map into text input options:
      `defineString("PARAM_NAME", { input: { text: { validationRegex: "^[a-z]+$" } } })`
+   - `required: true` / Non-empty validation -> map `nonEmpty: true` into input
+     options:
+     `defineString("PARAM_NAME", { input: { text: { nonEmpty: true } } })`
 1. Read parameter values inside handlers using `paramName.value()`.
 1. **Keep Exact Parameter Names**: Never change parameter names
    (`COLLECTION_PATH`, `DATASET_ID`, etc.) so that existing values carry over
@@ -340,8 +343,14 @@ extension already documented in `README.md` (and `PREINSTALL.md` /
 
 ______________________________________________________________________
 
-## References
+## References & Official Resources
 
+- **Official Google Migration Guide**:
+  [Prepare Firebase Extensions for migration to Cloud Functions](https://firebase.google.com/docs/extensions/publishers/migrate)
+- **Publisher Support Contacts**:
+  - Support Email: `firebase-extensions-migrator-support-external@google.com`
+  - Support Group Subscription:
+    `firebase-extensions-migrator-support-external+subscribe@google.com`
 - **Destructuring Shim**: See
   [destructuring-shim.md](references/destructuring-shim.md) for details on event
   property translation.
