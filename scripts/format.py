@@ -11,6 +11,7 @@ EXCLUDE_DIRS = {
     '.claude-plugin',
     '.codex-plugin',
     '.cursor-plugin',
+    '.kimi-plugin',
     '.jetskicli',
 }
 
