@@ -5,7 +5,7 @@
   "author": {
     "name": "Firebase",
     "email": "firebase-support@google.com",
-    "url": "https://firebase.google.com"
+    "url": "https://github.com/firebase/agent-skills"
   },
   "homepage": "https://github.com/firebase/agent-skills",
   "repository": "https://github.com/firebase/agent-skills",
@@ -45,6 +45,6 @@
     ],
     "brandColor": "#FFCA28",
     "composerIcon": "./assets/firebase_logo.svg",
-    "logo": "./assets/firebase-agent-skills_logo.svg"
+    "logo": "./assets/firebase_logo.svg"
   }
 }
