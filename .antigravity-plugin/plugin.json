@@ -1,7 +1,7 @@
 {
     "name": "firebase-antigravity-plugin",
     "version": "0.1.0",
-    "description": "Opinionated Firebase plugin for Antigravity, mimicking AI Studio capabilities.",
+    "description": "Builders Firebase plugin for Antigravity.",
     "skills": "./skills",
     "rules": "./rules",
     "hooks": "hooks.json"
