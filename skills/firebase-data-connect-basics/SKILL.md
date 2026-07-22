@@ -59,7 +59,7 @@ features.
 Define your GraphQL types, tables, and relationships (which map to a Postgres
 schema).
 
-> **Read [reference/schema.md](reference/schema.md)** for:
+> **Read [references/schema.md](references/schema.md)** for:
 >
 > - `@table`, `@col`, `@default`
 > - Relationships (`@ref`, one-to-many, many-to-many)
@@ -70,7 +70,7 @@ schema).
 Write the queries and mutations your client will use, including authorization
 logic. SQL Connect is secure by default.
 
-> **Read [reference/operations.md](reference/operations.md)** for:
+> **Read [references/operations.md](references/operations.md)** for:
 >
 > - **Queries**: Filtering (`where`), Ordering (`orderBy`), Pagination
 >   (`limit`/`offset`).
@@ -80,18 +80,18 @@ logic. SQL Connect is secure by default.
 > - **Transactions**: Use `@transaction` for multi-step atomic operations. Use
 >   `_expr: "response.<prevStep>"` to pass data between steps.
 >
-> **Read [reference/security.md](reference/security.md)** for authorization:
+> **Read [references/security.md](references/security.md)** for authorization:
 >
 > - `@auth(level: ...)` for PUBLIC, USER, or NO_ACCESS.
 > - `@check` and `@redact` for row-level security and validation.
 >
-> **Read [reference/realtime.md](reference/realtime.md)** for real-time
+> **Read [references/realtime.md](references/realtime.md)** for real-time
 > subscriptions:
 >
 > - `@refresh` directive for time-based polling and event-driven updates.
 > - CEL conditions to scope refresh triggers precisely.
 >
-> **Read [reference/native_sql.md](reference/native_sql.md)** for Native SQL
+> **Read [references/native_sql.md](references/native_sql.md)** for Native SQL
 > operations:
 >
 > - Embedding raw SQL with `_select`, `_selectFirst`, `_execute`
@@ -125,12 +125,12 @@ npx -y firebase-tools@latest dataconnect:sdk:generate
 
 For platform-specific instructions on how to use the generated SDKs, read:
 
-- **Web (TypeScript)**: [reference/sdk_web.md](reference/sdk_web.md)
-- **Android (Kotlin)**: [reference/sdk_android.md](reference/sdk_android.md)
-- **iOS (Swift)**: [reference/sdk_ios.md](reference/sdk_ios.md)
+- **Web (TypeScript)**: [references/sdk_web.md](references/sdk_web.md)
+- **Android (Kotlin)**: [references/sdk_android.md](references/sdk_android.md)
+- **iOS (Swift)**: [references/sdk_ios.md](references/sdk_ios.md)
 - **Admin (Node.js)**:
-  [reference/sdk_admin_node.md](reference/sdk_admin_node.md)
-- **Flutter (Dart)**: [reference/sdk_flutter.md](reference/sdk_flutter.md)
+  [references/sdk_admin_node.md](references/sdk_admin_node.md)
+- **Flutter (Dart)**: [references/sdk_flutter.md](references/sdk_flutter.md)
 
 ______________________________________________________________________
 
@@ -140,23 +140,23 @@ If you need to implement a specific feature, consult the mapped reference file:
 
 | Feature                         | Reference File                                               | Key Concepts                                       |
 | :------------------------------ | :----------------------------------------------------------- | :------------------------------------------------- |
-| **Data Modeling**               | [reference/schema.md](reference/schema.md)                   | `@table`, `@unique`, `@index`, Relations           |
-| **Vector Search**               | [reference/search.md](reference/search.md)                   | `Vector`, `@col(dataType: "vector")`, embeddings   |
-| **Full-Text Search**            | [reference/search.md](reference/search.md)                   | `@searchable`, `movies_search`                     |
-| **Upserting Data**              | [reference/operations.md](reference/operations.md)           | `_upsert` mutations                                |
-| **Complex Filters**             | [reference/operations.md](reference/operations.md)           | `_or`, `_and`, `_not`, `eq`, `contains`            |
-| **Transactions**                | [reference/operations.md](reference/operations.md)           | `@transaction`, `response` binding                 |
-| **Environment Config**          | [reference/config.md](reference/config.md)                   | `dataconnect.yaml`, `connector.yaml`               |
-| **Realtime Subscriptions**      | [reference/realtime.md](reference/realtime.md)               | `@refresh`, `subscribe()`, auto-refresh            |
-| **Cloud Functions Integration** | [reference/cloud_functions.md](reference/cloud_functions.md) | `onMutationExecuted`, triggering events            |
-| **Data Seeding & Migrations**   | [reference/data_seeding.md](reference/data_seeding.md)       | `seed_data.gql`, `_insertMany`, Admin SDK bulk     |
+| **Data Modeling**               | [references/schema.md](references/schema.md)                   | `@table`, `@unique`, `@index`, Relations           |
+| **Vector Search**               | [references/search.md](references/search.md)                   | `Vector`, `@col(dataType: "vector")`, embeddings   |
+| **Full-Text Search**            | [references/search.md](references/search.md)                   | `@searchable`, `movies_search`                     |
+| **Upserting Data**              | [references/operations.md](references/operations.md)           | `_upsert` mutations                                |
+| **Complex Filters**             | [references/operations.md](references/operations.md)           | `_or`, `_and`, `_not`, `eq`, `contains`            |
+| **Transactions**                | [references/operations.md](references/operations.md)           | `@transaction`, `response` binding                 |
+| **Environment Config**          | [references/config.md](references/config.md)                   | `dataconnect.yaml`, `connector.yaml`               |
+| **Realtime Subscriptions**      | [references/realtime.md](references/realtime.md)               | `@refresh`, `subscribe()`, auto-refresh            |
+| **Cloud Functions Integration** | [references/cloud_functions.md](references/cloud_functions.md) | `onMutationExecuted`, triggering events            |
+| **Data Seeding & Migrations**   | [references/data_seeding.md](references/data_seeding.md)       | `seed_data.gql`, `_insertMany`, Admin SDK bulk     |
 | **Starter Templates**           | [templates.md](templates.md)                                 | CRUD, user-owned resources, many-to-many, SDK init |
 
 ______________________________________________________________________
 
 ## Deployment & CLI
 
-> **Read [reference/config.md](reference/config.md)** for deep dive on
+> **Read [references/config.md](references/config.md)** for deep dive on
 > configuration.
 
 Follow these patterns based on your current task:
@@ -173,7 +173,7 @@ Follow these patterns based on your current task:
    `npx -y firebase-tools@latest emulators:start --only dataconnect`.
 1. Write schema and operations.
 1. Seed local test data into `seed_data.gql`. Read
-   [reference/data_seeding.md](reference/data_seeding.md#local-prototyping-data-seeding).
+   [references/data_seeding.md](references/data_seeding.md#local-prototyping-data-seeding).
 1. Run `npx -y firebase-tools@latest dataconnect:compile` or
    `npx -y firebase-tools@latest dataconnect:sdk:generate` to validate them.
 1. Use the operations in your app and build it.
