@@ -1,0 +1,16 @@
+{
+    "hooks": [
+        {
+            "id": "evaluate_rules_before_deploy",
+            "type": "pre_command",
+            "command_pattern": ".*firebase deploy --only firestore(:rules)?.*",
+            "action": {
+                "type": "evaluate",
+                "rubric_file": "./skills/firebase-score-rules.md",
+                "threshold": 3,
+                "on_failure": "block"
+            },
+            "description": "Blocks Firestore rules deployment if the rules score below a 3 based on the firebase-score-rules rubric."
+        }
+    ]
+}
