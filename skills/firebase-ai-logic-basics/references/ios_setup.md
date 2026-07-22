@@ -119,8 +119,9 @@ import FirebaseAILogic
 @Observable
 final class SecureAIViewModel {
     // Initialize with limited-use tokens for enhanced security
+    // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
     private lazy var model = FirebaseAI.firebaseAI(
-        backend: .googleAI(),
+        backend: .geminiDeveloperAPI(),
         useLimitedUseAppCheckTokens: true
     ).generativeModel(modelName: "<latest_supported_model>")
     
