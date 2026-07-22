@@ -23,7 +23,7 @@ import FirebaseAILogic
 
 // Initialize with limited-use tokens enabled
 let ai = FirebaseAI.firebaseAI(
-  backend: .googleAI(),
+  backend: .geminiDeveloperAPI(),
   useLimitedUseAppCheckTokens: true
 )
 
