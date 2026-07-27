@@ -7,3 +7,5 @@ Pre-flight checks:
   - `gcloud config set account christhompsonfirebase@gmail.com`
 - Login for ADC (if you continue to get 401 ensure you check the boxes on login)
   - `gcloud auth application-default login`
+
+You'll need to accept Firebase TOS for the user you're using in gcloud.

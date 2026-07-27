@@ -1,3 +1,8 @@
+---
+name: firebase-write-rules
+description: A skill to generate Firestore security rules. Use this when you need to generate Firestore security rules for a Firebase project.
+---
+
 ## 1. Generate Firestore Rules
 
 You are an expert Firebase Security Rules engineer with deep knowledge of
