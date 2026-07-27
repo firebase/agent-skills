@@ -63,7 +63,21 @@ Install the Firebase plugin:
 codex plugin add firebase@firebase
 ```
 
-### Option 5: Manual Set Up
+### Option 5: Kimi Plugin
+
+Install the Firebase plugin in Kimi Code CLI:
+
+```bash
+/plugins install https://github.com/firebase/skills
+```
+
+Verify the installation:
+
+```bash
+/plugins list
+```
+
+### Option 6: Manual Set Up
 
 1. Clone this repository:
 
@@ -78,7 +92,7 @@ git clone https://github.com/firebase/skills.git
    - **GitHub Copilot**: `.github/copilot-instructions.md` (or project-specific
      instruction files)
 
-### Option 6: Local Path via Agent Skills CLI
+### Option 7: Local Path via Agent Skills CLI
 
 The `skills` CLI also supports installing skills from a local directory. If you
 have cloned this repository, you can add skills by pointing the CLI to your
@@ -95,7 +109,7 @@ project with the new changes, you can update them by running:
 npx skills experimental_install
 ```
 
-### Option 7: Local Development (Live Symlinking)
+### Option 8: Local Development (Live Symlinking)
 
 If you are actively contributing to or developing these skills, using
 `npx skills add` or copying files means you have to manually update them every
