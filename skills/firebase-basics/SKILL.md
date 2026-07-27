@@ -1,11 +1,7 @@
 ---
 name: firebase-basics
 description: >-
-  Provides foundational setup, authentication, and project management workflows
-  for Firebase using the Firebase CLI. Use when checking Firebase CLI version
-  (must use 'npx -y firebase-tools@latest --version'), initializing a Firebase
-  environment, authenticating, setting active projects, or setting up `google-services.json`
-  or `GoogleService-Info.plist` files.
+  Provides foundational Firebase CLI setup, CLI installation, version checks (`firebase-tools@latest --version`), CLI login (including --no-localhost), project creation, project selection (`firebase use`), and app config file downloads (`google-services.json`, `GoogleService-Info.plist`). Use ONLY for CLI login, project creation/switching, or downloading app config files. Don't use for Firebase Hosting deploy, Firestore, Auth, App Hosting, Data Connect, Crashlytics, or Remote Config.
 ---
 
 # Prerequisites
@@ -63,6 +59,7 @@ Complete these setup steps before proceeding:
         user if this is the intended project.
      1. If not, or if no project is active, set the project provided by the
         user:
+        
         ```bash
         npx -y firebase-tools@latest use <PROJECT_ID>
         ```
@@ -143,6 +140,7 @@ Adhere to these principles:
 - **Login Issues:** If the browser fails to open during the login step, use
   `npx -y firebase-tools@latest login --no-localhost` instead.
 - **Genkit:** If using Genkit, install the skills:
+  
   ```bash
   npx skills add genkit-ai/skills
   ```
