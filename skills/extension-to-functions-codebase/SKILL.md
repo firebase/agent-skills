@@ -22,7 +22,7 @@ Leverages native Cloud Functions features (declarative IAM, Parameterized Config
 
 - **Target B: Publishable npm Package / Shareable Package**
   - Output: Reusable npm package exporting V2 functions.
-  - Configuration: `package.json` specifying `exports` map, `engines: { "node": ">=22" }`, and `peerDependencies: { "firebase-functions": ">=7.0.0" }`.
+  - Configuration: `package.json` specifying `exports` map, `engines: { "node": ">=22" }`, and `peerDependencies: { "firebase-functions": ">=6.0.0" }`.
   - Usage: Consumers install package and re-export functions in `index.ts` (`export * from "<package-name>"`).
 
 ---
@@ -58,11 +58,11 @@ V2 enables concurrency (up to 80 requests). To preserve V1 single-concurrency pr
 
 ### Step 1: Inventory Extension Resources
 1. **`extension.yaml`**:
-   - `params` $\rightarrow$ `defineString`, `defineInt`, `defineBoolean`, `defineSecret`.
-   - `apis` $\rightarrow$ `requiresAPI(...)`.
-   - `roles` $\rightarrow$ `requiresRole(...)`.
-   - `lifecycleEvents` $\rightarrow$ `afterFirstDeploy` & `afterRedeploy`.
-   - `resources` $\rightarrow$ Upgrade 1st Gen triggers to 2nd Gen (`onDocumentWritten`, `onTaskDispatched`, `onRequest`).
+   - `params` → `defineString`, `defineInt`, `defineBoolean`, `defineSecret`.
+   - `apis` → `requiresAPI(...)`.
+   - `roles` → `requiresRole(...)`.
+   - `lifecycleEvents` → `afterFirstDeploy` & `afterRedeploy`.
+   - `resources` → Upgrade 1st Gen triggers to 2nd Gen (`onDocumentWritten`, `onTaskDispatched`, `onRequest`).
 2. **Files & Scripts**: Preserve devDependencies, test framework (`jest`), and test scripts.
 
 ### Step 2: Configure `package.json`
@@ -71,7 +71,7 @@ V2 enables concurrency (up to 80 requests). To preserve V1 single-concurrency pr
   ```json
   "peerDependencies": {
     "firebase-admin": "^11.0.0 || ^12.0.0",
-    "firebase-functions": ">=7.0.0"
+    "firebase-functions": ">=6.0.0"
   }
   ```
 - Configure `exports` map targeting ESM/CommonJS and TypeScript declarations (`lib/index.js`, `lib/index.d.ts`).
@@ -84,8 +84,8 @@ V2 enables concurrency (up to 80 requests). To preserve V1 single-concurrency pr
 
 ### Step 4: Convert Lifecycle Events
 Map extension lifecycle events to SDK lifecycle hooks in `src/index.ts`:
-- `onInstall` $\rightarrow$ `afterFirstDeploy({ task: { function: "initTask" } })`
-- `onUpdate` / `onConfigure` $\rightarrow$ `afterRedeploy({ task: { function: "setupTask" } })`
+- `onInstall` → `afterFirstDeploy({ task: { function: "initTask" } })`
+- `onUpdate` / `onConfigure` → `afterRedeploy({ task: { function: "setupTask" } })`
 
 ### Step 5: Package README & Export Instructions
 Generate `README.md` containing:
