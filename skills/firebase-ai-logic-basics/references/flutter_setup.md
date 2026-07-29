@@ -63,7 +63,7 @@ Use `FirebaseAI.googleAI` for the **Gemini Developer API**.
 > [!IMPORTANT] **Choose the Right API Provider:** Always use
 > `FirebaseAI.googleAI` (Gemini Developer API) as the default for prototyping
 > and standard use. Avoid using the Agent Platform Gemini API (formerly branded
-> Vertex AI) unless your application specifically requires enterprise-grade
+> Vertex AI) unless the app and business use case specifically requires enterprise-grade
 > scalability and is configured for the Blaze plan.
 
 ### Text Generation
