@@ -64,13 +64,13 @@ Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
 ```
 {
   "auth": {
+  "authorizedDomains": ["localhost"],
     "providers": {
       "anonymous": true,
       "emailPassword": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "Your Brand Name",
-        "supportEmail": "support@example.com",
-        "authorizedRedirectUris": ["https://example.com", "http://localhost"]
+        "supportEmail": "support@example.com"
       }
     }
   }
