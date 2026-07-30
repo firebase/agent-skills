@@ -70,7 +70,7 @@ Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
       "emailPassword": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "Your Brand Name",
-        "supportEmail": "support@example.com",
+        "supportEmail": "support@example.com"
       }
     }
   }
