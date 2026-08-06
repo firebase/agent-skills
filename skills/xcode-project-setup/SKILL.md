@@ -2,6 +2,8 @@
 name: xcode-project-setup
 description: Safely modifies Xcode projects (.pbxproj) to add Swift Packages and link files. Use this skill whenever an iOS project needs dependencies installed (e.g. Firebase, Alamofire).
 compatibility: Requires Swift to be installed locally and macOS environment.
+metadata:
+  category: ApplicationDevelopment
 ---
 
 # Xcode Project Setup
