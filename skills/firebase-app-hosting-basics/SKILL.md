@@ -2,6 +2,8 @@
 name: firebase-app-hosting-basics
 description: >-
   Deploys and manages full-stack web applications (Next.js, Angular) with Server-Side Rendering (SSR) using Firebase App Hosting. Use when deploying Next.js/Angular apps, configuring apphosting.yaml or firebase.json apphosting blocks, managing secrets, setting up GitHub CI/CD, or configuring Blaze billing requirements. Don't use for classic static web hosting, Auth, Firestore, Crashlytics, or Xcode.
+metadata:
+  category: Serverless
 ---
 
 # App Hosting Basics

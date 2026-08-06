@@ -2,6 +2,8 @@
 name: firebase-security-rules-auditor
 description: >-
   Audits Firebase (Firestore, Cloud Storage) security rules for vulnerabilities, privilege escalation, role bypasses, create vs update inconsistencies, resource exhaustion, type safety, size limits, and hasOnly ownership checks. Use when auditing/reviewing rules, running red-team rule assessments, or scoring against auditor checklists. Don't use for Firebase CLI (login, deploy), Auth, Crashlytics, Remote Config, or database queries.
+metadata:
+  category: CloudSecurity
 ---
 
 # Overview
