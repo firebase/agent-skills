@@ -78,14 +78,18 @@ Connector configuration and SDK generation:
 connectorId: "default"
 generate:
   javascriptSdk:
-    outputDir: "../web/src/lib/dataconnect"
+    outputDir: "../../web/src/lib/dataconnect"
     package: "@myapp/dataconnect"
   kotlinSdk:
-    outputDir: "../android/app/src/main/kotlin/com/myapp/dataconnect"
+    outputDir: "../../android/app/src/main/kotlin/com/myapp/dataconnect"
     package: "com.myapp.dataconnect"
   swiftSdk:
-    outputDir: "../ios/MyApp/DataConnect"
+    outputDir: "../../ios/MyApp/DataConnect"
 ```
+
+> `outputDir` is resolved **relative to the `connector.yaml` directory** (e.g.
+> `dataconnect/connector/`). To target a sibling app at the project root, walk
+> up two levels — `outputDir: "../../web/src/dataconnect/generated"`.
 
 ### SDK Generation Options
 
@@ -164,6 +168,28 @@ Default ports:
 
 - SQL Connect: `9399`
 - PostgreSQL: `9939` (local PostgreSQL instance)
+
+The emulator bundles its own PostgreSQL, so no Cloud SQL, Docker, or Java is
+required.
+
+### Offline validation and SDK generation
+
+`dataconnect:compile` and `dataconnect:sdk:generate` authenticate against the
+backend and fail offline with `could not find default credentials`. For
+credential-free local iteration, run the emulator with a **demo project**: it
+compiles the schema and connectors on every reload (surfacing errors in
+`dataconnect-debug.log`) and regenerates the configured SDKs automatically.
+
+```bash
+firebase emulators:start --only dataconnect --project demo-myapp
+```
+
+A `demo-`-prefixed project ID keeps the emulator fully offline.
+
+> **Emulator UUIDs come back without hyphens.** The bundled PostgreSQL returns a
+> UUID as 32 hex chars (`eeeeeeee...`), whereas Cloud SQL returns the hyphenated
+> form. Don't compare ids against hard-coded literals — round-trip the id values
+> the SDK returns.
 
 ### Emulator Configuration (firebase.json)
 

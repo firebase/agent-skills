@@ -24,6 +24,27 @@ this file runs locally to establish a test state and is not an exposed API
 connector endpoint, authorization directives are completely unnecessary and
 should be omitted.
 
+#### Running the seed
+
+The Data Connect IDE extension runs `seed_data.gql` via its "Run (local)"
+action. From the CLI or CI, seed by calling your generated SDK against the
+running emulator — point the SDK at the emulator and invoke your create/seed
+mutations:
+
+```js
+import { initializeApp } from 'firebase/app';
+import { getDataConnect, connectDataConnectEmulator } from 'firebase/data-connect';
+import { connectorConfig, addMovie } from '@myapp/dataconnect';
+
+const dc = getDataConnect(initializeApp({ projectId: 'demo-myapp' }), connectorConfig);
+connectDataConnectEmulator(dc, '127.0.0.1', 9399);
+
+await addMovie(dc, { id, title, genre }); // a mutation defined in your connector
+```
+
+Mutations are never cached, so this is safe to re-run; use `_upsert` /
+`_upsertMany` mutations for idempotent re-seeding.
+
 ### Seeding Independent Tables (FK Order)
 
 When executing standard bulk insertions (`_insertMany`) across multiple tables,

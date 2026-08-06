@@ -97,12 +97,24 @@ generate:
       storage: memory # Only memory is supported on Web
 ```
 
-Use policies in code:
+The fetch policy is passed in an options object (the second argument to
+`executeQuery` and to the generated action shortcuts):
 
 ```typescript
-await executeQuery(queryRef, QueryFetchPolicy.CACHE_ONLY);
-await executeQuery(queryRef, QueryFetchPolicy.SERVER_ONLY);
+import { QueryFetchPolicy } from 'firebase/data-connect';
+
+await executeQuery(queryRef, { fetchPolicy: QueryFetchPolicy.CACHE_ONLY });
+await executeQuery(queryRef, { fetchPolicy: QueryFetchPolicy.SERVER_ONLY });
+await listMovies(dataConnect, { fetchPolicy: QueryFetchPolicy.SERVER_ONLY });
 ```
+
+> **Queries default to `PREFER_CACHE`.** A repeated `executeQuery` (or generated
+> action shortcut) can return a cached snapshot instead of hitting the server,
+> even with no `clientCache` configured. For always-fresh reads — polling, a
+> live feed, or asserting just-written data in tests — pass `SERVER_ONLY`. The
+> three policies are `PREFER_CACHE` (default), `CACHE_ONLY`, and `SERVER_ONLY`.
+> For push-based realtime, prefer `subscribe()` (below); `SERVER_ONLY` polling
+> is the fallback when you are not subscribing.
 
 ### Subscriptions (Realtime)
 
