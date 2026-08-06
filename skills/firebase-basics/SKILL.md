@@ -1,12 +1,16 @@
 ---
 name: firebase-basics
+metadata:
+  category: Serverless
 description: >-
   Provides foundational Firebase CLI setup, CLI installation, version checks (`firebase-tools@latest --version`), CLI login (including --no-localhost), project creation, project selection (`firebase use`), and app config file downloads (`google-services.json`, `GoogleService-Info.plist`). Use ONLY for CLI login, project creation/switching, or downloading app config files. Don't use for Firebase Hosting deploy, Firestore, Auth, App Hosting, Data Connect, Crashlytics, or Remote Config.
 metadata:
   category: CloudInfrastructureAndServices
 ---
 
-# Prerequisites
+# Firebase Basics
+
+## Prerequisites
 
 Complete these setup steps before proceeding:
 
@@ -75,7 +79,7 @@ Complete these setup steps before proceeding:
      *Note: The `<project-id>` must be 6-30 characters, lowercase, and can
      contain digits and hyphens. It must be globally unique.*
 
-# Firebase Usage Principles
+## Firebase Usage Principles
 
 Adhere to these principles:
 
@@ -124,7 +128,7 @@ Adhere to these principles:
      `app/google-services.json` for Android, or a path to be linked by
      `xcode-project-setup` for iOS).
 
-# References
+## References
 
 - **Initialize Firebase:** See
   [references/firebase-service-init.md](references/firebase-service-init.md)
@@ -137,7 +141,7 @@ Adhere to these principles:
   - **Android**: See [references/android_setup.md](references/android_setup.md)
   - **iOS**: See [references/ios_setup.md](references/ios_setup.md)
 
-# Common Issues
+## Common Issues
 
 - **Login Issues:** If the browser fails to open during the login step, use
   `npx -y firebase-tools@latest login --no-localhost` instead.
