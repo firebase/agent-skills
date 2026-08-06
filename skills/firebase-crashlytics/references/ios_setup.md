@@ -16,7 +16,7 @@ Use the `firebase-tools` CLI to set up the project if necessary.
 1. **Create Firebase Project:** If no project exists, create one:
    `npx -y firebase-tools@latest projects:create <project-id> --display-name="My Awesome App"`
 1. **Create Firebase App:** Register the iOS app with the discovered bundle ID:
-   `npx -y firebase-tools@latest apps:create IOS <bundle-id>`
+   `npx -y firebase-tools@latest apps:create IOS <bundle-id> --non-interactive`
 1. **Link the GoogleService-Info.plist file:** Use the script in the
    `xcode-project-setup` skill to obtain the config and link.
 
