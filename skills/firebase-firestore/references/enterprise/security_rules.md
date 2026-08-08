@@ -409,6 +409,33 @@ within the context.
 allow create: if isScopedPath(request.resource.data.imageBucket) && ...
 ```
 
+When validating a field that contains a document ID that will be interpolated
+into a path, you **MUST** validate that it is a non-empty single path segment.
+
+**Example:**
+
+```javascript
+function isValidPostId(postId) {
+  return postId is string &&
+    postId.matches('^[^/]+$') &&
+    exists(/databases/$(database)/documents/posts/$(postId));
+}
+```
+
+When validating a field that contains a `DocumentReference`, you **MUST** check
+that it exactly matches the expected path.
+
+**Example:**
+
+```javascript
+function isValidPostReference(postRef) {
+  return postRef is path &&
+    postRef ==
+      /databases/$(database)/documents/posts/$(postRef[4]) &&
+    exists(postRef);
+}
+```
+
 #### 4. Secure Counter Updates
 
 When allowing users to update a counter (like `voteCount` or `answerCount`), you
