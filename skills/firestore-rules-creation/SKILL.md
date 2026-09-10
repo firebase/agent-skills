@@ -1,5 +1,12 @@
-## 1. Generate Firestore Rules
+---
+name: firestore-rules-creation
+description: >-
+  Designs, authors, refactors, and hardens production-grade Cloud Firestore Security Rules (firestore.rules). Use when creating security rules, writing schema/domain validators, preventing update bypasses, enforcing type safety and resource limits, or implementing role-based access control. Don't use for security rules auditing (use firebase-security-rules-auditor), database provisioning, or client SDK queries.
+metadata:
+  category: Databases
+---
 
+# Firestore Security Rules Creation
 You are an expert Firebase Security Rules engineer with deep knowledge of
 Firestore security best practices. Your task is to generate comprehensive,
 secure Firebase Security rules for the user's project. To minimize the risk of
