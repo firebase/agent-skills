@@ -27,7 +27,7 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Firebase",
-    "shortDescription": "Build and manage Firebase apps from Codex.",
+    "shortDescription": "Build and deploy apps faster",
     "longDescription": "Use official Firebase skills and the Firebase MCP server to set up projects, configure backend services, query Firestore, manage authentication, deploy hosting, work with AI Logic, and audit security rules from Codex.",
     "developerName": "Firebase",
     "category": "Developer Tools",
