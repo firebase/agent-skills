@@ -69,10 +69,27 @@ const articlesWithAuthProfile = db.pipeline().collection("articles")
   );
 ```
 
+### Vector Search & Similarity
+
+Leverage the database-native `.findNearest()` stage for vector similarity
+lookups:
+
+```javascript
+// Execute vector similarity search within pipeline
+const vectorPipeline = db.pipeline()
+  .collection("articles")
+  .findNearest({
+    field: "embedding",
+    vectorValue: queryVector,
+    distanceMeasure: "cosine",
+    limit: 5
+  });
+```
+
 ### Full-Text Search
 
-Leverage the database-native `.search()` stage for high-performance text
-lookups.
+Leverage the database-native `.search()` stage (introduced in Firebase v12.13.0)
+for high-performance text lookups.
 
 ```javascript
 import { documentMatches, score } from "firebase/firestore/pipelines";

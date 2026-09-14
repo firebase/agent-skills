@@ -1,0 +1,17 @@
+{
+  "name": "firestore-eval-harness",
+  "version": "1.0.0",
+  "description": "NPM evaluation harness and test fixtures for Firebase Firestore Web SDK",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "firebase": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.5"
+  }
+}

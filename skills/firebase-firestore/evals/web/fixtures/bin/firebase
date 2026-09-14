@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+
+# Mock Firebase CLI for hermetic evaluation environments.
+# Handles firestore:databases:get queries with realistic JSON output.
+if [[ "$*" == *"firestore:databases:get"* ]]; then
+  cat << 'EOF'
+{
+  "name": "projects/mock-firebase-project/databases/analytics-db",
+  "type": "ENTERPRISE",
+  "locationId": "us-central1",
+  "concurrencyMode": "OPTIMISTIC",
+  "appEngineIntegrationMode": "DISABLED",
+  "deleteProtectionState": "DELETE_PROTECTION_DISABLED"
+}
+EOF
+  exit 0
+fi
+
+echo "Mock Firebase CLI: command '$*' not recognized in mock environment" >&2
+exit 1
