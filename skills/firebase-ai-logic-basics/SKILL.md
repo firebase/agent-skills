@@ -42,7 +42,7 @@ Use the Gemini Developer API as a default, and only Agent Platform Gemini API
 
 The library is part of the standard Firebase Web SDK.
 
-`npm install -g firebase@latest`
+`npm install firebase@latest`
 
 If you're in a firebase directory (with a firebase.json) the currently selected
 project will be marked with "current" using this command:
@@ -177,21 +177,18 @@ without deploying new client code. See
 
 ## Initialization Code References
 
-| Language,   | Gemini API | Context URL                                     |
-: Framework,  : provider   :                                                 :
-: Platform    :            :                                                 :
-| :---------- | :--------- | :---------------------------------------------- |
-| Web Modular | Gemini     | firebase://docs/ai-logic/get-started            |
-: API         : Developer  :                                                 :
-:             : API        :                                                 :
-:             : (Developer :                                                 :
-:             : API)       :                                                 :
-| iOS (Swift) | Gemini     | [ios_setup.md](references/ios_setup.md)         |
-:             : Developer  :                                                 :
-:             : API        :                                                 :
-| Flutter     | Gemini     | [flutter_setup.md](references/flutter_setup.md) |
-: (Dart)      : Developer  :                                                 :
-:             : API        :                                                 :
+-   **Web Modular API**
+    -   Provider: Gemini Developer API
+    -   Reference: [usage_patterns_web.md](references/usage_patterns_web.md)
+-   **Android (Kotlin)**
+    -   Provider: Gemini Developer API
+    -   Reference: [usage_patterns_android.md](references/usage_patterns_android.md)
+-   **iOS (Swift)**
+    -   Provider: Gemini Developer API
+    -   Reference: [ios_setup.md](references/ios_setup.md)
+-   **Flutter (Dart)**
+    -   Provider: Gemini Developer API
+    -   Reference: [flutter_setup.md](references/flutter_setup.md)
 
 > [!WARNING] **CRITICAL: Use current model names:** Always check the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
