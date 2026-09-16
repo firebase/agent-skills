@@ -24,15 +24,35 @@ with the SQL Connect backend.
 Ensure you have the Kotlin Serialization plugin and standard SQL Connect
 dependencies:
 
+> [!IMPORTANT] **[AGENT] MATCHING THE KOTLIN SERIALIZATION PLUGIN VERSION** The
+> `plugin.serialization` version is not independent: it MUST be the same version
+> as the Kotlin plugin the project already applies. Mismatched versions fail the
+> Gradle build, so never copy a version out of this guide. Read the version the
+> project actually declares:
+>
+> ```bash
+> # Print the Kotlin plugin version this project already uses
+> grep -rn "org.jetbrains.kotlin" build.gradle.kts app/build.gradle.kts gradle/libs.versions.toml 2>/dev/null
+> ```
+>
+> *Example:* if the project's root `build.gradle.kts` declares
+> `id("org.jetbrains.kotlin.android") version "1.9.20" apply false`, then apply
+> `kotlin("plugin.serialization") version "1.9.20"` — not the version shown
+> below.
+
 ```kotlin
 plugins {
-    kotlin("plugin.serialization") version "1.8.22" // Must match Kotlin version
+    // [AGENT] Replace with the project's own Kotlin version, resolved above.
+    // The value below is only an example.
+    kotlin("plugin.serialization") version "1.9.20"
 }
 
 dependencies {
     // [AGENT] Fetch the latest available BoM version from https://firebase.google.com/support/release-notes/android before adding this
     implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
     implementation("com.google.firebase:firebase-dataconnect")
+    // [AGENT] These runtimes are also coupled to the Kotlin version above;
+    // bump them if Gradle reports an incompatible serialization runtime.
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
 }
