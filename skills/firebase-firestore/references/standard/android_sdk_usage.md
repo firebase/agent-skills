@@ -37,9 +37,9 @@ ______________________________________________________________________
 In your Activity or Fragment, initialize the `FirebaseFirestore` instance:
 
 ```kotlin
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.firestore
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,8 +47,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val db = Firebase.firestore
-        
+        db = Firebase.firestore
+
         setContent {
             MaterialTheme {
                 Text("Firestore initialized!")
@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val db = Firebase.firestore
-        
+
         setContent {
             MaterialTheme {
                 Text("Firestore initialized!")

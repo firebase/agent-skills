@@ -135,7 +135,7 @@ val articlesWithAuthProfile = db.pipeline().collection("articles")
     .define(field("authorUid").alias("author_id"))
     .addFields(
         db.pipeline().collection("users")
-            .where(field("__name__").documentId().equalTo(variable("author_id")))
+            .where(field("__name__").documentId().equal(variable("author_id")))
             .select(field("displayName"), field("avatarUrl"), field("handle"))
             .toScalarExpression()
             .alias("author")
@@ -150,13 +150,14 @@ high-performance text query matches on the database level.
 ```kotlin
 import com.google.firebase.firestore.pipeline.Expression.documentMatches
 import com.google.firebase.firestore.pipeline.Expression.score
+import com.google.firebase.firestore.pipeline.SearchStage
 
 // Execute full-text search inside a pipeline, sorted by relevance score descending
 val searchPipeline = db.pipeline()
     .collection("articles")
     .search(
-        query = documentMatches("machine learning"),
-        sort = score().descending()
+        SearchStage.withQuery(documentMatches("machine learning"))
+            .withSort(score().descending())
     )
     .limit(5)
 ```
@@ -175,7 +176,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.firestore
 
-val db = Firebase.firestore
+val db = Firebase.firestore("<database-name>")
 // 1. Add a new document to a collection
 val taskData = hashMapOf(
     "title" to "Refactor Android SDK Usage Guide",

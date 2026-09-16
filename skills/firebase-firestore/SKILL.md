@@ -15,12 +15,18 @@ rules, you MUST always identify the Firestore instance edition.
 ## 1. Instance Selection and Edition Detection
 
 Run the following command to list current Firestore databases:
-`bash npx -y firebase-tools@latest firestore:databases:list`
+
+```bash
+npx -y firebase-tools@latest firestore:databases:list
+```
 
 ### A. Instance Found
 
 1. For each database found, inspect its edition and details:
-   `bash npx -y firebase-tools@latest firestore:databases:get <database-id>`
+
+    ```bash
+    npx -y firebase-tools@latest firestore:databases:get <database-id>
+    ```
 1. Ask the user which database instance they wish to target or if they would
    prefer to create a new instance.
 1. Once the target instance is established:
@@ -37,7 +43,10 @@ If no databases exist or the user requests a new one, default to provisioning an
 Suggest colocating with other resources if applicable.
 
 Once the location is determined, create the database:
-`bash npx -y firebase-tools@latest firestore:databases:create <database-id> --edition="enterprise" --location="<selected-location>"`
+
+```bash
+npx -y firebase-tools@latest firestore:databases:create <database-id> --edition="enterprise" --location="<selected-location>"
+```
 
 Proceed with using the guides under `references/enterprise/`.
 
