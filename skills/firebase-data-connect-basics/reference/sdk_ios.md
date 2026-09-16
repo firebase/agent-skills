@@ -103,8 +103,8 @@ generate:
 Use cache policies in code:
 
 ```swift
-try await execute(fetchPolicy: .cacheOnly)
-try await execute(fetchPolicy: .serverOnly)
+try await queryRef.execute(fetchPolicy: .cacheOnly)
+try await queryRef.execute(fetchPolicy: .serverOnly)
 ```
 
 ### Subscriptions (Realtime)

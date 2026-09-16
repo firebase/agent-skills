@@ -117,6 +117,7 @@ generate:
     package: "com.example.dataconnect"
   swiftSdk:
     outputDir: "../ios-app/DataConnect"
+    package: "DataConnectGenerated"
 ```
 
 Generate SDKs:
@@ -175,7 +176,7 @@ Follow these patterns based on your current task:
    `npx -y firebase-tools@latest emulators:start --only dataconnect`.
 1. Write schema and operations.
 1. Seed local test data into `seed_data.gql`. Read
-   [reference/data_seeding.md](reference/data_seeding.md#local-prototyping-data-seeding).
+   [reference/data_seeding.md](reference/data_seeding.md#1-local-prototyping-data-seeding).
 1. Run `npx -y firebase-tools@latest dataconnect:compile` or
    `npx -y firebase-tools@latest dataconnect:sdk:generate` to validate them.
 1. Use the operations in your app and build it.
