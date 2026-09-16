@@ -57,9 +57,12 @@ type MovieActor @table(key: ["movie", "actor"]) {
   character: String
 }
 
-# Reviews (user-owned)
-type Review @table @unique(fields: ["movie", "user"]) {
-  id: UUID! @default(expr: "uuidV4()")
+# Reviews (user-owned). The composite (movie, user) PRIMARY KEY enforces one
+# review per user per movie AND is the conflict target that `review_upsert`
+# matches on. A surrogate `id` PK plus `@unique(fields: ["movie", "user"])` does
+# NOT work for upsert: `_upsert` keys on the primary key, so it fails with
+# "key id is required in upsert but is not set in data".
+type Review @table(key: ["movie", "user"]) {
   movie: Movie!
   user: User!
   rating: Int!
@@ -101,10 +104,10 @@ query GetMovie($id: UUID!) @auth(level: PUBLIC) {
   }
 }
 
-# User: Get my reviews
+# User: Get my reviews (Review has no surrogate `id` — key is movie + user)
 query MyReviews @auth(level: USER) {
   reviews(where: { user: { uid: { eq_expr: "auth.uid" }}}) {
-    id rating text createdAt
+    rating text createdAt
     movie { id title posterUrl }
   }
 }
@@ -135,11 +138,11 @@ mutation AddReview($movieId: UUID!, $rating: Int!, $text: String)
   })
 }
 
-# User: Delete my review
-mutation DeleteReview($id: UUID!) @auth(level: USER) {
+# User: Delete my review (targeted by the natural key, not a surrogate id)
+mutation DeleteReview($movieId: UUID!) @auth(level: USER) {
   review_delete(
     first: { where: {
-      id: { eq: $id },
+      movie: { id: { eq: $movieId }},
       user: { uid: { eq_expr: "auth.uid" }}
     }}
   )
