@@ -1,25 +1,45 @@
-# Android SDK Usage (Enterprise Native Mode)
+# Cloud Firestore (Enterprise edition) - Android Setup Guide (Kotlin)
 
-This guide covers the Firestore Android SDK (Kotlin) setup and usage patterns
-optimized for Firestore Enterprise edition in Native mode.
+This guide describes the SDK setup and basic usage patterns for
+Cloud Firestore (Enterprise edition in Native mode) in an Android app using
+Kotlin DSL (`build.gradle.kts`) and Kotlin code.
+
+## Prerequisites
+
+IMPORTANT: Before specifically working with Cloud Firestore, make sure
+to use the skill and reference `firebase_basics/references/android_setup` to
+ensure the following is done.
+
+- The Firebase CLI is available and authenticated.
+- An Android project exists and is registered with a Firebase Project.
+- The Android project has a Firebase config file (`google-services.json`) and
+  the Google services Gradle plugin (`google-services`).
 
 ______________________________________________________________________
 
-## 1. Initialization
+## 1. Provision Firestore
 
-### Add Dependencies
+Follow the instructions in
+`firebase_firestore/references/enterprise/provisioning` to do the following:
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
-the Firebase Kotlin Bill of Materials (BoM) and the dependency for Cloud
-Firestore:
+- Provision a Firestore instance (Enterprise edition in Native mode)
+- Create or append a `firebase.json` file
+- Create a `firestore.rules` file
+- Create a `firestore.indexes.json` file
+- Deploy database, rules, and indexes
+- Run Firestore locally for development and testing
 
-> [!IMPORTANT] **[AGENT] RESOLVING THE RESOLVED SDK VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date SDK version. Before adding
-> dependencies, you MUST query the latest available versions directly from the
-> Google Maven Repository:
+______________________________________________________________________
+
+## 2. Add dependencies to Gradle build files
+
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
+> Never guess or hardcode a memorized out-of-date SDK or plugin version.
+> Before adding dependencies, you MUST query the latest available versions
+> directly from the Google Maven Repository:
 >
 > ```bash
-> # Find the latest Firebase BoM version
+> # Find the latest Firebase Android BoM version
 > curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
 >
 > # Find the latest firebase-firestore version
@@ -33,20 +53,26 @@ Firestore:
 > ./gradlew -q :app:dependencyInsight --dependency firebase-firestore --configuration releaseRuntimeClasspath
 > ```
 
+In the **module (app-level)** `build.gradle.kts` (usually
+`<project>/<app-module>/build.gradle.kts`), add the dependency for
+Cloud Firestore:
+
 ```kotlin
 dependencies {
     // [AGENT] Fetch the latest resolved version using the Gradle command above
     implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
     // Add the dependency for the Cloud Firestore library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+    // When using the BoM, don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
 }
 ```
 
-### Initialize Firestore
+______________________________________________________________________
 
-Initialize the `FirebaseFirestore` instance in your ComponentActivity (Jetpack
+## 3. Initialize Firestore
+
+Initialize the `FirebaseFirestore` instance in your `ComponentActivity` (Jetpack
 Compose) or standard Activity/Fragment:
 
 ```kotlin
@@ -63,7 +89,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Initialize the Firestore instance
         val db = FirebaseFirestore.getInstance("<database-name>")
-        
+
         setContent {
             MaterialTheme {
                 Text("Firestore initialized!")
@@ -75,7 +101,7 @@ class MainActivity : ComponentActivity() {
 
 ______________________________________________________________________
 
-## 2. Decision Framework: Mandatory Pipeline Architecture
+## 4. Decision framework: Mandatory pipeline architecture
 
 > [!CRITICAL] **MANDATORY PIPELINE ARCHITECTURE (ZERO TOLERANCE)** You are
 > strictly forbidden from using standard collection queries (e.g.,
@@ -85,34 +111,34 @@ ______________________________________________________________________
 > Server-side execution via pipelines is the superior, non-negotiable core
 > architecture for Enterprise instances.
 
-### Strict Rules & Accountability
+### Strict rules & accountability
 
-1. **Mandatory Execution Engine**: Every repository lookup requiring related
-   data mapping, textual relevance scoring, or multi-document counting MUST be
-   authored natively using the server-side `db.pipeline()` API.
-1. **Required Proof of Use**: In your task execution summaries, you MUST
-   explicitly highlight the exact pipeline stages (`.define()`, `.addFields()`,
-   `.search()`, `.aggregate()`) integrated into your primary data layer return
-   paths. Failure to implement pipelines natively constitutes an immediate
-   violation of instructions.
-1. **Check API References**:
-   - **Locate**: Locate the standard Maven sources JAR (`-sources.jar`)
-     corresponding to the resolved `firebase-firestore` dependency version
-     inside your local Gradle or Maven dependency cache.
-   - **Extract Once**: Extract the documentation files `pipeline.docs.txt` and
-     `expressions.docs.txt` from the root directory of that `-sources.jar`
-     archive into a temporary workspace scratch directory of your choice.
-   - **Read & Reference**:
-     - **Read** the extracted `pipeline.docs.txt` once fully to understand core
-       pipeline structure and stage capabilities.
-     - **Reference** the extracted `expressions.docs.txt` on-demand for specific
-       function overloads and parameters.
+1.  **Mandatory Execution Engine**: Every repository lookup requiring related
+    data mapping, textual relevance scoring, or multi-document counting MUST be
+    authored natively using the server-side `db.pipeline()` API.
+1.  **Required Proof of Use**: In your task execution summaries, you MUST
+    explicitly highlight the exact pipeline stages (`.define()`, `.addFields()`,
+    `.search()`, `.aggregate()`) integrated into your primary data layer return
+    paths. Failure to implement pipelines natively constitutes an immediate
+    violation of instructions.
+1.  **Check API References**:
+    - **Locate**: Locate the standard Maven sources JAR (`-sources.jar`)
+      corresponding to the resolved `firebase-firestore` dependency version
+      inside your local Gradle or Maven dependency cache.
+    - **Extract Once**: Extract the documentation files `pipeline.docs.txt` and
+      `expressions.docs.txt` from the root directory of that `-sources.jar`
+      archive into a temporary workspace scratch directory of your choice.
+    - **Read & Reference**:
+      - **Read** the extracted `pipeline.docs.txt` once fully to understand core
+        pipeline structure and stage capabilities.
+      - **Reference** the extracted `expressions.docs.txt` on-demand for
+        specific function overloads and parameters.
 
 ______________________________________________________________________
 
-## 3. Pipeline Examples
+## 5. Pipeline examples
 
-### Relational Joins Pattern
+### Relational joins pattern
 
 When querying related data (e.g., articles and their author profiles), perform
 the join at the database level via pipeline stages instead of executing multiple
@@ -142,7 +168,7 @@ val articlesWithAuthProfile = db.pipeline().collection("articles")
     )
 ```
 
-### Full-Text Search
+### Full-text search
 
 Leverage the database-native `.search()` stage within your pipelines to run
 high-performance text query matches on the database level.
@@ -164,7 +190,7 @@ val searchPipeline = db.pipeline()
 
 ______________________________________________________________________
 
-## 4. Real-Time Listener & Document Operations
+## 6. Real-time listener & document operations
 
 When real-time data sync or transaction-based document mutations are strictly
 required by application specifications, write clean operations as shown in this

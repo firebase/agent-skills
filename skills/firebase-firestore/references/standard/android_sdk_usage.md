@@ -1,40 +1,78 @@
-# Cloud Firestore on Android (Kotlin)
+# Cloud Firestore (Standard edition) - Android Setup Guide (Kotlin)
 
-This guide walks you through using Cloud Firestore in your Android app using
-Kotlin.
+This guide describes the SDK setup and basic usage patterns for
+Cloud Firestore (Standard edition) in an Android app using
+Kotlin DSL (`build.gradle.kts`) and Kotlin code.
 
-### Enable Firestore via CLI
+## Prerequisites
 
-Before adding dependencies in your app, make sure you enable the Firestore
-service in your Firebase Project using the Firebase CLI:
+IMPORTANT: Before specifically working with Cloud Firestore, make sure
+to use the skill and reference `firebase_basics/references/android_setup` to
+ensure the following is done.
 
-```bash
-npx -y firebase-tools@latest init firestore
-```
+- The Firebase CLI is available and authenticated.
+- An Android project exists and is registered with a Firebase Project.
+- The Android project has a Firebase config file (`google-services.json`) and
+  the Google services Gradle plugin (`google-services`).
 
 ______________________________________________________________________
 
-### 1. Add Dependencies
+## 1. Provision Firestore
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
-the dependency for Cloud Firestore:
+Follow the instructions in
+`firebase_firestore/references/standard/provisioning` to do the following:
+
+- Provision a Firestore instance (Standard edition)
+- Create or append a `firebase.json` file
+- Create a `firestore.rules` file
+- Create a `firestore.indexes.json` file
+- Deploy database, rules, and indexes
+- Run Firestore locally for development and testing
+
+______________________________________________________________________
+
+## 2. Add dependencies to Gradle build files
+
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
+> Never guess or hardcode a memorized out-of-date SDK or plugin version.
+> Before adding dependencies, you MUST query the latest available versions
+> directly from the Google Maven Repository:
+>
+> ```bash
+> # Find the latest Firebase Android BoM version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+>
+> # Find the latest firebase-firestore version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-firestore/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+> ```
+>
+> If the dependency is already declared, fetch the exact resolved version
+> currently active in the workspace's build graph:
+>
+> ```bash
+> ./gradlew -q :app:dependencyInsight --dependency firebase-firestore --configuration releaseRuntimeClasspath
+> ```
+
+In the **module (app-level)** `build.gradle.kts` (usually
+`<project>/<app-module>/build.gradle.kts`), add the dependency for
+Cloud Firestore:
 
 ```kotlin
 dependencies {
-    // [AGENT] Fetch the latest available BoM version from https://firebase.google.com/support/release-notes/android before adding this
+    // [AGENT] Fetch the latest resolved version using the Gradle command above
     implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
     // Add the dependency for the Cloud Firestore library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+    // When using the BoM, don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
 }
 ```
 
 ______________________________________________________________________
 
-### 2. Initialize Firestore
+## 3. Initialize Firestore
 
-In your Activity or Fragment, initialize the `FirebaseFirestore` instance:
+In the Activity or Fragment, initialize the `FirebaseFirestore` instance:
 
 ```kotlin
 import com.google.firebase.Firebase
@@ -58,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-#### Jetpack Compose (Modern)
+### Jetpack Compose (Modern)
 
 Initialize inside a `ComponentActivity` using `setContent`:
 
@@ -87,7 +125,11 @@ class MainActivity : ComponentActivity() {
 
 ______________________________________________________________________
 
-### 3. Add Data
+## 4. Work with data
+
+After Firestore is initialized, you can work with data in the following ways.
+
+### Add data
 
 Add a new document with a generated ID using `add()`:
 
@@ -125,9 +167,7 @@ db.collection("cities").document("LA")
     .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
 ```
 
-______________________________________________________________________
-
-### 4. Read Data
+### Read data
 
 Read a single document using `get()`:
 
@@ -162,9 +202,7 @@ db.collection("cities")
     }
 ```
 
-______________________________________________________________________
-
-### 5. Update Data
+### Update data
 
 Update some fields of a document using `update()` without overwriting the entire
 document:
@@ -179,9 +217,7 @@ washingtonRef
     .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
 ```
 
-______________________________________________________________________
-
-### 6. Delete Data
+### Delete data
 
 Delete a document using `delete()`:
 

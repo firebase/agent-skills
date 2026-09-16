@@ -1,108 +1,100 @@
-# Firebase Remote Config Android Setup Guide
+# Firebase Remote Config - Android Setup Guide (Kotlin)
 
-Important references:
+This guide describes the SDK setup and basic usage patterns for
+Firebase Remote Config in an Android app using
+Kotlin DSL (`build.gradle.kts`) and Kotlin code.
 
-- Refer to the `firebase-basics` skills, particularly those for project and app
-  setup, before proceeding.
+## Prerequisites
 
-## Project and App Setup
+IMPORTANT: Before specifically working with Firebase Remote Config, make sure
+to use the skill and reference `firebase_basics/references/android_setup` to
+ensure the following is done.
 
-Before you begin, ensure you have the following. If a `google-services.json`
-file is present, then use that Firebase project and app. Otherwise you may need
-to create them.
+- The Firebase CLI is available and authenticated.
+- An Android project exists and is registered with a Firebase Project.
+- The Android project has a Firebase config file (`google-services.json`) and
+  the Google services Gradle plugin (`google-services`).
 
-- **Firebase CLI**: Installed and logged in (see `firebase-basics`).
-- **Firebase Project**: Created via
-  `npx -y firebase-tools@latest projects:create` (see `firebase-basics`).
-- **Firebase App**: Created via
-  `npx -y firebase-tools@latest apps:create ANDROID <display-name> --package-name=<package-name>`
+## 1. Add dependencies to Gradle build files
 
-The `google-services.json` file must be present in the Android app's module
-directory. If missing, get the config using the Firebase CLI:
-`npx -y firebase-tools@latest apps:sdkconfig ANDROID <App-ID>`.
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
+> Never guess or hardcode a memorized out-of-date SDK or plugin version.
+> Before adding dependencies, you MUST query the latest available versions
+> directly from the Google Maven Repository:
+>
+> ```bash
+> # Find the latest Firebase Android BoM version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+>
+> # Find the latest firebase-config version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-config/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+> ```
+>
+> If the dependency is already declared, fetch the exact resolved version
+> currently active in the workspace's build graph:
+>
+> ```bash
+> ./gradlew -q :app:dependencyInsight --dependency firebase-config --configuration releaseRuntimeClasspath
+> ```
 
-## Add Dependencies to Gradle Build
+These changes are made to the Android project's Gradle files.
 
-These changes are made to your Android project's Gradle files. Google Analytics
-is highly recommended as it enables conditional targeting based on user
-properties and audiences.
+Google Analytics for Firebase is highly recommended as it enables conditional
+targeting based on user properties and audiences. Additional manual setup for
+Google Analytics is required (see "Before you begin" in
+https://firebase.google.com/docs/analytics/android/get-started.md.txt)
 
-### Project-level `build.gradle.kts` (`<project>/build.gradle.kts`)
-
-Ensure the Google Services plugin is in the `plugins` block:
+In the **module (app-level)** `build.gradle.kts` (usually
+`<project>/<app-module>/build.gradle.kts`), add the dependencies for
+Firebase Remote Config and Google Analytics:
 
 ```kotlin
-plugins {
-    // ... other plugins
-    id("com.google.gms.google-services") version "4.4.0" apply false
+dependencies {
+    // [AGENT] Fetch the latest resolved version using the Gradle command above
+    implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
+
+    // Add the dependencies for the Firebase Remote Config and Analytics libraries
+    // When using the BoM, don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-config")
+    implementation("com.google.firebase:firebase-analytics")
 }
 ```
 
-### App-level `build.gradle.kts` (`<project>/<app-module>/build.gradle.kts`)
+______________________________________________________________________
 
-1. Add the Google Services plugin to the `plugins` block:
+## 2. Set in-app defaults
 
-   ```kotlin
-   plugins {
-       // ... other plugins
-       id("com.google.gms.google-services")
-   }
-   ```
+1.  Define default values so the app has functional logic before it ever fetches
+    a template from the server. Create an XML file (e.g.,
+    `res/xml/remote_config_defaults.xml`):
 
-1. Add the Firebase Remote Config and Analytics dependencies. Using the Firebase
-   Bill of Materials (BoM) is the best practice for version management.
+    ```xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <!-- Example Remote Config Defaults File -->
+    <defaultsMap>
+        <entry>
+            <key>welcome_message</key>
+            <value>Welcome to the app!</value>
+        </entry>
+        <entry>
+            <key>is_feature_enabled</key>
+            <value>false</value>
+        </entry>
+    </defaultsMap>
+    ```
 
-   ```kotlin
-   dependencies {
-       // ... other dependencies
+2.  Initialize the SDK in the Activity or Application class:
 
-       // Import the Firebase BoM
-       implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
+    ```kotlin
+    val remoteConfig = Firebase.remoteConfig
+    remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+    ```
 
-       // Add the dependencies for Remote Config and Analytics
-       implementation("com.google.firebase:firebase-config")
-       implementation("com.google.firebase:firebase-analytics")
-   }
-   ```
+______________________________________________________________________
 
-## Follow up Steps
+## 3. Fetch and activate values
 
-The following steps cover the essential patterns for using Remote Config
-effectively.
-
-### Set In-App Defaults
-
-Define default values so your app has functional logic before it ever fetches a
-template from the server. Create an XML file (e.g.,
-`res/xml/remote_config_defaults.xml`):
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Example Remote Config Defaults File -->
-<defaultsMap>
-    <entry>
-        <key>welcome_message</key>
-        <value>Welcome to the app!</value>
-    </entry>
-    <entry>
-        <key>is_feature_enabled</key>
-        <value>false</value>
-    </entry>
-</defaultsMap>
-```
-
-Then, initialize the SDK in your Activity or Application class:
-
-```kotlin
-import com.google.firebase.Firebase
-import com.google.firebase.remoteconfig.remoteConfig
-
-val remoteConfig = Firebase.remoteConfig
-remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-```
-
-### Fetch and Activate Values
-
-To apply values from the cloud, you must fetch them and then activate them.
+To apply values from the cloud, fetch them and then activate them in the app:
 
 ```kotlin
 remoteConfig.fetchAndActivate()
