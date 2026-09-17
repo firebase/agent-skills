@@ -15,7 +15,7 @@ to create them.
 - **Firebase Project**: Created via
   `npx -y firebase-tools@latest projects:create` (see `firebase-basics`).
 - **Firebase App**: Created via
-  `npx -y firebase-tools@latest apps:create <IOS|ANDROID|WEB> <package-name-or-bundle-id>`
+  `npx -y firebase-tools@latest apps:create ANDROID <display-name> --package-name=<package-name>`
 
 The `google-services.json` file must be present in the Android app's module
 directory. If missing, get the config using the Firebase CLI:
@@ -57,11 +57,11 @@ plugins {
        // ... other dependencies
 
        // Import the Firebase BoM
-       implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+       implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
        // Add the dependencies for Remote Config and Analytics
-       implementation("com.google.firebase:firebase-config-ktx")
-       implementation("com.google.firebase:firebase-analytics-ktx")
+       implementation("com.google.firebase:firebase-config")
+       implementation("com.google.firebase:firebase-analytics")
    }
    ```
 
@@ -75,17 +75,45 @@ effectively.
 Define default values so your app has functional logic before it ever fetches a
 template from the server. Create an XML file (e.g.,
 `res/xml/remote_config_defaults.xml`):
-`xml     <!-- Example Remote Config Defaults File -->     <?xml version="1.0" encoding="utf-8"?>     <defaultsMap>         <entry>             <key>welcome_message</key>             <value>Welcome to the app!</value>         </entry>         <entry>             <key>is_feature_enabled</key>             <value>false</value>         </entry>     </defaultsMap>     `
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Example Remote Config Defaults File -->
+<defaultsMap>
+    <entry>
+        <key>welcome_message</key>
+        <value>Welcome to the app!</value>
+    </entry>
+    <entry>
+        <key>is_feature_enabled</key>
+        <value>false</value>
+    </entry>
+</defaultsMap>
+```
+
 Then, initialize the SDK in your Activity or Application class:
 
-````
 ```kotlin
+import com.google.firebase.Firebase
+import com.google.firebase.remoteconfig.remoteConfig
+
 val remoteConfig = Firebase.remoteConfig
 remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 ```
-````
 
 ### Fetch and Activate Values
 
 To apply values from the cloud, you must fetch them and then activate them.
-`kotlin     remoteConfig.fetchAndActivate()     .addOnCompleteListener(this) { task ->         if (task.isSuccessful) {             val updated = task.result             println("Config params updated: $updated")         } else {             println("Fetch failed")         }         // Access a value         val message = remoteConfig.getString("welcome_message")     }     `
+
+```kotlin
+remoteConfig.fetchAndActivate()
+    .addOnCompleteListener(this) { task ->
+        if (task.isSuccessful) {
+            val updated = task.result
+            println("Config params updated: $updated")
+        } else {
+            println("Fetch failed")
+        }
+        // Access a value
+        val message = remoteConfig.getString("welcome_message")
+    }
+```
