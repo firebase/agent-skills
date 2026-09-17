@@ -16,7 +16,7 @@ Use the `firebase-tools` CLI to set up the project if necessary.
 1. **Create Firebase Project:** If no project exists, create one:
    `npx -y firebase-tools@latest projects:create <project-id> --display-name="My Awesome App"`
 1. **Create Firebase App:** Register the iOS app with the discovered bundle ID:
-   `npx -y firebase-tools@latest apps:create IOS <bundle-id>`
+   `npx -y firebase-tools@latest apps:create IOS <display-name> --bundle-id=<bundle-id>`
 1. **Link the GoogleService-Info.plist file:** Use the script in the
    `xcode-project-setup` skill to obtain the config and link.
 
@@ -65,9 +65,9 @@ two options to be done manually.
 
 **For SwiftUI Apps (in `AppDelegate.swift`):**
 
-````
 *File: `AppDelegate.swift`*
 ```swift
+import UIKit
 import FirebaseCore
 import Dispatch // For DispatchQueue
 
@@ -85,7 +85,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
   }
 }
 ```
-````
 
 2. Run your app on a device or simulator. If running in the iOS simulator, make
    sure that the Xcode debugger is disconnected, otherwise the crash will not
