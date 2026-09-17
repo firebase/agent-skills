@@ -88,8 +88,8 @@ content.
 
 ```swift
 let safetySettings = [
-  SafetySetting(category: .harassment, threshold: .blockLowAndAbove),
-  SafetySetting(category: .hateSpeech, threshold: .blockMediumAndAbove)
+  SafetySetting(harmCategory: .harassment, threshold: .blockLowAndAbove),
+  SafetySetting(harmCategory: .hateSpeech, threshold: .blockMediumAndAbove)
 ]
 
 let model = FirebaseAI.firebaseAI().generativeModel(
@@ -128,13 +128,12 @@ systems. *Note: Advanced workflows like function calling generally require a
 multi-turn Chat Session to handle the back-and-forth execution.*
 
 ```swift
-let getStockPriceTool = Tool(functionDeclarations: [
+let getStockPriceTool = Tool.functionDeclarations([
   FunctionDeclaration(
     name: "getStockPrice",
     description: "Get the current stock price for a given symbol.",
     parameters: [
-      "symbol": Schema(
-        type: .string,
+      "symbol": .string(
         description: "The stock symbol, e.g. AAPL"
       )
     ]
