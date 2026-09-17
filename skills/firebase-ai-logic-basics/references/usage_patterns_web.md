@@ -23,7 +23,7 @@ const app = initializeApp(firebaseConfig);
 const ai = getAI(app, { backend: new GoogleAIBackend() });
 
 const generationConfig = {
-  candidate_count: 1,
+  candidateCount: 1,
   maxOutputTokens: 2048,
   stopSequences: [],
   temperature: 0.7,      // Balanced: creative but focused
@@ -141,7 +141,7 @@ const model = getGenerativeModel(ai, {
 const prompt = 'Generate an image of the Eiffel Tower with fireworks in the background.';
 
 // To generate an image, call `generateContent` with the text input
-const result = model.generateContent(prompt);
+const result = await model.generateContent(prompt);
 
 // Handle the generated image
 try {
@@ -166,7 +166,7 @@ const jsonModel = getGenerativeModel(ai, {
     generationConfig: {
         responseMimeType: "application/json",
         // Optional: Define a schema
-        schema = Schema.object({ ... });
+        responseSchema: Schema.object({ ... })
     }
 });
 

@@ -15,7 +15,7 @@ to create them.
 - **Firebase Project**: Created via
   `npx -y firebase-tools@latest projects:create` (see `firebase-basics`).
 - **Firebase App**: Created via
-  `npx -y firebase-tools@latest apps:create <IOS|ANDROID|WEB> <package-name-or-bundle-id>`
+  `npx -y firebase-tools@latest apps:create ANDROID <display-name> --package-name=<package-name>`
 
 The `google-services.json` file must be present in the Android app's module
 directory. If missing, get the config using the Firebase CLI:
@@ -64,7 +64,8 @@ plugins {
        implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
        // Add the dependencies for the Crashlytics and Analytics
-       implementation("com.google.firebase:firebase-crashlytics-ktx")
+       implementation("com.google.firebase:firebase-crashlytics")
+       implementation("com.google.firebase:firebase-analytics")
    }
    ```
 
@@ -82,7 +83,7 @@ App-level `build.gradle.kts` (`<project>/<app-module>/build.gradle.kts`)
    ```kotlin
    dependencies {
        // ... other dependencies
-       implementation("com.google.firebase:firebase-crashlytics-ndk:18.6.2")
+       implementation("com.google.firebase:firebase-crashlytics-ndk")
    }
    ```
 
@@ -91,12 +92,14 @@ App-level `build.gradle.kts` (`<project>/<app-module>/build.gradle.kts`)
    required to symbolicate native crash reports.
 
    ```kotlin
+   import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+
    android {
        // ... other config
        buildTypes {
            getByName("release") {
                // ...
-               firebaseCrashlytics {
+               configure<CrashlyticsExtension> {
                    nativeSymbolUploadEnabled = true
                }
            }
