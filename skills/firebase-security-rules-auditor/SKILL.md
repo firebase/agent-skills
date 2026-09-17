@@ -37,9 +37,9 @@ operations to bypass it.
 1. **Type Safety:** Are fields checked with 'is string', 'is int', or 'is
    timestamp'?
 1. **Field-Level vs. Identity-Level Security:** Be careful with rules that use
-   \`hasOnly()\` or \`diff()\`. While these restrict *which* fields can be
+   `hasOnly()` or `diff()`. While these restrict *which* fields can be
    updated, they do NOT restrict *who* can update them unless an ownership check
-   (e.g., \`resource.data.uid == request.auth.uid\`) is also present. If a rule
+   (e.g., `resource.data.uid == request.auth.uid`) is also present. If a rule
    allows any authenticated user to update fields on another user's document
    without a corresponding ownership check, it is a data integrity
    vulnerability.
@@ -67,7 +67,18 @@ single hardcoded admin email (e.g., checking request.auth.token.email ==
 - **5 (Secure):** Comprehensive validation, strict ownership, and role-based
   access via secure ACLs.
 
-Return your assessment in JSON format using the following structure: { "score":
-1-5, "summary": "overall assessment", "findings": \[ { "check": "checklist
-item", "severity": "critical|major|moderate|minor", "issue": "description",
-"recommendation": "fix" } \] }
+Return your assessment in JSON format using the following structure:
+```json
+{
+  "score": 1,
+  "summary": "overall assessment",
+  "findings": [
+    {
+      "check": "checklist item",
+      "severity": "critical|major|moderate|minor",
+      "issue": "description",
+      "recommendation": "fix"
+    }
+  ]
+}
+```

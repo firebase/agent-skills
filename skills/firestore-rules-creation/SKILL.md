@@ -180,7 +180,7 @@ function isValidList(list, maxSize) {
 //
 // Validate optional string (if present, must be string and within length)
 function isValidOptionalString(field, minLen, maxLen) {
-  return !('field' in request.resource.data) ||
+  return !(field in request.resource.data) ||
          (request.resource.data[field] is string &&
           request.resource.data[field].size() >= minLen &&
           request.resource.data[field].size() <= maxLen);
@@ -352,12 +352,12 @@ match /users/{userId} {
   pollution. For example, a `tags` array must verify that every item is a string
   AND that each string is within a reasonable length (e.g., < 20 chars).
 
-- **Permission-Field Lockdown:** Fields that control access (e.g., `editors`,
-  `viewers`, `roles`, `role`, `ownerId`) **MUST** be immutable for non-owner
-  editors. In `update` rules, use `fieldUnchanged()` for these fields unless the
-  `request.auth.uid` matches the document's original owner/creator. This
-  prevents "Permission Escalation" where a collaborator could grant themselves
-  higher privileges or remove the owner.
+-   **Permission-Field Lockdown:** Fields that control access (e.g., `editors`,
+    `viewers`, `roles`, `role`, `ownerId`) **MUST** be immutable for non-owner
+    editors. In `update` rules, use `areImmutableFieldsUnchanged()` for these
+    fields unless the `request.auth.uid` matches the document's original
+    owner/creator. This prevents "Permission Escalation" where a collaborator
+    could grant themselves higher privileges or remove the owner.
 
 ### Advanced Validation for Business Logic
 
@@ -365,7 +365,7 @@ Secure rules must enforce the application's business logic. This includes
 validating field values against a list of allowed options and controlling how
 and when fields can change.
 
-\#### 1. Enforce Enum Values
+#### 1. Enforce Enum Values
 
 If a field should only contain specific values (e.g., a status), validate
 against a list.
@@ -382,7 +382,7 @@ against a list.
  allow create: if isValidStatus() && ...
 ```
 
-\#### 2. Validate State Transitions
+#### 2. Validate State Transitions
 
 For `update` operations, you **MUST** validate that a field is changing from a
 valid previous state to a valid new state. This prevents users from bypassing

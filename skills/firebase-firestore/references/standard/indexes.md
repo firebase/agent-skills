@@ -41,23 +41,18 @@ specific index.
 
 ## Query Support Examples
 
-| Query Type                                                | Index Required                       |
-| :-------------------------------------------------------- | :----------------------------------- |
-| **Simple Equality**<br>\`where("a",                       | Automatic (Single-Field)             |
-| : "==", 1)\` : :                                          |                                      |
-| **Simple Range/Sort**<br>\`where("a",                     | Automatic (Single-Field)             |
-| : ">", 1).orderBy("a")\` : :                              |                                      |
-| **Multiple Equality**<br>\`where("a",                     | Automatic (Merged Single-Field)      |
-| : "==", 1).where("b", "==", 2)\` : :                      |                                      |
-| \*\*Equality +                                            | **Composite Index**                  |
-| : Range/Sort\*\*<br>\`where("a", "==", : :                |                                      |
-| : 1).where("b", ">", 2)\` : :                             |                                      |
-| **Multiple Ranges**<br>\`where("a",                       | **Composite Index** (and technically |
-| : ">", 1).where("b", ">", 2)\` : limited query support) : |                                      |
-| \*\*Array Contains +                                      | **Composite Index**                  |
-| : Equality\*\*<br>\`where("tags", : :                     |                                      |
-| : "array-contains", : :                                   |                                      |
-| : "news").where("active", "==", true)\` : :               |                                      |
+- **Simple Equality**: `where("a", "==", 1)`
+  - Index Required: Automatic (Single-Field)
+- **Simple Range/Sort**: `where("a", ">", 1).orderBy("a")`
+  - Index Required: Automatic (Single-Field)
+- **Multiple Equality**: `where("a", "==", 1).where("b", "==", 2)`
+  - Index Required: Automatic (Merged Single-Field)
+- **Equality + Range/Sort**: `where("a", "==", 1).where("b", ">", 2)`
+  - Index Required: **Composite Index**
+- **Multiple Ranges**: `where("a", ">", 1).where("b", ">", 2)`
+  - Index Required: **Composite Index** (limited query support)
+- **Array Contains + Equality**: `where("tags", "array-contains", "news").where("active", "==", true)`
+  - Index Required: **Composite Index**
 
 ## Best Practices & Exemptions
 
@@ -110,4 +105,7 @@ Your indexes should be defined in `firestore.indexes.json` (pointed to by
 ### CLI Commands
 
 Deploy indexes only:
-`bash npx -y firebase-tools@latest deploy --only firestore:indexes`
+
+```bash
+npx -y firebase-tools@latest deploy --only firestore:indexes
+```

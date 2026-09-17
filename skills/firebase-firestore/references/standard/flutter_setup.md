@@ -81,7 +81,7 @@ class ItemService {
     try {
       await _itemsRef.add(item.toFirestore());
     } catch (e) {
-      print("Error creating document: \$e");
+      print("Error creating document: $e");
     }
   }
 
@@ -95,7 +95,7 @@ class ItemService {
 
       return querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
     } catch (e) {
-      print("Error fetching documents: \$e");
+      print("Error fetching documents: $e");
       return [];
     }
   }
@@ -118,7 +118,7 @@ class ItemService {
     try {
       await _itemsRef.doc(id).update({'name': newName});
     } catch (e) {
-      print("Error updating document: \$e");
+      print("Error updating document: $e");
     }
   }
 
@@ -127,7 +127,7 @@ class ItemService {
     try {
       await _itemsRef.doc(id).delete();
     } catch (e) {
-      print("Error deleting document: \$e");
+      print("Error deleting document: $e");
     }
   }
 }
