@@ -16,7 +16,7 @@ Use the `firebase-tools` CLI to set up the project if necessary.
 1. **Create Firebase Project:** If no project exists, create one:
    `npx -y firebase-tools@latest projects:create <project-id> --display-name="My Awesome App"`
 1. **Create Firebase App:** Register the iOS app with the discovered bundle ID:
-   `npx -y firebase-tools@latest apps:create IOS <bundle-id>`
+   `npx -y firebase-tools@latest apps:create IOS <display-name> --bundle-id=<bundle-id>`
 1. **Link the GoogleService-Info.plist file:** Use the script in the
    `xcode-project-setup` skill to obtain the config and link.
 
@@ -43,7 +43,6 @@ effectively in your iOS app.
 Define default values so your app behaves as intended before it connects to the
 backend. Create a property list file (e.g., RemoteConfigDefaults.plist):
 
-````
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -56,24 +55,20 @@ backend. Create a property list file (e.g., RemoteConfigDefaults.plist):
 </dict>
 </plist>
 ```
-````
 
 Then, initialize the SDK and set the defaults:
 
-````
 ```swift
 import FirebaseRemoteConfig
 
 let remoteConfig = RemoteConfig.remoteConfig()
 remoteConfig.setDefaults(fromPlist: "RemoteConfigDefaults")
 ```
-````
 
 ### Fetch and Activate Values
 
 To retrieve values from the cloud and apply them to your app:
 
-````
 ```swift
 remoteConfig.fetchAndActivate { (status, error) in
     if status == .successFetchedFromRemote || status == .successUsingPreFetchedData {
@@ -86,4 +81,3 @@ remoteConfig.fetchAndActivate { (status, error) in
     let message = remoteConfig.configValue(forKey: "welcome_message").stringValue
 }
 ```
-````

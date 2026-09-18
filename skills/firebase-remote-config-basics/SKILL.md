@@ -71,11 +71,6 @@ patterns (see
 Use the following commands to manage your Remote Config template and version
 history through the terminal:
 
-### Template Management via CLI
-
-Use the following commands to manage your Remote Config template and version
-history through the terminal:
-
 - **Get current template**: Save the remote template to a local JSON file for
   auditing or modification.
 
