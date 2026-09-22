@@ -263,6 +263,13 @@ mutation UpsertUser($email: String!, $name: String!) @auth(level: USER) {
 }
 ```
 
+> **`_upsert` matches on the PRIMARY KEY, not on `@unique` constraints.** To
+> "insert or update" on a natural or composite key (e.g. one review per movie
+> per user), make that key the table's `key` (`@table(key: ["movie", "user"])`)
+> instead of adding a surrogate `id` PK plus `@unique`. With a surrogate `id`
+> PK, `_upsert` requires `id` in `data` and otherwise fails to compile
+> (`key id is required in upsert but is not set in data`).
+
 ### Delete
 
 ```graphql
