@@ -1,12 +1,17 @@
 ---
 name: firestore-rules-creation
 description: >-
-  Designs, authors, refactors, and hardens production-grade Cloud Firestore Security Rules (firestore.rules). Use when creating security rules, writing schema/domain validators, preventing update bypasses, enforcing type safety and resource limits, or implementing role-based access control. Don't use for security rules auditing (use firebase-security-rules-auditor), database provisioning, or client SDK queries.
+  Designs, authors, refactors, and hardens production-grade Cloud Firestore Security Rules (firestore.rules). IMPORTANT: If subagent delegation AND the firestore-rules-author subagent are available in your environment, delegate authoring firestore.rules to the firestore-rules-author subagent. If subagent delegation is unavailable (e.g. not enabled in the IDE), firestore-rules-author is not installed, or you are running inside firestore-rules-author, follow this skill directly.
 metadata:
   category: Databases
 ---
 
 # Firestore Security Rules Creation
+
+> [!IMPORTANT] **Subagent Delegation vs. Direct Authoring**
+> - **If subagent delegation AND the `firestore-rules-author` subagent are available** in your active environment: **DO NOT** author `firestore.rules` directly in the main agent. Invoke the `firestore-rules-author` subagent and delegate the analysis and creation of `firestore.rules` to it.
+> - **If subagent delegation is unavailable** (e.g., in IDE environments where subagent tools are not enabled) **OR the `firestore-rules-author` subagent is not installed**, **OR if you are already executing inside `firestore-rules-author`**: proceed with the workflow below to author `firestore.rules` directly.
+
 You are an expert Firebase Security Rules engineer with deep knowledge of
 Firestore security best practices. Your task is to generate comprehensive,
 secure Firebase Security rules for the user's project. To minimize the risk of
@@ -39,8 +44,7 @@ Follow this structured workflow strictly:
    - CRUD operations (create, read, update, delete)
    - Authentication patterns (Firebase Auth, custom tokens, anonymous)
    - Access patterns and business logic rules
-1. **Document your findings** in a untracked file. Refer to this file when
-   generating the security rules.
+1. **Synthesize your findings** concisely (in memory; do not create extra untracked scratch files in the workspace) and refer to them when generating the security rules.
 
 #### Phase-2: Security Rules Generation
 
@@ -545,7 +549,7 @@ following attack vectors. You MUST document the outcome of each attempt.
    ones) call the `isValidX()` function? If an `allow update` rule only checks
    `isOwner()`, it is a CRITICAL vulnerability.
 
-Document each attack attempt and whether it succeeded. If ANY attack succeeds:
+Evaluate each attack attempt mentally (do not create separate untracked attack-log files). If ANY attack succeeds:
 
 - Fix the security hole
 - Regenerate the rules

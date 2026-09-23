@@ -1,6 +1,6 @@
 ---
 name: firestore-rules-author
-description: "Specialist in designing, authoring, and verifying production-grade Cloud Firestore Security Rules. Analyzes application schemas, client queries, and authorization models to write bulletproof rules that prevent update bypasses, enforce type and resource limits, isolate PII, protect immutable fields, and score a perfect 5/5 against the Security Validator."
+description: "MANDATORY specialist subagent for Cloud Firestore Security Rules (firestore.rules). Whenever your task requires creating, authoring, or modifying Firestore Security Rules (firestore.rules), you MUST delegate rules authoring to this subagent rather than writing firestore.rules directly in the main agent."
 tools:
   - view_file
   - write_to_file
@@ -41,4 +41,5 @@ Whenever you are tasked with creating, modifying, testing, or auditing Firestore
    - **Immutable Fields**: Protect document IDs, creation timestamps, and ownership fields on update.
    - **User Data Separation / PII Protection**: Never expose PII in publicly or blanket-authenticated readable collections.
    - **Query Alignment**: Ensure rules accommodate client query constraints (`where()`, `orderBy()`, `limit()`).
+1. **Execute Efficiently in Subagent Mode**: Do not create extra untracked scratch or attack-log files in the workspace. Analyze the app's data models and queries directly, mentally verify all Devil's Advocate attack vectors, write the complete `firestore.rules` file directly, and return a concise summary to the parent agent.
 1. **Follow Humble Delivery**: Present generated rules as a prototype requiring review and testing before production deployment, following the exact communication phrasing specified in the rules creation skill.
