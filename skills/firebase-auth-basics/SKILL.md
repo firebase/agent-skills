@@ -1,6 +1,6 @@
 ---
 name: firebase-auth-basics
-description: Guide for setting up and using Firebase Authentication. Use this skill when the user's app requires user sign-in, user management, or secure data access using auth rules.
+description: Guide for setting up Firebase Authentication and FirebaseUI drop-in sign-in screens on Web, iOS, Android, and Flutter. Use when adding user sign-in, sign-up, password reset, social/OAuth providers, a login or auth UI, or user management to an app. Don't use for authoring Firestore or Storage security rules beyond `request.auth` checks.
 compatibility: This skill is best used with the Firebase CLI, but does not require it. Firebase CLI can be accessed through `npx -y firebase-tools@latest`.
 metadata:
   category: Identity
@@ -105,15 +105,59 @@ Enable other providers in the Firebase Console.
 1. Select your project.
 1. Enable the desired Sign-in providers (e.g., Email/Password, Google).
 
-### 2. Client Setup & Usage
+### 2. Choose the Auth UI Approach
 
-**Web** See [references/client_sdk_web.md](references/client_sdk_web.md).
+> [!IMPORTANT] **For Agents:** For every request to add or build a sign-in,
+> sign-up, login, password-reset, or authentication flow, you MUST surface both
+> UI approaches and ask the user which they want before planning or changing
+> code:
+>
+> 1. **FirebaseUI** (recommended) — pre-built, maintained authentication screens
+>    and flows.
+> 1. **Direct Firebase Auth SDK integration** — for custom-designed screens, or
+>    to wire auth into screens the app already has.
 
-**Flutter** See [references/flutter_setup.md](references/flutter_setup.md).
-**Android (Kotlin)** See
-[references/client_sdk_android.md](references/client_sdk_android.md).
+Briefly explain the tradeoffs when asking. Do not assume the user knows
+FirebaseUI exists. Do not pick direct SDK integration merely because the project
+uses Compose, SwiftUI, React, Angular, Flutter, or another framework supported
+by that platform's FirebaseUI library.
 
-### 3. Security Rules
+Skip the question only when the user has already chosen: they asked for
+FirebaseUI, asked for direct SDK integration or custom screens, or asked to wire
+Firebase Auth into existing screens.
+
+### 3. Direct Firebase Auth SDK Setup and Usage
+
+Build authentication UI directly against the Auth SDK.
+
+- **Web**: [references/client_sdk_web.md](references/client_sdk_web.md)
+- **iOS (Swift)**: [references/ios_setup.md](references/ios_setup.md)
+- **Android (Kotlin)**:
+  [references/client_sdk_android.md](references/client_sdk_android.md)
+- **Flutter**: [references/flutter_setup.md](references/flutter_setup.md)
+
+### 4. Drop-in Auth UI with FirebaseUI
+
+FirebaseUI ships pre-built sign-in screens handling sign-in, sign-up, password
+reset, account linking, and MFA.
+
+- **iOS (SwiftUI)**:
+  [references/firebaseui_ios.md](references/firebaseui_ios.md)
+- **Android (Compose)**:
+  [references/firebaseui_android.md](references/firebaseui_android.md)
+- **Web (React, Shadcn, Angular)**:
+  [references/firebaseui_web.md](references/firebaseui_web.md)
+- **Flutter**:
+  [references/firebaseui_flutter.md](references/firebaseui_flutter.md)
+
+Each reference above is a pointer, not a guide: it routes to that library's own
+agent skill, or to its documentation where no skill exists.
+
+Load and follow that source before planning or implementing the FirebaseUI flow.
+Do not implement from the pointer reference, from memory, or from a library
+README, which lags behind the library.
+
+### 5. Security Rules
 
 Secure your data using `request.auth` in Firestore/Storage rules.
 
