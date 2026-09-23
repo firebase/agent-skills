@@ -36,7 +36,6 @@ Main SQL Connect service configuration:
 specVersion: "v1"
 serviceId: "my-service"
 location: "us-central1"
-schemaValidation: "STRICT" # or "COMPATIBLE"
 schema:
   source: "./schema"
   datasource:
@@ -44,6 +43,7 @@ schema:
       database: "fdcdb"
       cloudSql:
         instanceId: "my-instance"
+      schemaValidation: "STRICT" # or "COMPATIBLE"
 connectorDirs: ["./connector"]
 ```
 
@@ -52,7 +52,7 @@ connectorDirs: ["./connector"]
 | `specVersion`       | Always `"v1"`                                                                            |
 | `serviceId`         | Unique identifier for the service                                                        |
 | `location`          | GCP region (us-central1, us-east4, europe-west1, etc.)                                   |
-| `schemaValidation`  | Deployment mode: `"STRICT"` (must match exactly) or `"COMPATIBLE"` (backward compatible) |
+| `schema.datasource.postgresql.schemaValidation` | Deployment mode: `"STRICT"` (must match exactly) or `"COMPATIBLE"` (backward compatible) |
 | `schema.source`     | Path to schema directory                                                                 |
 | `schema.datasource` | PostgreSQL connection config                                                             |
 | `connectorDirs`     | List of connector directories                                                            |
@@ -85,6 +85,7 @@ generate:
     package: "com.myapp.dataconnect"
   swiftSdk:
     outputDir: "../ios/MyApp/DataConnect"
+    package: "DataConnectGenerated"
 ```
 
 ### SDK Generation Options
@@ -93,8 +94,8 @@ generate:
 | --------------- | -------------------------------------- |
 | `javascriptSdk` | `outputDir`, `package`                 |
 | `kotlinSdk`     | `outputDir`, `package`                 |
-| `swiftSdk`      | `outputDir`                            |
-| `nodeAdminSdk`  | `outputDir`, `package` (for Admin SDK) |
+| `swiftSdk`      | `outputDir`, `package`                 |
+| `adminNodeSdk`  | `outputDir`, `package` (for Admin SDK) |
 
 ______________________________________________________________________
 

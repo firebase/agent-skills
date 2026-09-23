@@ -66,8 +66,8 @@ is old).
 ```dart
 final result = await MoviesConnector.instance.listMovies().execute();
 
-if (result.data != null && result.data!.isNotEmpty) {
-  handleEnumValue(result.data![0].aspectratio);
+if (result.data.movies.isNotEmpty) {
+  handleEnumValue(result.data.movies[0].aspectratio);
 }
 
 void handleEnumValue(EnumValue<AspectRatio> aspectValue) {

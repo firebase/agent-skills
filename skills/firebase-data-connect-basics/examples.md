@@ -196,12 +196,12 @@ query MyProfile @auth(level: USER)
     operation: "UpdateProfile",
     condition: "mutation.auth.uid == request.auth.uid"
   }) {
-  user(uid_expr: "auth.uid") { id name }
+  user(uid_expr: "auth.uid") { uid displayName }
 }
 
 # Counterpart mutation for MyProfile
 mutation UpdateProfile($name: String!) @auth(level: USER) {
-  user_update(id_expr: "auth.uid", data: { name: $name })
+  user_update(key: { uid_expr: "auth.uid" }, data: { displayName: $name })
 }
 
 # Time-based: live leaderboard refreshing every 30 seconds
@@ -221,13 +221,13 @@ import { subscribe } from 'firebase/data-connect';
 // Subscribe to movie list — refreshes when AddReview mutation runs
 const unsubMovies = subscribe(listMoviesRef({ genre: 'Action' }), {
   onNext: (result) => updateMovieList(result.data.movies),
-  onError: (error) => console.error(error)
+  onErr: (error) => console.error(error) // Observer object property is `onErr` (positional overload parameter is `onError`)
 });
 
 // Subscribe to leaderboard — refreshes every 30 seconds
 const unsubLeaderboard = subscribe(movieLeaderboardRef(), {
   onNext: (result) => updateLeaderboard(result.data.movies),
-  onError: (error) => console.error(error)
+  onErr: (error) => console.error(error)
 });
 
 // Cleanup

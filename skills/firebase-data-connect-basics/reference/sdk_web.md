@@ -100,15 +100,17 @@ generate:
 Use policies in code:
 
 ```typescript
-await executeQuery(queryRef, QueryFetchPolicy.CACHE_ONLY);
-await executeQuery(queryRef, QueryFetchPolicy.SERVER_ONLY);
+await executeQuery(queryRef, { fetchPolicy: QueryFetchPolicy.CACHE_ONLY });
+await executeQuery(queryRef, { fetchPolicy: QueryFetchPolicy.SERVER_ONLY });
 ```
 
 ### Subscriptions (Realtime)
 
-Use `subscribe()` to receive live updates.
+Use `subscribe()` to receive live updates. It accepts either an observer object (`SubscriptionOptions`) or positional callbacks:
 
-#### Web (Vanilla JS)
+> **Note:** When passing an observer object literal, the error callback property is named **`onErr`** (`{ onNext, onErr, onComplete }`). Passing `onError` in an object literal fails TypeScript compilation (`TS2769`) and is ignored at runtime. The name `onError` is only used as the parameter name in the positional callback overload (`subscribe(ref, onNext, onError, onComplete)`).
+
+#### Web (Vanilla JS / TypeScript)
 
 ```typescript
 import { subscribe } from 'firebase/data-connect';
@@ -116,9 +118,18 @@ import { getMovieByIdRef } from '@dataconnect/generated';
 
 const queryRef = getMovieByIdRef({ id: "<MOVIE_ID>" });
 
-const unsubscribe = subscribe(queryRef, (result) => {
-  console.log("Updated result:", result);
+// Option 1: Observer object (recommended — uses `onErr`)
+const unsubscribe = subscribe(queryRef, {
+  onNext: (result) => console.log("Updated result:", result),
+  onErr: (error) => console.error("Subscription error:", error)
 });
+
+// Option 2: Positional callbacks (`onNext`, `onError`, `onComplete`)
+const unsubscribePositional = subscribe(
+  queryRef,
+  (result) => console.log("Updated result:", result),
+  (error) => console.error("Subscription error:", error)
+);
 ```
 
 ### TanStack Query Support (React)
