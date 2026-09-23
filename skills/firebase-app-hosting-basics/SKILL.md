@@ -39,7 +39,7 @@ to upgrade their plan.
 This is the recommended flow for most users.
 
 1. Configure `firebase.json` with an `apphosting` block.
-   
+
    ```json
    {
      "apphosting": {
@@ -55,12 +55,15 @@ This is the recommended flow for most users.
      }
    }
    ```
+
 1. Create or edit `apphosting.yaml`- see
    [Configuration](references/configuration.md) for more information on how to
    do so.
+
 1. If the app needs safe access to sensitive keys, use
    `npx -y firebase-tools@latest apphosting:secrets` commands to set and grant
    access to secrets.
+
 1. Run `npx -y firebase-tools@latest deploy` when you are ready to deploy.
 
 ### Automated deployment via GitHub (CI/CD)
@@ -70,6 +73,17 @@ deployments "git push" deployments. This is only recommended for more advanced
 users, and is not required to use App Hosting. See
 [CLI Commands](references/cli_commands.md) for more information on how to set
 this up using CLI commands.
+
+## Runtimes & Automatic Base Image Updates (ABIU)
+
+App Hosting supports versioned Node.js runtimes with Automatic Base Image
+Updates (ABIU) to apply security patches without redeploys.
+
+- **CRITICAL**: AI Assistants **MUST** inspect the project's `package.json` and
+  check the `engines.node` field before recommending a runtime version or
+  creating a backend. Mismatched runtimes trigger build-time errors.
+- For a complete guide on setup, CLI flags, and lifecycle management, see
+  [Runtimes & ABIU](references/runtimes_and_abiu.md).
 
 ## Emulation
 
