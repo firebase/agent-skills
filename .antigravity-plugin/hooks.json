@@ -1,0 +1,15 @@
+{
+    "firebase-rules-guard": {
+        "PreToolUse": [
+            {
+                "matcher": "run_command|run_shell_command",
+                "hooks": [
+                    {
+                        "command": "node ./node_hooks/firebase_rules_deploy_guard.js",
+                        "timeout": 30
+                    }
+                ]
+            }
+        ]
+    }
+}
