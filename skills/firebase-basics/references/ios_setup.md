@@ -1,6 +1,6 @@
 # Firebase iOS Setup Guide
 
-# ⛔️ CRITICAL RULE: STATE MANAGEMENT (OBSERVATION VS COMBINE) ⛔️
+## ⛔️ CRITICAL RULE: STATE MANAGEMENT (OBSERVATION VS COMBINE) ⛔️
 
 When writing or updating SwiftUI code, you **MUST** prioritize the modern Swift
 **Observation framework (`@Observable` macro and `@State`)** as your default
@@ -16,7 +16,7 @@ However, it is acceptable to use **Combine** (`ObservableObject`, `@Published`,
 If neither of those conditions are true, default to the Swift 5.9+ Observation
 framework.
 
-# ⛔️ CRITICAL RULE: INITIALIZATION ORDER ⛔️
+## ⛔️ CRITICAL RULE: INITIALIZATION ORDER ⛔️
 
 When using SwiftUI, you **MUST** ensure `FirebaseApp.configure()` is called
 **BEFORE** any Firebase-dependent state objects are initialized.
