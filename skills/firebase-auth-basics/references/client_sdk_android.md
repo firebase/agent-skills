@@ -1,12 +1,26 @@
-# Firebase Authentication on Android (Kotlin)
+# Firebase Authentication - Android Setup Guide (Kotlin)
 
-This guide walks you through using Firebase Authentication in your Android app
-using Kotlin DSL (`build.gradle.kts`) and Kotlin code.
+This guide describes the SDK setup and basic usage patterns for
+Firebase Authentication in an Android app using
+Kotlin DSL (`build.gradle.kts`) and Kotlin code.
 
-### 1, Enable Authentication via CLI
+## Prerequisites
 
-Before adding dependencies in your app, make sure you enable the Auth service in
-your Firebase Project using the Firebase CLI:
+IMPORTANT: Before specifically working with Firebase Authentication, make sure
+to use the skill and reference `firebase_basics/references/android_setup` to
+ensure the following is done.
+
+- The Firebase CLI is available and authenticated.
+- An Android project exists and is registered with a Firebase Project.
+- The Android project has a Firebase config file (`google-services.json`) and
+  the Google services Gradle plugin (`google-services`).
+
+______________________________________________________________________
+
+## 1. Enable Authentication via CLI
+
+Enable the Firebase Authentication service in the Firebase Project using the
+Firebase CLI:
 
 ```bash
 npx -y firebase-tools@latest init auth
@@ -14,27 +28,48 @@ npx -y firebase-tools@latest init auth
 
 ______________________________________________________________________
 
-### 2. Add Dependencies
+## 2. Add dependencies to Gradle build files
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
-the dependency for Firebase Authentication:
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
+> Never guess or hardcode a memorized out-of-date SDK or plugin version.
+> Before adding dependencies, you MUST query the latest available versions
+> directly from the Google Maven Repository:
+>
+> ```bash
+> # Find the latest Firebase Android BoM version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+>
+> # Find the latest firebase-auth version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-auth/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+> ```
+>
+> If the dependency is already declared, fetch the exact resolved version
+> currently active in the workspace's build graph:
+>
+> ```bash
+> ./gradlew -q :app:dependencyInsight --dependency firebase-auth --configuration releaseRuntimeClasspath
+> ```
+
+In the **module (app-level)** `build.gradle.kts` (usually
+`<project>/<app-module>/build.gradle.kts`), add the dependency for
+Firebase Authentication:
 
 ```kotlin
 dependencies {
-    // [AGENT] Fetch the latest available BoM version from https://firebase.google.com/support/release-notes/android before adding this
+    // [AGENT] Fetch the latest resolved version using the Gradle command above
     implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
     // Add the dependency for the Firebase Authentication library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+    // When using the BoM, don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
 }
 ```
 
 ______________________________________________________________________
 
-### 3. Initialize FirebaseAuth
+## 3. Initialize FirebaseAuth
 
-In your Activity or Fragment, initialize the `FirebaseAuth` instance:
+In the Activity or Fragment, initialize the `FirebaseAuth` instance:
 
 ```kotlin
 import com.google.firebase.Firebase
@@ -48,6 +83,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+
         setContent {
             MaterialTheme {
                 Text("Auth initialized!")
@@ -57,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-#### Jetpack Compose (Modern)
+### Jetpack Compose (Modern)
 
 Initialize inside a `ComponentActivity` using `setContent`:
 
@@ -86,9 +122,9 @@ class MainActivity : ComponentActivity() {
 
 ______________________________________________________________________
 
-### 4. Check Current Auth State
+## 4. Check current Auth state
 
-You should check if a user is already signed in when your activity starts:
+Check if a user is already signed in when the activity starts:
 
 ```kotlin
 public override fun onStart() {
@@ -105,7 +141,11 @@ public override fun onStart() {
 
 ______________________________________________________________________
 
-### 5. Sign Up New Users (Email/Password)
+## 5. Use sign-in providers in the app
+
+### Email/Password
+
+#### Sign up NEW users with Email/Password
 
 Use `createUserWithEmailAndPassword` to register new users:
 
@@ -125,11 +165,9 @@ fun signUpUser(email: String, password: String) {
 }
 ```
 
-______________________________________________________________________
+#### Sign in EXISTING users with Email/Password
 
-### 6. Sign In Existing Users (Email/Password)
-
-Use `signInWithEmailAndPassword` to log in existing users:
+Use `signInWithEmailAndPassword` to sign in existing users:
 
 ```kotlin
 fun signInUser(email: String, password: String) {
@@ -149,7 +187,7 @@ fun signInUser(email: String, password: String) {
 
 ______________________________________________________________________
 
-### 7. Sign Out
+## 6. Sign out users
 
 To sign out a user, call `signOut()` on the `FirebaseAuth` instance:
 
