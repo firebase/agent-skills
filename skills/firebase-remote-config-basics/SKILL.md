@@ -1,124 +1,115 @@
 ---
 name: firebase-remote-config-basics
 description: >-
-  Manages Firebase Remote Config templates, feature flags, loading strategies, and SDKs (Android, iOS). Use when downloading/deploying remoteconfig JSON templates, managing version history/feature flags, setting in-app defaults, fetchAndActivate(), real-time listeners, or SDK setup. Don't use for Firebase Hosting, Auth, Firestore, Data Connect, Crashlytics, or App Hosting.
-compatibility: This skill is best used with the Firebase CLI, but does not require it. Firebase CLI can be accessed through `npx -y firebase-tools@latest`.
+  Integrates Firebase Remote Config client SDKs into Android and iOS apps. Use
+  ONLY when adding firebase-config dependencies, setting XML/Plist in-app
+  defaults (setDefaultsAsync/setDefaults), calling fetchAndActivate(), or adding
+  real-time config listeners. For Remote Config templates, use
+  firebase-remote-config-templates. Don't use for Xcode setup, CLI, AI, or Auth.
+compatibility: >-
+  Best used with Android (Gradle BoM) or iOS (Swift Package Manager) projects
+  and the Firebase CLI (`npx -y firebase-tools@latest`).
 metadata:
   author: Google LLC
   category: ApplicationDevelopment
 ---
 
-# Remote Config
+# Firebase Remote Config Client SDK Onboarding (Android & iOS)
 
-This skill provides a complete guide for getting started with Remote Config on
-Android or iOS. Remote Config allows you to change the behavior and appearance
-of your app without publishing an app update by maintaining a cloud-based
-configuration template.
+> [!IMPORTANT] **Remote Config Template Management (`remote_config.json`)**
+> - **Do NOT read `firebase-remote-config-templates`** when the user only asks
+>   for Android or iOS client SDK setup, `remote_config_defaults.xml`,
+>   `RemoteConfigDefaults.plist`, `fetchAndActivate()`, or real-time listeners.
+> - Only read `firebase-remote-config-templates` when the task explicitly asks
+>   to fetch, validate, author, or deploy Remote Config JSON templates
+>   (`parameters`, `conditions`, `condition order`, `parameterGroups`, or
+>   version rollbacks).
+
+This skill covers integrating the Firebase Remote Config client SDK into
+**Android (Kotlin)** and **iOS (Swift)** applications, configuring in-app
+default values, fetching and activating server values, and listening for
+real-time template updates.
 
 ## Prerequisites
 
-Provisioning Remote Config requires both a Firebase project and a Firebase app,
-either Android or iOS. To manage the Remote Config template and conditions via
-the command line, use the Firebase CLI. See the `firebase-basics` skill for
-references on project initialization.
+1. A Firebase project initialized with an Android (`google-services.json`) or
+   iOS (`GoogleService-Info.plist`) app. See the `firebase-basics` skill for
+   project initialization and `xcode-project-setup` for iOS target setup.
+2. **Google Analytics** is recommended in client apps when using user-property,
+   audience, or percentage-based conditions.
 
-## Troubleshooting Execution
+## 1. Platform SDK Setup Guides
 
-### Handling npx 403 Forbidden Errors
+Before writing or modifying client application code, read the platform-specific
+reference guide for your target OS:
 
-If `npx -y firebase-tools@latest` fails due to registry permissions (403 error):
+- **Android (Kotlin + Gradle BoM)**: Read
+  [android_setup.md](references/android_setup.md)
+- **iOS (Swift + Swift Package Manager)**: Read
+  [ios_setup.md](references/ios_setup.md)
 
-1. **Inform the user**: "I am unable to fetch the latest Firebase tools via npx
-   due to a registry error."
-1. **Fallback**: Attempt to use the local `firebase` command directly if the
-   user confirms it is installed globally (`npm install -g firebase-tools`).
+## 2. Core Client Integration Workflow
 
-### Handling Project Context Issues
+Every Android or iOS Remote Config integration must follow these five steps in
+order:
 
-If a command fails because "no active project is selected":
+1. **Add Dependencies**:
+   - **Android**: Query Google Maven (`dl.google.com/dl/android/maven2/`) for
+     the latest `firebase-bom` version and add
+     `com.google.firebase:firebase-config` and
+     `com.google.firebase:firebase-analytics` (never use deprecated `-ktx`
+     coordinate suffixes or `.ktx` package imports).
+   - **iOS**: Add `firebase-ios-sdk` via Swift Package Manager and link
+     `FirebaseRemoteConfig` and `FirebaseAnalytics`.
+2. **Obtain Singleton & Configure Fetch Settings**:
+   - Use a relaxed `minimumFetchIntervalInSeconds` (e.g., `3600` seconds / 1
+     hour in production; `0` only in local debug builds to avoid server
+     throttling).
+3. **Set In-App Defaults (`setDefaultsAsync` / `setDefaults`)**:
+   - **Android**: Define `<defaultsMap>` entries in
+     `app/src/main/res/xml/remote_config_defaults.xml` and call
+     `remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)`.
+   - **iOS**: Define keys in `RemoteConfigDefaults.plist` and call
+     `remoteConfig.setDefaults(fromPlist: "RemoteConfigDefaults")`.
+   - **Type Synchronization**: Ensure every key's in-app default format matches
+     the parameter's `valueType` (`BOOLEAN`, `NUMBER`, `STRING`, `JSON`)
+     and the typed getter used in code (`getBoolean`/`boolValue`,
+     `getLong`/`getDouble`/`numberValue`, `getString`/`stringValue`).
+   - **Flat Key Lookup**: Even if a parameter is organized inside a
+     `parameterGroup`, client SDKs **always** read it by its flat `<param_key>`
+     (e.g., `remoteConfig.getString("checkout_button_color")`), never prefixed
+     by the group name.
+4. **Fetch and Activate (`fetchAndActivate()`)**:
+   - Call `fetchAndActivate()` to retrieve the latest evaluated values from the
+     Remote Config backend and make them active in the current session.
+5. **Attach Real-Time Listeners (`addOnConfigUpdateListener`)**:
+   - Register a real-time config update listener and call `activate()` inside
+     `onUpdate` when changed keys (`configUpdate.updatedKeys`) affect active
+     screens. Remove the listener registration when the lifecycle scope ends
+     (except for application-scoped singletons).
 
-1. **Check login**: Run `npx -y firebase-tools@latest login:list`.
-1. **Prompt for ID**: If logged in but no project is active, ask the user:
-   "Please provide your Firebase Project ID to proceed."
-1. **Use Flag**: Append `--project <PROJECT_ID>` to every subsequent command.
+## 3. Recommended Client Loading Strategies
 
-## SDK Setup
-
-To learn how to set up Remote Config in your application code, choose your
-platform:
-
-- **Android**: [android_setup.md](references/android_setup.md)
-- **iOS**: [ios_setup.md](references/ios_setup.md)
-
-## Best Practices and Template Management
-
-Follow these guidelines and use the associated CLI tools to ensure efficient and
-safe use of Remote Config.
-
-### Fetching Strategies
-
-To optimize app performance and user experience, follow these recommended
-patterns (see
+Choose the loading strategy that matches your app's UX latency requirements (see
 [Loading Strategies](https://firebase.google.com/docs/remote-config/loading)):
 
-- **Load new values for next startup**: The most effective pattern is to
-  activate previously fetched values immediately on startup and fetch new values
-  in the background to be used next time. This minimizes user wait time.
-- **Real-time Updates**: Use the SDK's real-time listener to update the app
-  instantly without a refresh when server-side configuration changes.
-
-### Template Management via CLI
-
-Use the following commands to manage your Remote Config template and version
-history through the terminal:
-
-- **Get current template**: Save the remote template to a local JSON file for
-  auditing or modification.
-
-  ```bash
-  npx -y firebase-tools@latest remoteconfig:get -o remote_config.json
-  ```
-
-- **Autonomous Editing & Discovery** : Modify the local `remote_config.json`
-  directly. Determine the correct signal (e.g., device.country or percent) and
-  update the "conditions" array and "parameters" map accordingly.
-
-- **MANDATORY: User Review and Verification** : STOP and ask the user to verify
-  your changes before proceeding to deployment.
-
-  - Action: Inform the user: "I have prepared the changes in remote_config.json.
-    Please review the file for accuracy. Once you are satisfied, tell me to
-    'deploy' to make the changes live."
-
-- **Deployment Orchestration** : To push changes, you must ensure the
-  environment is configured for deployment.
-
-  - Config Mapping: If a firebase.json file is missing, create one to map the
-    local JSON to the Remote Config service:
-
-  ```json
-    { "remoteconfig": { "template": "remote_config.json" } }
-  ```
-
-  - Deploy: Execute the partial deployment command
-
-    ```bash
-    npx -y firebase-tools@latest deploy --only remoteconfig
-    ```
-
-- **Verification**: After deployment, verify the update by listing the version
-  history.
-
-  ```bash
-  npx -y firebase-tools@latest remoteconfig:versions:list
-  ```
-
-The SDK provides a number of features to make your application dynamic and
-responsive to user segments.
-
-- **Set In-App Defaults**: Define baseline values to ensure the app functions
-  offline or before the first fetch.
-- **Fetch and Activate**: Retrieve values from the Firebase backend and apply
-  them to the local UI/Logic.
-- **Template Management**: Use the Firebase CLI to version-control, get, and
-  deploy your config JSON files.
+- **Strategy 1: Fetch Now and Activate on Next Startup (Recommended Default)**:
+  Activate previously downloaded values immediately on launch so UI renders
+  without network delay, then trigger an asynchronous `fetch()` in the
+  background to cache fresh values for the next app session.
+- **Strategy 2: Fetch and Activate Behind a Loading Screen**:
+  If a screen depends on fresh server configuration before first render, call
+  `fetchAndActivate()` while showing a skeleton/splash state with a strict
+  timeout fallback to in-app defaults.
+- **Strategy 3: Real-Time Background Updates**:
+  Combine startup `fetchAndActivate()` with `addOnConfigUpdateListener` so
+  urgent feature-flag kill-switches propagate immediately while the app is in
+  the foreground.
+- **Anti-Patterns to Avoid**:
+  - Never block the main/UI thread waiting for a network fetch without in-app
+    defaults configured.
+  - Never ship production builds with `minimumFetchIntervalInSeconds = 0`
+    without real-time listeners, as rapid polling triggers client-side and
+    server-side throttling.
+  - Never mutate UI layout mid-interaction on a background `activate()` unless
+    the screen explicitly supports reactive state updates.
