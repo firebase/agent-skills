@@ -155,3 +155,56 @@ lifecycleScope.launch {
         }
 }
 ```
+
+______________________________________________________________________
+
+### 6. App Check (Debug Token Persistence)
+
+When running on emulators or during development with App Check, persist a stable
+debug token across emulator resets and fresh installs without hardcoding
+secrets:
+
+> [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Never hardcode
+> debug token strings in `build.gradle.kts` or Kotlin source files. Store the
+> token in gitignored `local.properties` and inject it dynamically.
+
+1. In gitignored `local.properties`:
+
+   ```properties
+   APP_CHECK_DEBUG_TOKEN=<YOUR_DEBUG_TOKEN>
+   ```
+
+1. In `app/build.gradle.kts`:
+
+   ```kotlin
+   val localProperties = java.util.Properties().apply {
+       val localPropertiesFile = rootProject.file("local.properties")
+       if (localPropertiesFile.exists()) {
+           load(localPropertiesFile.inputStream())
+       }
+   }
+   val appCheckDebugToken = localProperties.getProperty("APP_CHECK_DEBUG_TOKEN")
+       ?: System.getenv("APP_CHECK_DEBUG_TOKEN") ?: ""
+
+   android {
+       defaultConfig {
+           // For normal emulator runs (injects into AndroidManifest)
+           manifestPlaceholders["firebaseAppCheckDebugSecret"] = appCheckDebugToken
+
+           // For instrumentation tests
+           if (appCheckDebugToken.isNotEmpty()) {
+               testInstrumentationRunnerArguments["firebaseAppCheckDebugSecret"] = appCheckDebugToken
+           }
+       }
+   }
+   ```
+
+1. Initialize the debug provider in debug builds:
+
+   ```kotlin
+   if (BuildConfig.DEBUG) {
+       Firebase.appCheck.installAppCheckProviderFactory(
+           DebugAppCheckProviderFactory.getInstance()
+       )
+   }
+   ```

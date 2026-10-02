@@ -4,34 +4,34 @@ ______________________________________________________________________
 
 ## Prerequisites
 
-1.  **Firebase CLI**: Make sure the Firebase CLI is available and authenticated.
+1. **Firebase CLI**: Make sure the Firebase CLI is available and authenticated.
 
-    For detailed instructions about the Firebase CLI, see
-    `firebase_basics/references/local-env-setup`. Here are high-level
-    instructions for setting up the Firebase CLI.
+   For detailed instructions about the Firebase CLI, see
+   `firebase_basics/references/local-env-setup`. Here are high-level
+   instructions for setting up the Firebase CLI.
 
-    1.  Ensure the Firebase CLI is available:
+   1. Ensure the Firebase CLI is available:
+
+      ```bash
+      npx -y firebase-tools@latest --version
+      ```
+
+   1. Login to the CLI:
+
+      - local:
 
         ```bash
-        npx -y firebase-tools@latest --version
+        npx -y firebase-tools@latest login
         ```
 
-    2.  Login to the CLI:
+      - remote servers:
 
-        - local:
+        ```bash
+        npx -y firebase-tools@latest login --no-localhost
+        ```
 
-          ```bash
-          npx -y firebase-tools@latest login
-          ```
-
-        - remote servers:
-
-          ```bash
-          npx -y firebase-tools@latest login --no-localhost
-          ```
-
-2.  **Android project**: Create or use an existing Android project in an
-    Android-development IDE.
+1. **Android project**: Create or use an existing Android project in an
+   Android-development IDE.
 
 ______________________________________________________________________
 
@@ -63,19 +63,18 @@ ______________________________________________________________________
 
 ## 2. Create a new Firebase project or use an existing one
 
-Check if there's an existing Firebase Project available for use with the
-Android project:
+Check if there's an existing Firebase Project available for use with the Android
+project:
 
 ```bash
 npx -y firebase-tools@latest projects:list
 ```
 
-- **If existing Firebase Project:**
-  Ask the human user if they want to use the existing project.
+- **If existing Firebase Project:** Ask the human user if they want to use the
+  existing project.
 
 - **If no existing Firebase Project or human user does not want to use an
-  existing project:**
-  Create a new Firebase Project.
+  existing project:** Create a new Firebase Project.
 
   Provide a required unique PROJECT_ID and an optional PROJECT_DISPLAY_NAME:
 
@@ -114,25 +113,25 @@ ______________________________________________________________________
 
 ## 4. Obtain and save `google-services.json`
 
-1.  Fetch the Firebase configuration file (`google-services.json`) using the
-    Firebase Android APP_ID (which is printed in the output of the previous
-    `apps:create` command):
+1. Fetch the Firebase configuration file (`google-services.json`) using the
+   Firebase Android APP_ID (which is printed in the output of the previous
+   `apps:create` command):
 
-    ```bash
-    npx -y firebase-tools@latest apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>
-    ```
+   ```bash
+   npx -y firebase-tools@latest apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>
+   ```
 
-2.  Save the configuration file within the **module (app-level)** root directory
-    of the Android project: `app/google-services.json`
+1. Save the configuration file within the **module (app-level)** root directory
+   of the Android project: `app/google-services.json`
 
 ______________________________________________________________________
 
 ## 5. Add the `google-services` plugin
 
-> [!IMPORTANT] **[AGENT] RESOLVING THE PLUGIN VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date plugin version.
-> Before adding dependencies, you MUST query the latest available versions
-> directly from the Google Maven Repository:
+> [!IMPORTANT] **[AGENT] RESOLVING THE PLUGIN VERSION DETERMINISTICALLY** Never
+> guess or hardcode a memorized out-of-date plugin version. Before adding
+> dependencies, you MUST query the latest available versions directly from the
+> Google Maven Repository:
 >
 > ```bash
 > # Find the latest Google services Gradle plugin version
@@ -165,6 +164,71 @@ plugins {
     id("com.google.gms.google-services")
 }
 ```
+
+______________________________________________________________________
+
+## 6. App Check (Debug Token Persistence)
+
+When using App Check on Android emulators or local development,
+`DebugAppCheckProviderFactory.getInstance()` generates a UUID token and stores
+it in `SharedPreferences`. Wiping emulator data, clearing app storage, or fresh
+installs generate a new UUID in Logcat, causing debug token churn in the
+Firebase Console.
+
+> [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** App Check debug
+> tokens allow clients to bypass attestation and access backend resources
+> without a genuine device. **Never hardcode debug token strings in
+> build.gradle.kts, Java, or Kotlin files, and never commit tokens to version
+> control.** If a token is compromised, revoke it immediately in the Firebase
+> Console.
+
+To persist a stable debug token across emulator resets and testing without
+committing secrets:
+
+1. Obtain or generate a stable UUID debug token and register it in the Firebase
+   Console under **Security > App Check > Apps > Manage debug tokens**.
+
+1. Store the token in your project's gitignored `local.properties`:
+
+   ```properties
+   # In local.properties (ensure this file is in your .gitignore!)
+   APP_CHECK_DEBUG_TOKEN=<YOUR_DEBUG_TOKEN>
+   ```
+
+1. Inject the secret in `app/build.gradle.kts` for instrumentation/testing:
+
+   ```kotlin
+   val localProperties = java.util.Properties().apply {
+       val localPropertiesFile = rootProject.file("local.properties")
+       if (localPropertiesFile.exists()) {
+           load(localPropertiesFile.inputStream())
+       }
+   }
+   val appCheckDebugToken = localProperties.getProperty("APP_CHECK_DEBUG_TOKEN")
+       ?: System.getenv("APP_CHECK_DEBUG_TOKEN") ?: ""
+
+   android {
+       defaultConfig {
+           // For normal emulator runs (injects into AndroidManifest)
+           manifestPlaceholders["firebaseAppCheckDebugSecret"] = appCheckDebugToken
+
+           // For instrumentation tests
+           if (appCheckDebugToken.isNotEmpty()) {
+               testInstrumentationRunnerArguments["firebaseAppCheckDebugSecret"] = appCheckDebugToken
+           }
+       }
+   }
+   ```
+
+1. In your application or activity, install the debug provider for debug builds:
+
+   ```kotlin
+   if (BuildConfig.DEBUG) {
+       Firebase.appCheck.installAppCheckProviderFactory(
+           DebugAppCheckProviderFactory.getInstance()
+       )
+   }
+   ```
 
 ______________________________________________________________________
 
