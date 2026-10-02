@@ -47,7 +47,9 @@ Controls the resources allocated to the Cloud Run service that serves your app.
 
 ## `env` (Environment Variables)
 
-Defines environment variables available during build and/or runtime.
+Defines environment variables available during build and/or runtime (local
+`.env*` files are gitignored and not uploaded, so declare any required variables
+or secrets here).
 
 - `variable`: The name of the env var (e.g., `NEXT_PUBLIC_API_URL`).
 - `value`: A literal string value.

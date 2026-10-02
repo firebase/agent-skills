@@ -48,6 +48,8 @@ This is the recommended flow for most users.
        "ignore": [
          "node_modules",
          ".git",
+         ".next",
+         ".vercel",
          "firebase-debug.log",
          "firebase-debug.*.log",
          "functions"
@@ -58,9 +60,15 @@ This is the recommended flow for most users.
 1. Create or edit `apphosting.yaml`- see
    [Configuration](references/configuration.md) for more information on how to
    do so.
-1. If the app needs safe access to sensitive keys, use
-   `npx -y firebase-tools@latest apphosting:secrets` commands to set and grant
-   access to secrets.
+1. Ensure the backend exists (`npx -y firebase-tools@latest apphosting:backends:list`),
+   or create it in a region with available quota (`us-central1` or `us-east4`,
+   max 10 per region):
+   `npx -y firebase-tools@latest apphosting:backends:create --backend my-app-id --primary-region us-central1 --root-dir /`.
+1. If the app needs safe access to sensitive keys, set and grant access (*after*
+   the backend exists) via
+   `printf "%s" "<value>" | npx -y firebase-tools@latest apphosting:secrets:set <secret-name> --data-file - --force`
+   and
+   `npx -y firebase-tools@latest apphosting:secrets:grantaccess <secret-name> --backend my-app-id`.
 1. Run `npx -y firebase-tools@latest deploy` when you are ready to deploy.
 
 ### Automated deployment via GitHub (CI/CD)
