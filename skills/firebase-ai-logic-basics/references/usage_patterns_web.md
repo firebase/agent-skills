@@ -19,8 +19,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize the AI Logic service (defaults to Gemini Developer API)
-// To set the AI provider, set the backend as the second parameter
-const ai = getAI(app, { backend: new GoogleAIBackend() });
+// Pass useLimitedUseAppCheckTokens: true to enable replay protection:
+const ai = getAI(app, {
+  backend: new GoogleAIBackend(),
+  useLimitedUseAppCheckTokens: true,
+});
 
 const generationConfig = {
   candidateCount: 1,
@@ -35,6 +38,30 @@ const generationConfig = {
 // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
 const model = getGenerativeModel(ai, { model: "<latest_supported_model>",  generationConfig });
 ```
+
+### App Check Replay Protection
+
+Generative and preview models enforce replay protection with 5-minute
+limited-use App Check tokens. If you call a protected model without enabling
+limited-use tokens, the request fails with:
+
+```text
+HTTP 403: "To access this model, you must enforce Firebase App Check"
+```
+
+To resolve this error on Web, initialize `getAI` with
+`useLimitedUseAppCheckTokens: true`:
+
+```javascript
+const ai = getAI(app, {
+  backend: new GoogleAIBackend(),
+  useLimitedUseAppCheckTokens: true,
+});
+```
+
+This instructs the SDK to fetch fresh, short-lived limited-use tokens (such as
+via reCAPTCHA Enterprise or the debug provider) for requests rather than reusing
+standard cached App Check tokens.
 
 ## Core Capabilities
 

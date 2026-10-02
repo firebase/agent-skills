@@ -7,12 +7,39 @@ Ensure you have installed the `FirebaseAILogic` SDK via Swift Package Manager.
 ```swift
 import FirebaseAILogic
 
-// Initialize the Firebase AI service and the generative model.
-let ai = FirebaseAI.firebaseAI()
+// To enable replay protection for generative or preview models, pass
+// useLimitedUseAppCheckTokens: true with your backend:
+let ai = FirebaseAI.firebaseAI(
+    backend: .googleAI(),
+    useLimitedUseAppCheckTokens: true
+)
 
 // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
 let model = ai.generativeModel(modelName: "<latest_supported_model>")
 ```
+
+### App Check Replay Protection
+
+Generative and preview models enforce replay protection with 5-minute
+limited-use App Check tokens. If you call a protected model without enabling
+limited-use tokens, the request fails with:
+
+```text
+HTTP 403: "To access this model, you must enforce Firebase App Check"
+```
+
+To resolve this error, initialize `FirebaseAI` with
+`useLimitedUseAppCheckTokens: true`:
+
+```swift
+let ai = FirebaseAI.firebaseAI(
+    backend: .googleAI(),
+    useLimitedUseAppCheckTokens: true
+)
+```
+
+This ensures the SDK fetches a fresh, short-lived limited-use token for each
+request rather than reusing a standard cached App Check token.
 
 ## 2. SwiftUI Integration (Best Practices)
 
@@ -33,7 +60,10 @@ import FirebaseAILogic
 @Observable
 final class AIViewModel {
     // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-    private lazy var model = FirebaseAI.firebaseAI().generativeModel(modelName: "<latest_supported_model>")
+    private lazy var model = FirebaseAI.firebaseAI(
+        backend: .googleAI(),
+        useLimitedUseAppCheckTokens: true
+    ).generativeModel(modelName: "<latest_supported_model>")
     
     var responseText: String = ""
     var isFetching: Bool = false
