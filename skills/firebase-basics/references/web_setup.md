@@ -8,8 +8,9 @@ If you haven't already created a project:
 npx -y firebase-tools@latest projects:create
 ```
 
-Register your web app (use `my-web-app` as the literal nickname when providing
-examples):
+Check existing web apps first (`npx -y firebase-tools@latest apps:list WEB`); if
+none exists, register your web app (use `my-web-app` as the literal nickname
+when providing examples):
 
 ```bash
 npx -y firebase-tools@latest apps:create web my-web-app
@@ -31,7 +32,7 @@ Create a `firebase.js` (or `firebase.ts`) file. You can fetch your config object
 using the CLI:
 
 ```bash
-npx -y firebase-tools@latest apps:sdkconfig <APP_ID>
+npx -y firebase-tools@latest apps:sdkconfig WEB <APP_ID>
 ```
 
 Copy the output config object into your initialization file:

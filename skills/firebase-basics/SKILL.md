@@ -39,9 +39,10 @@ Complete these setup steps before proceeding:
        [references/setup/other_agents.md](references/setup/other_agents.md)
 
 1. **Authentication:** Ensure you are logged in to Firebase so that commands
-   have the correct permissions. Run `npx -y firebase-tools@latest login`. For
-   environments without a browser (e.g., remote shells), use
-   `npx -y firebase-tools@latest login --no-localhost`.
+   have the correct permissions. Run `npx -y firebase-tools@latest login:list`
+   first; only if not logged in, run `npx -y firebase-tools@latest login` (or
+   `npx -y firebase-tools@latest login --no-localhost` in environments without a
+   browser).
 
    - The command should output the current user.
    - If you are not logged in, follow the interactive instructions from this
@@ -50,14 +51,15 @@ Complete these setup steps before proceeding:
 1. **Active Project:** Most Firebase tasks require an active project context.
 
    > [!IMPORTANT] **For Agents:** Before proceeding with project configuration,
-   > you MUST pause and ask the developer if they prefer to:
+   > if no Project ID was provided, you MUST pause and ask the developer if they
+   > prefer to:
    >
    > 1. **Provide an existing Firebase Project ID**, or
    > 1. **Create a new Firebase project**.
 
    - **If using an existing Project ID:**
 
-     1. Check the current project by running `npx -y firebase-tools@latest use`.
+     1. Ensure `firebase.json` exists (`[ -f firebase.json ] || echo "{}" > firebase.json`), then check the current project by running `npx -y firebase-tools@latest use`.
      1. If the command outputs `Active Project: <project-id>`, confirm with the
         user if this is the intended project.
      1. If not, or if no project is active, set the project provided by the
