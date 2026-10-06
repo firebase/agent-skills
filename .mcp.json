@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "firebase-tools@latest",
+        "firebase-tools@0.3.0",
         "mcp",
         "--dir",
         "."
