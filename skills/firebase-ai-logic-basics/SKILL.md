@@ -1,6 +1,6 @@
 ---
 name: firebase-ai-logic-basics
-description: Official skill for integrating Firebase AI Logic (Gemini API) into web applications. Covers setup, multimodal inference, structured output, and security.
+description: Official skill for integrating Firebase AI Logic (Gemini API) into Android applications. Covers setup, multimodal inference, structured output, and security.
 version: 1.0.1
 metadata:
   author: Google LLC
@@ -50,6 +50,10 @@ More info in [Firebase AI Logic Getting Started](https://firebase.google.com/doc
 
 ## Core Capabilities
 
+> [!WARNING]
+> **CRITICAL: Use current model names:**
+> Always check the [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt) for the currently supported model names. Do NOT use `gemini-2.0-pro` or `gemini-2.0-flash` or other older models that are shutdown.
+
 ### Text-Only Generation
 
 ### Multimodal (Text + Images/Audio/Video/PDF input)
@@ -66,7 +70,10 @@ To improve the user experience by showing partial results as they arrive (like a
 
 ### Generate Images with Nano Banana
 
-- Start with Gemini for most use cases, and choose Imagen for specialized tasks where image quality and specific styles are critical. (Example: gemini-2.5-flash-image)
+> [!WARNING]
+> **Use current Image model names:**
+> Always check the [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt) for the currently supported image generation (Nano Banana) model names.
+
 - Requires an upgraded Blaze pay-as-you-go billing plan.
 
 ### Search Grounding with the built in googleSearch tool
@@ -92,30 +99,25 @@ Hybrid on-device inference for web apps, where the Firebase Javascript SDK autom
 > [!WARNING]
 > **Critical Safety Requirement:** In order to use AI Logic safely, you MUST set up App Check on your app. This prevents unauthorized clients from using your API quota and accessing your backend resources.
 
-See  for setup instructions.
-
 ### Remote Config
 
-Consider that you do not need to hardcode model names (e.g., `gemini-flash-lite-latest`). Use Firebase Remote Config to update model versions dynamically without deploying new client code.  See [Changing model names remotely](https://firebase.google.com/docs/ai-logic/change-model-name-remotely.md.txt) 
-
+Consider that you do not need to hardcode model names (e.g., a specific model version string). Use Firebase Remote Config to update model versions dynamically without deploying new client code.  See [Changing model names remotely](https://firebase.google.com/docs/ai-logic/change-model-name-remotely.md.txt) 
 
 > [!WARNING]
 > **CRITICAL: Backend Provisioning Required**
 > For all platforms (Flutter, Android, iOS, Web), you MUST run `npx firebase-tools init ailogic` to provision the service. `flutterfire configure` ONLY handles client configuration and does NOT enable the AI service, leading to `PERMISSION_DENIED` errors.
+
 ## Initialization Code References
 
 | Language, Framework, Platform | Gemini API provider | Context URL |
-| :---- | :---- | :---- |
-| Web Modular API | Gemini Developer API (Developer API) | firebase://docs/ai-logic/get-started  |
-| iOS (Swift) | Gemini Developer API |  |
-| Flutter (Dart) | Gemini Developer API |  |
+| :--- | :--- | :--- |
+| Android (Kotlin) | Gemini Developer API | [usage_patterns_android.md](references/usage_patterns_android.md) |
 
-**Always use the most recent version of Gemini (gemini-flash-latest) unless another model is requested by the docs or the user. DO NOT USE gemini-1.5-flash. **
+> [!WARNING]
+> **CRITICAL: Use current model names:**
+> Always check the [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt) for the currently supported model names. Do NOT use `gemini-2.0-pro` or `gemini-2.0-flash` or other older models that are shutdown.
 
 ## References
-
-
-
 
 
 
