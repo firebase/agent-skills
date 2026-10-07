@@ -84,7 +84,11 @@ function mergeMetadataBlocks(mainMetadataBlock, targetMetadataBlock) {
 
   const mainSub = parseSubKeys(mainMetadataBlock);
   const targetSub = parseSubKeys(targetMetadataBlock);
-  const merged = new Map([...targetSub, ...mainSub]);
+  const merged = new Map();
+  for (const [k, v] of mainSub.entries()) merged.set(k, v);
+  for (const [k, v] of targetSub.entries()) {
+    if (!merged.has(k)) merged.set(k, v);
+  }
 
   return ['metadata:', ...merged.values()].join('\n');
 }
@@ -220,11 +224,109 @@ function didProseOrDescriptionChange(repoRoot, beforeSha, skillMdRepoPath, mainC
   }
 }
 
+/**
+ * Local Android Studio SKILL.md adapter (authored via Jetski so local runs
+ * do not require an external GEMINI_API_KEY HTTP call).
+ */
+function adaptSkillMdLocally(skillName, mainSkillMd) {
+  let out = mainSkillMd;
+
+  if (skillName === 'firebase-remote-config-basics') {
+    out = out.replace(/\(Android,\s*iOS\)/g, '(Android)');
+    out = out.replace(/^[ \t]*[*-][ \t]+\*\*iOS\*\*:[ \t]*\[ios_setup\.md\]\(references\/ios_setup\.md\)\r?\n?/gm, '');
+  } else if (skillName === 'firebase-auth-basics') {
+    out = out.replace(/\*\*Web\*\*[\s\n]+See \[references\/client_sdk_web\.md\]\(references\/client_sdk_web\.md\)\.\r?\n\r?\n?/g, '');
+    out = out.replace(/\*\*Flutter\*\*[\s\n]+See \[references\/flutter_setup\.md\]\(references\/flutter_setup\.md\)\.\r?\n\r?\n?/g, '');
+    out = out.replace(/\*\*iOS \(Swift\)\*\*[\s\n]+See \[references\/ios_setup\.md\]\(references\/ios_setup\.md\)\.\r?\n\r?\n?/g, '');
+  } else if (skillName === 'firebase-basics') {
+    out = out.replace(/`google-services\.json`,\s*`GoogleService-Info\.plist`/g, '`google-services.json`');
+    out = out.replace(/[\s\n]+or[\s\n]+`GoogleService-Info\.plist`/g, '');
+    out = out.replace(/When setting up[\s\n]+iOS[\s\n]+or[\s\n]+Android[\s\n]+apps/g, 'When setting up Android apps');
+    out = out.replace(
+      /^[ \t]*[-*1.]+[ \t]+For iOS:[ \t\r\n]+`npx -y firebase-tools@latest apps:sdkconfig IOS <APP_ID> --project <PROJECT_ID>`\r?\n/gm,
+      ''
+    );
+    out = out.replace(
+      /,[\s\n]+or[\s\n]+a[\s\n]+path[\s\n]+to[\s\n]+be[\s\n]+linked[\s\n]+by[\s\n]+`xcode-project-setup`[\s\n]+for[\s\n]+iOS/g,
+      ''
+    );
+    out = out.replace(/^[ \t]*[-*][ \t]+\*\*Web\*\*:[ \t]*See \[references\/web_setup\.md\]\(references\/web_setup\.md\)\r?\n/gm, '');
+    out = out.replace(/^[ \t]*[-*][ \t]+\*\*iOS\*\*:[ \t]*See \[references\/ios_setup\.md\]\(references\/ios_setup\.md\)\r?\n/gm, '');
+    out = out.replace(/^[ \t]*[-*][ \t]+\*\*Flutter\*\*:[ \t]*See \[references\/flutter_setup\.md\]\(references\/flutter_setup\.md\)\r?\n/gm, '');
+  } else if (skillName === 'firebase-crashlytics') {
+    out = out.replace(/^[ \t]*[*-][ \t]+\*\*iOS\*\*:[ \t]*\[ios_setup\.md\]\(references\/ios_setup\.md\)\r?\n/gm, '');
+    out = out.replace(/^[ \t]*[*-][ \t]+\*\*iOS\*\*:[ \t]*\[Customize Crash Reports for Apple Platforms\]\([^)]+\)\r?\n/gm, '');
+  } else if (skillName === 'firebase-data-connect-basics') {
+    out = out.replace(
+      /  javascriptSdk:\r?\n    outputDir: "\.\.\/web-app\/src\/lib\/dataconnect"\r?\n    package: "@movie-app\/dataconnect"\r?\n/g,
+      ''
+    );
+    out = out.replace(
+      /  swiftSdk:\r?\n    outputDir: "\.\.\/ios-app\/DataConnect"(?:\r?\n    package: "DataConnectGenerated")?\r?\n/g,
+      ''
+    );
+    out = out.replace(/^[ \t]*[*-][ \t]+\*\*Web \(TypeScript\)\*\*:[ \t]*\[reference\/sdk_web\.md\]\(reference\/sdk_web\.md\)\r?\n/gm, '');
+    out = out.replace(/^[ \t]*[*-][ \t]+\*\*iOS \(Swift\)\*\*:[ \t]*\[reference\/sdk_ios\.md\]\(reference\/sdk_ios\.md\)\r?\n/gm, '');
+    out = out.replace(/^[ \t]*[*-][ \t]+\*\*Flutter \(Dart\)\*\*:[ \t]*\[reference\/sdk_flutter\.md\]\(reference\/sdk_flutter\.md\)\r?\n/gm, '');
+  } else if (skillName === 'firebase-firestore') {
+    out = out.replace(/\(Web,\s*Python,\s*iOS,\s*Android,\s*Flutter\)/g, '(Android, Python)');
+    out = out.replace(
+      /Read \[web_sdk_usage\.md\]\(references\/standard\/web_sdk_usage\.md\),[\s\n]+\[android_sdk_usage\.md\]\(references\/standard\/android_sdk_usage\.md\),[\s\n]+\[ios_setup\.md\]\(references\/standard\/ios_setup\.md\),[\s\n]+or[\s\n]+\[flutter_setup\.md\]\(references\/standard\/flutter_setup\.md\)/g,
+      'Read [android_sdk_usage.md](references/standard/android_sdk_usage.md)'
+    );
+    out = out.replace(
+      /Read \[web_sdk_usage\.md\]\(references\/enterprise\/web_sdk_usage\.md\),[\s\n]+\[python_sdk_usage\.md\]\(references\/enterprise\/python_sdk_usage\.md\),[\s\n]+\[android_sdk_usage\.md\]\(references\/enterprise\/android_sdk_usage\.md\),[\s\n]+\[ios_setup\.md\]\(references\/enterprise\/ios_setup\.md\),[\s\n]+or[\s\n]+\[flutter_setup\.md\]\(references\/enterprise\/flutter_setup\.md\)/g,
+      'Read [python_sdk_usage.md](references/enterprise/python_sdk_usage.md) or [android_sdk_usage.md](references/enterprise/android_sdk_usage.md)'
+    );
+  } else if (skillName === 'firebase-ai-logic-basics') {
+    out = out.replace(/into web applications/g, 'into Android applications');
+    out = out.replace(
+      /The library is part of the standard Firebase Web SDK\.\r?\n\r?\n`npm install firebase@latest`\r?\n\r?\n/g,
+      ''
+    );
+    out = out.replace(
+      /See[\s\n]+\[App Check with reCAPTCHA Enterprise\]\(https:\/\/firebase\.google\.com\/docs\/app-check\/web\/recaptcha-enterprise-provider\.md\.txt\)[\s\n]+for setup instructions\.\r?\n\r?\n/g,
+      ''
+    );
+    out = out.replace(
+      /^[ \t]*[*-][ \t]+\*\*Web\*\*:[ \t]*Set `self\.FIREBASE_APPCHECK_DEBUG_TOKEN = true;` before[\s\n]+initializing App Check\.\r?\n/gm,
+      ''
+    );
+    out = out.replace(
+      /^[ \t]*[*-][ \t]+\*\*iOS\*\*:[ \t]*Set provider factory to `AppCheckDebugProviderFactory\(\)`\.\r?\n/gm,
+      ''
+    );
+    // Replace Initialization Code References table or list with Android-only entry
+    out = out.replace(
+      /\| Language,[\s\S]*?\[flutter_setup\.md\]\(references\/flutter_setup\.md\)\s*\|\r?\n(?::[^\n]*\r?\n)*/g,
+      '| Language, Framework, Platform | Gemini API provider | Context URL |\n| :--- | :--- | :--- |\n| Android (Kotlin) | Gemini Developer API | [usage_patterns_android.md](references/usage_patterns_android.md) |\n'
+    );
+    out = out.replace(
+      /-[ \t]+\*\*Web Modular API\*\*[\s\n]+-[ \t]+Provider: Gemini Developer API[\s\n]+-[ \t]+Reference: \[usage_patterns_web\.md\]\(references\/usage_patterns_web\.md\)\r?\n/g,
+      ''
+    );
+    out = out.replace(
+      /-[ \t]+\*\*iOS \(Swift\)\*\*[\s\n]+-[ \t]+Provider: Gemini Developer API[\s\n]+-[ \t]+Reference: \[ios_setup\.md\]\(references\/ios_setup\.md\)\r?\n/g,
+      ''
+    );
+    out = out.replace(
+      /-[ \t]+\*\*Flutter \(Dart\)\*\*[\s\n]+-[ \t]+Provider: Gemini Developer API[\s\n]+-[ \t]+Reference: \[flutter_setup\.md\]\(references\/flutter_setup\.md\)\r?\n/g,
+      ''
+    );
+    out = out.replace(/\[Web SDK code examples and usage patterns\]\(references\/usage_patterns_web\.md\)\r?\n/g, '');
+    out = out.replace(/\[iOS SDK code examples and usage patterns\]\(references\/ios_setup\.md\)\r?\n/g, '');
+    out = out.replace(/\[Flutter SDK code examples and usage patterns\]\(references\/flutter_setup\.md\)\r?\n/g, '');
+  }
+
+  return stripExcludedLocalLinks(out);
+}
+
 async function main() {
   const args = process.argv.slice(2);
   let sourceDir = path.resolve(__dirname, '../skills');
   let targetDir = path.resolve(__dirname, '../android-skills');
   let fullResync = false;
+  let localMode = false;
   let changedFilesArg = '';
   let beforeSha = '';
 
@@ -235,6 +337,8 @@ async function main() {
       targetDir = path.resolve(args[++i]);
     } else if (args[i] === '--full') {
       fullResync = true;
+    } else if (args[i] === '--local') {
+      localMode = true;
     } else if (args[i] === '--changed-files') {
       changedFilesArg = args[++i] || '';
     } else if (args[i] === '--before-sha') {
@@ -363,16 +467,35 @@ async function main() {
       continue;
     }
 
-    console.log(`[Category 3] Adapting ${skill}/SKILL.md with Gemini...`);
-    const model = await getGeminiModel();
-    const adaptedSkillMd = await rewriteSkillMdWithLLM({
-      skillName: skill,
-      mainSkillMd,
-      existingTargetSkillMd,
-      survivingFiles,
-      model,
-    });
-    fs.writeFileSync(destSkillMdPath, adaptedSkillMd, 'utf8');
+    if (localMode) {
+      console.log(`[Category 3] Adapting ${skill}/SKILL.md locally...`);
+      let adaptedSkillMd = adaptSkillMdLocally(skill, mainSkillMd);
+      if (existingTargetSkillMd) {
+        const adaptedParts = splitFrontmatter(adaptedSkillMd);
+        const existingParts = splitFrontmatter(existingTargetSkillMd);
+        const adaptedBlocks = parseFrontmatterBlocks(adaptedParts.rawFrontmatter);
+        const existingBlocks = parseFrontmatterBlocks(existingParts.rawFrontmatter);
+        if (existingBlocks.has('metadata')) {
+          adaptedBlocks.set(
+            'metadata',
+            mergeMetadataBlocks(adaptedBlocks.get('metadata'), existingBlocks.get('metadata'))
+          );
+          adaptedSkillMd = `---\n${Array.from(adaptedBlocks.values()).join('\n')}\n---\n${adaptedParts.body}`;
+        }
+      }
+      fs.writeFileSync(destSkillMdPath, adaptedSkillMd, 'utf8');
+    } else {
+      console.log(`[Category 3] Adapting ${skill}/SKILL.md with Gemini...`);
+      const model = await getGeminiModel();
+      const adaptedSkillMd = await rewriteSkillMdWithLLM({
+        skillName: skill,
+        mainSkillMd,
+        existingTargetSkillMd,
+        survivingFiles,
+        model,
+      });
+      fs.writeFileSync(destSkillMdPath, adaptedSkillMd, 'utf8');
+    }
   }
 
   console.log('Sync complete!');
