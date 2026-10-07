@@ -5,6 +5,7 @@ description: >-
 metadata:
   author: Google LLC
   category: CloudInfrastructureAndServices
+  version: "1.0.0"
 ---
 
 # Prerequisites
