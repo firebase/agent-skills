@@ -17,6 +17,7 @@ Firebase SQL Connect is a relational database service using Cloud SQL for Postgr
 ```text
 dataconnect/
 ├── dataconnect.yaml      # Service configuration
+├── seed_data.gql         # LOCAL ONLY — prototype/test data
 ├── schema/
 │   └── schema.gql        # Data model (types with @table)
 └── connector/
@@ -94,6 +95,8 @@ For platform-specific instructions on how to use the generated SDKs, read:
 *   **Android (Kotlin)**: [reference/sdk_android.md](reference/sdk_android.md)
 *   **Admin (Node.js)**: [reference/sdk_admin_node.md](reference/sdk_admin_node.md)
 
+
+
 ---
 
 ## Feature Capability Map
@@ -103,13 +106,15 @@ If you need to implement a specific feature, consult the mapped reference file:
 | Feature | Reference File | Key Concepts |
 | :--- | :--- | :--- |
 | **Data Modeling** | [reference/schema.md](reference/schema.md) | `@table`, `@unique`, `@index`, Relations |
-| **Vector Search** | [reference/advanced.md](reference/advanced.md) | `Vector`, `@col(dataType: "vector")` |
-| **Full-Text Search** | [reference/advanced.md](reference/advanced.md) | `@searchable` |
+| **Vector Search** | [reference/search.md](reference/search.md) | `Vector`, `@col(dataType: "vector")`, embeddings |
+| **Full-Text Search** | [reference/search.md](reference/search.md) | `@searchable`, `movies_search` |
 | **Upserting Data** | [reference/operations.md](reference/operations.md) | `_upsert` mutations |
 | **Complex Filters** | [reference/operations.md](reference/operations.md) | `_or`, `_and`, `_not`, `eq`, `contains` |
 | **Transactions** | [reference/operations.md](reference/operations.md) | `@transaction`, `response` binding |
 | **Environment Config** | [reference/config.md](reference/config.md) | `dataconnect.yaml`, `connector.yaml` |
 | **Realtime Subscriptions** | [reference/realtime.md](reference/realtime.md) | `@refresh`, `subscribe()`, auto-refresh |
+| **Cloud Functions Integration** | [reference/cloud_functions.md](reference/cloud_functions.md) | `onMutationExecuted`, triggering events |
+| **Data Seeding & Migrations** | [reference/data_seeding.md](reference/data_seeding.md) | `seed_data.gql`, `_insertMany`, Admin SDK bulk |
 | **Starter Templates** | [templates.md](templates.md) | CRUD, user-owned resources, many-to-many, SDK init |
 
 ---
@@ -130,9 +135,10 @@ Follow these patterns based on your current task:
 
 1.  Start the emulator: `npx -y firebase-tools@latest emulators:start --only dataconnect`.
 2.  Write schema and operations.
-3.  Run `npx -y firebase-tools@latest dataconnect:compile` or `npx -y firebase-tools@latest dataconnect:sdk:generate` to
+3.  Seed local test data into `seed_data.gql`. Read [reference/data_seeding.md](reference/data_seeding.md#local-prototyping-data-seeding).
+4.  Run `npx -y firebase-tools@latest dataconnect:compile` or `npx -y firebase-tools@latest dataconnect:sdk:generate` to
     validate them.
-4.  Use the operations in your app and build it.
+5.  Use the operations in your app and build it.
 
 ### How to deploy SQL Connect to Cloud SQL
 
