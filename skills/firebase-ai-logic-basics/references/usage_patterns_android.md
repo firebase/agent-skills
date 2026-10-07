@@ -1,21 +1,24 @@
 # Firebase AI Logic on Android (Kotlin)
 
-First, ensure you have initialized the Firebase App (see `firebase-basics` skill). Then, initialize
-the AI Logic service as below
+First, ensure you have initialized the Firebase App (see `firebase-basics`
+skill). Then, initialize the AI Logic service as below
+
 ### 0. Enable Firebase AI Logic via CLI
 
-Before adding dependencies in your app, make sure you enable the AI Logic service in your Firebase Project using the Firebase CLI:
+Before adding dependencies in your app, make sure you enable the AI Logic
+service in your Firebase Project using the Firebase CLI:
 
 ```bash
 npx -y firebase-tools@latest init
 # When prompted, select 'AI logic' to enable the Gemini API in your project.
 ```
 
- ---
+______________________________________________________________________
 
 ### 1. Add Dependencies
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add the dependency for Firebase AI:
+In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
+the dependency for Firebase AI:
 
 ```kotlin
 dependencies {
@@ -27,16 +30,17 @@ dependencies {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 2. Initialize and Generate Content
 
-In your Activity or Fragment, initialize the `FirebaseAI` service and generate content using a Gemini model:
+In your Activity or Fragment, initialize the `FirebaseAI` service and generate
+content using a Gemini model:
 
 ```kotlin
 import com.google.firebase.ai.FirebaseAI
-import com.google.firebase.ai.ktx.ai
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,8 +51,8 @@ class MainActivity : AppCompatActivity() {
         // Initialize Firebase AI
         val ai = Firebase.ai
 
-        // Use a model (e.g., gemini-2.5-flash-lite)
-        val model = ai.generativeModel("gemini-2.5-flash-lite")
+        // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+        val model = ai.generativeModel("<latest_supported_model>")
 
         // Generate content
         lifecycleScope.launch {
@@ -82,7 +86,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val ai = Firebase.ai
-        val model = ai.generativeModel("gemini-2.5-flash-lite")
+        // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+        val model = ai.generativeModel("<latest_supported_model>")
         
         lifecycleScope.launch {
             val response = model.generateContent("Hello Gemini!")
@@ -96,7 +101,7 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 3. Multimodal Input (Text and Images)
 
@@ -107,16 +112,16 @@ val image1: Bitmap = ... // Load your bitmap
 val image2: Bitmap = ...
 
 val response = model.generateContent(
-    content("Analyze these images for me") {
+    content {
         image(image1)
         image(image2)
-        text("Compare these two items.")
+        text("Analyze these images for me. Compare these two items.")
     }
 )
 Log.d(TAG, response.text)
 ```
 
----
+______________________________________________________________________
 
 ### 4. Chat Session (Multi-turn)
 
@@ -125,7 +130,7 @@ Maintain chat history automatically:
 ```kotlin
 val chat = model.startChat(
     history = listOf(
-        content("user") { text("Hello, I am a software engineer.") }
+        content("user") { text("Hello, I am a software engineer.") },
         content("model") { text("Hello! How can I help you today?") }
     )
 )
@@ -136,7 +141,7 @@ lifecycleScope.launch {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 5. Streaming Responses
 

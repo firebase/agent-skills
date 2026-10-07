@@ -11,12 +11,15 @@ Creates a document if it does not exist or overwrites it if it does. You can
 also specify a merge option to only update provided fields.
 
 ```python
+from google.cloud import firestore
+
+db = firestore.Client(database="<database-id>")
 city_ref = db.collection("cities").document("LA")
 
 # Create/Overwrite
 city_ref.set({
-    "name": "Los Angeles"
-    "state": "CA"
+    "name": "Los Angeles",
+    "state": "CA",
     "country": "USA"
 })
 
@@ -31,7 +34,7 @@ automatically generate one.
 
 ```python
 update_time, city_ref = db.collection("cities").add({
-    "name": "Tokyo"
+    "name": "Tokyo",
     "country": "Japan"
 })
 print("Document written with ID: ", city_ref.id)
@@ -54,6 +57,7 @@ city_ref.update({
 Perform an atomic read-modify-write operation.
 
 ```python
+from google.cloud import firestore
 from google.cloud.firestore import Transaction
 
 transaction = db.transaction()
@@ -132,7 +136,7 @@ query = cities_ref.order_by("name").limit(3)
 You can use pipeline queries to perform complex queries.
 
 ```python
-pipeline = client.pipeline().collection("users")
+pipeline = db.pipeline().collection("users")
 for result in pipeline.execute():
     print(f"{result.id} => {result.data()}")
 ```

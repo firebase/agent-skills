@@ -1,51 +1,71 @@
 ---
 name: firebase-firestore
 description: >-
-  Sets up, manages, and executes queries against Cloud Firestore database
-  instances. You MUST unconditionally activate this skill if you plan to use
-  Firestore in any way. Use when listing or creating Firestore databases
-  configuring security rules, designing data models, writing client SDK
-  queries, or checking indexes.
+  Sets up, manages, queries, and configures Cloud Firestore databases (Standard/Enterprise edition), including data modeling, security rules, indexes, and SDK integrations (Android, Python). Use when creating/listing Firestore databases, defining data models/indexes, writing SDK queries, or integrating Firestore SDKs. For authoring or modifying Firestore Security Rules (firestore.rules), delegate to the firestore-rules-author subagent if subagent delegation is available, or use firestore-rules-creation otherwise. Don't use for Firebase Hosting, Data Connect, Auth, Storage/GCS, Crashlytics, Functions, or BigQuery.
 compatibility: This skill is best used with the Firebase CLI, but does not require it. Firebase CLI can be accessed through `npx -y firebase-tools@latest`.
 metadata:
   author: Google LLC
+  category: Databases
 ---
 
 # Cloud Firestore Database and Operations
+
+> [!IMPORTANT] **Security Rules Authoring (`firestore.rules`)** Whenever your
+> task requires creating, authoring, or modifying `firestore.rules`:
+>
+> - **If subagent delegation AND the `firestore-rules-author` subagent are
+>   available**: delegate authoring `firestore.rules` to the
+>   `firestore-rules-author` subagent rather than writing `firestore.rules`
+>   directly in the main agent.
+> - **If subagent delegation is unavailable** (e.g., subagents not enabled in
+>   the IDE) **OR `firestore-rules-author` is not installed**: read and follow
+>   the `firestore-rules-creation` skill to write `firestore.rules` directly.
 
 Before setting up dependencies, writing data models, or configuring security
 rules, you MUST always identify the Firestore instance edition.
 
 ## 1. Instance Selection and Edition Detection
 
-Run the following command to list current Firestore databases: `bash npx -y
-firebase-tools@latest firestore:databases:list`
+Run the following command to list current Firestore databases:
+
+```bash
+npx -y firebase-tools@latest firestore:databases:list
+```
 
 ### A. Instance Found
 
-1.  For each database found, inspect its edition and details: `bash npx -y
-    firebase-tools@latest firestore:databases:get <database-id>`
-2.  Ask the user which database instance they wish to target or if they would
-    prefer to create a new instance.
-3.  Once the target instance is established:
-    -   If the **`edition`** is `STANDARD`, follow the guides under
-        `references/standard/`.
-    -   If the **`edition`** is `ENTERPRISE` or native mode, follow the guides
-        under `references/enterprise/`.
+1. For each database found, inspect its edition and details:
+
+   ```bash
+   npx -y firebase-tools@latest firestore:databases:get <database-id>
+   ```
+
+1. Ask the user which database instance they wish to target or if they would
+   prefer to create a new instance.
+
+1. Once the target instance is established:
+
+   - If the **`edition`** is `STANDARD`, follow the guides under
+     `references/standard/`.
+   - If the **`edition`** is `ENTERPRISE` or native mode, follow the guides
+     under `references/enterprise/`.
 
 ### B. No Instance Found (or New Requested)
 
-If no databases exist or the user requests a new one, default to provisioning an **Enterprise** edition database
-and ask the user what location to use.
-Run `npx -y firebase-tools@latest firestore:locations` to get the list of options.
+If no databases exist or the user requests a new one, default to provisioning an
+**Enterprise** edition database and ask the user what location to use. Run
+`npx -y firebase-tools@latest firestore:locations` to get the list of options.
 Suggest colocating with other resources if applicable.
 
 Once the location is determined, create the database:
-`bash npx -y firebase-tools@latest firestore:databases:create <database-id> --edition="enterprise" --location="<selected-location>"`
+
+```bash
+npx -y firebase-tools@latest firestore:databases:create <database-id> --edition="enterprise" --location="<selected-location>"
+```
 
 Proceed with using the guides under `references/enterprise/`.
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 2. Specialized Guides
 
@@ -54,15 +74,30 @@ corresponding reference guides:
 
 ### Standard Edition (`references/standard/`)
 
--   **Provisioning**: Read [provisioning.md](references/standard/provisioning.md)
--   **Security Rules**: Read [security_rules.md](references/standard/security_rules.md)
--   **SDK Usage**: Read [android_sdk_usage.md](references/standard/android_sdk_usage.md)
--   **Indexes**: Read [indexes.md](references/standard/indexes.md)
+- **Provisioning**: Read [provisioning.md](references/standard/provisioning.md)
+- **Security Rules**: See the `firestore-rules-creation` skill
+- **SDK Usage**: Read
+  [android_sdk_usage.md](references/standard/android_sdk_usage.md)
+- **Indexes**: Read [indexes.md](references/standard/indexes.md)
 
 ### Enterprise Edition / Native Mode (`references/enterprise/`)
 
--   **Provisioning**: Read [provisioning.md](references/enterprise/provisioning.md)
--   **Data Model**: Read [data_model.md](references/enterprise/data_model.md)
--   **Security Rules**: Read [security_rules.md](references/enterprise/security_rules.md)
--   **SDK Usage**: Read [python_sdk_usage.md](references/enterprise/python_sdk_usage.md), [android_sdk_usage.md](references/enterprise/android_sdk_usage.md)
--   **Indexes**: Read [indexes.md](references/enterprise/indexes.md)
+- **Provisioning**: Read
+  [provisioning.md](references/enterprise/provisioning.md)
+
+- **Data Model**: Read [data_model.md](references/enterprise/data_model.md)
+
+- **Security Rules**: See the `firestore-rules-creation` skill
+
+- **SDK Usage**:
+
+  > [!CRITICAL] **Mandatory Reference Reading** Before writing or modifying any
+  > application code for Firestore Enterprise Edition, you **MUST** read at
+  > least one of the relevant reference documents below for the target
+  > platform/language to understand specific architectural requirements and
+  > pipeline initialization patterns.
+
+  Read [python_sdk_usage.md](references/enterprise/python_sdk_usage.md) or
+  [android_sdk_usage.md](references/enterprise/android_sdk_usage.md)
+
+- **Indexes**: Read [indexes.md](references/enterprise/indexes.md)

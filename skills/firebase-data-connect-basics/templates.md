@@ -2,7 +2,7 @@
 
 Ready-to-use templates for common Firebase SQL Connect patterns.
 
----
+______________________________________________________________________
 
 ## Basic CRUD Schema
 
@@ -38,8 +38,8 @@ mutation CreateItem($name: String!, $description: String) @auth(level: USER) {
 
 mutation UpdateItem($id: UUID!, $name: String, $description: String) @auth(level: USER) {
   item_update(id: $id, data: {
-    name: $name
-    description: $description
+    name: $name,
+    description: $description,
     updatedAt_expr: "request.time"
   })
 }
@@ -49,7 +49,7 @@ mutation DeleteItem($id: UUID!) @auth(level: USER) {
 }
 ```
 
----
+______________________________________________________________________
 
 ## User-Owned Resources
 
@@ -74,7 +74,7 @@ type Note @table {
 # queries.gql
 query MyNotes @auth(level: USER) {
   notes(
-    where: { owner: { uid: { eq_expr: "auth.uid" }}}
+    where: { owner: { uid: { eq_expr: "auth.uid" }}},
     orderBy: [{ createdAt: DESC }]
   ) { id title content createdAt }
 }
@@ -82,7 +82,7 @@ query MyNotes @auth(level: USER) {
 query GetMyNote($id: UUID!) @auth(level: USER) {
   note(
     first: { where: {
-      id: { eq: $id }
+      id: { eq: $id },
       owner: { uid: { eq_expr: "auth.uid" }}
     }}
   ) { id title content }
@@ -93,15 +93,15 @@ query GetMyNote($id: UUID!) @auth(level: USER) {
 # mutations.gql
 mutation CreateNote($title: String!, $content: String) @auth(level: USER) {
   note_insert(data: {
-    owner: { uid_expr: "auth.uid" }
-    title: $title
+    owner: { uid_expr: "auth.uid" },
+    title: $title,
     content: $content
   })
 }
 
 mutation UpdateNote($id: UUID!, $title: String, $content: String) @auth(level: USER) {
   note_update(
-    first: { where: { id: { eq: $id }, owner: { uid: { eq_expr: "auth.uid" }}}}
+    first: { where: { id: { eq: $id }, owner: { uid: { eq_expr: "auth.uid" }}}},
     data: { title: $title, content: $content }
   )
 }
@@ -113,7 +113,7 @@ mutation DeleteNote($id: UUID!) @auth(level: USER) {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Many-to-Many Relationship
 
@@ -159,7 +159,7 @@ query ArticleWithTags($id: UUID!) @auth(level: PUBLIC) {
 # mutations.gql
 mutation AddTagToArticle($articleId: UUID!, $tagId: UUID!) @auth(level: USER) {
   articleTag_insert(data: {
-    article: { id: $articleId }
+    article: { id: $articleId },
     tag: { id: $tagId }
   })
 }
@@ -169,7 +169,7 @@ mutation RemoveTagFromArticle($articleId: UUID!, $tagId: UUID!) @auth(level: USE
 }
 ```
 
----
+______________________________________________________________________
 
 ## dataconnect.yaml Template
 
@@ -187,7 +187,7 @@ schema:
 connectorDirs: ["./connector"]
 ```
 
----
+______________________________________________________________________
 
 ## connector.yaml Template
 
@@ -202,12 +202,13 @@ generate:
     package: "com.myapp.dataconnect"
   swiftSdk:
     outputDir: "../ios/MyApp/DataConnect"
+    package: "DataConnectGenerated"
   dartSdk:
     outputDir: "../flutter/lib/dataconnect"
     package: myapp_dataconnect
 ```
 
----
+______________________________________________________________________
 
 ## Firebase Init Commands
 
@@ -229,7 +230,7 @@ npx -y firebase-tools@latest dataconnect:sdk:generate
 npx -y firebase-tools@latest deploy --only dataconnect
 ```
 
----
+______________________________________________________________________
 
 ## SDK Initialization (Web)
 
@@ -241,9 +242,9 @@ import { getDataConnect, connectDataConnectEmulator } from 'firebase/data-connec
 import { connectorConfig } from '@myapp/dataconnect';
 
 const firebaseConfig = {
-  apiKey: "..."
-  authDomain: "..."
-  projectId: "..."
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
 };
 
 export const app = initializeApp(firebaseConfig);
@@ -268,7 +269,7 @@ console.log(data.items);
 await createItem({ name: 'New Item', description: 'Description' });
 ```
 
----
+______________________________________________________________________
 
 ## Realtime Query Templates
 
@@ -290,7 +291,7 @@ query LiveDashboard
 query ItemList($categoryId: UUID!)
   @auth(level: PUBLIC)
   @refresh(onMutationExecuted: {
-    operation: "CreateItem"
+    operation: "CreateItem",
     condition: "request.variables.categoryId == mutation.variables.categoryId"
   }) {
   items(where: { category: { id: { eq: $categoryId }}}) {
@@ -309,8 +310,8 @@ const unsubscribe = subscribe(liveDashboardRef(), {
   onNext: (result) => {
     // Called immediately with current data, then on each refresh
     renderDashboard(result.data.items);
-  }
-  onError: (error) => console.error('Subscription error:', error)
+  },
+  onErr: (error) => console.error('Subscription error:', error) // Observer object property is `onErr` (positional overload parameter is `onError`)
 });
 
 // Cleanup when done
