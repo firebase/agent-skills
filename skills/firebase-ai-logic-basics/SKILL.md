@@ -41,10 +41,6 @@ Use the Gemini Developer API as a default, and only Agent Platform Gemini API
 
 ### Installation
 
-The library is part of the standard Firebase Web SDK.
-
-`npm install -g firebase@latest`
-
 If you're in a firebase directory (with a firebase.json) the currently selected
 project will be marked with "current" using this command:
 
@@ -170,9 +166,9 @@ without deploying new client code. See
 
 ## Initialization Code References
 
-| Language, Framework, Platform | Gemini API provider  | Context URL                                                       |
-| :---------------------------- | :------------------- | :---------------------------------------------------------------- |
-| Android (Kotlin)              | Gemini Developer API | [usage_patterns_android.md](references/usage_patterns_android.md) |
+- **Android (Kotlin)**
+  - Provider: Gemini Developer API
+  - Reference: [usage_patterns_android.md](references/usage_patterns_android.md)
 
 > [!WARNING] **CRITICAL: Use current model names:** Always check the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)

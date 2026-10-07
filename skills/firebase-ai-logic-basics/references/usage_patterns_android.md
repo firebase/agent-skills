@@ -39,8 +39,8 @@ content using a Gemini model:
 
 ```kotlin
 import com.google.firebase.ai.FirebaseAI
-import com.google.firebase.ai.ktx.ai
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
 
 class MainActivity : AppCompatActivity() {
 
@@ -112,10 +112,10 @@ val image1: Bitmap = ... // Load your bitmap
 val image2: Bitmap = ...
 
 val response = model.generateContent(
-    content("Analyze these images for me") {
+    content {
         image(image1)
         image(image2)
-        text("Compare these two items.")
+        text("Analyze these images for me. Compare these two items.")
     }
 )
 Log.d(TAG, response.text)
