@@ -55,7 +55,7 @@ Complete these setup steps before proceeding:
 
    > [!IMPORTANT]
    > **For Agents:** Before proceeding with project configuration, you MUST pause and ask the developer if they prefer to:
-   > 1. **Provide an existing Firebase Project ID**
+   > 1. **Provide an existing Firebase Project ID**, or
    > 2. **Create a new Firebase project**.
 
    - **If using an existing Project ID:**
@@ -88,7 +88,7 @@ Adhere to these principles:
    - **Cursor**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
    - **Android Studio**: Follow [references/refresh/android_studio.md](references/refresh/android_studio.md)
    - **Others**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
-6. **Automate Config File Retrieval:** When setting up Android apps, do NOT direct users to the Firebase Console to download `google-services.json`. Instead, use the Firebase CLI to fetch the config programmatically:
+6. **Automate Config File Retrieval:** When setting up iOS or Android apps, do NOT direct users to the Firebase Console to download `google-services.json`. Instead, use the Firebase CLI to fetch the config programmatically:
    - For Android: `npx -y firebase-tools@latest apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>`
    Save the output to the appropriate location (e.g., `app/google-services.json` for Android).
 
@@ -97,10 +97,14 @@ Adhere to these principles:
 - **Initialize Firebase:** See [references/firebase-service-init.md](references/firebase-service-init.md) when you need to initialize new Firebase services using the CLI.
 - **Exploring Commands:** See [references/firebase-cli-guide.md](references/firebase-cli-guide.md) to discover and understand CLI functionality.
 - **SDK Setup:** For detailed guides on adding Firebase to your app:
-
   - **Android**: See [references/android_setup.md](references/android_setup.md)
 
 # Common Issues
 
 -   **Login Issues:** If the browser fails to open during the login step, use
     `npx -y firebase-tools@latest login --no-localhost` instead.
+-   **Genkit:**
+    If using Genkit, install the skills:
+    ```bash
+    npx skills add genkit-ai/skills
+    ```
