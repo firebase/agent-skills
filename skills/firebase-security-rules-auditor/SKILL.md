@@ -1,6 +1,7 @@
 ---
 name: firebase-security-rules-auditor
-description: A skill to evaluate how secure Firestore security rules are. Use this when Firestore security rules are updated to ensure that the generated rules are extremely secure and robust.
+description: >-
+  Audits Firebase (Firestore, Cloud Storage) security rules for vulnerabilities, privilege escalation, role bypasses, create vs update inconsistencies, resource exhaustion, type safety, size limits, and hasOnly ownership checks. Use when auditing/reviewing rules, running red-team rule assessments, or scoring against auditor checklists. Don't use for Firebase CLI (login, deploy), Auth, Crashlytics, Remote Config, or database queries.
 metadata:
   author: Google LLC
 ---
@@ -67,6 +68,6 @@ single hardcoded admin email (e.g., checking request.auth.token.email ==
   access via secure ACLs.
 
 Return your assessment in JSON format using the following structure: { "score":
-1-5 "summary": "overall assessment" "findings": \[ { "check": "checklist item"
-"severity": "critical|major|moderate|minor" "issue": "description"
+1-5, "summary": "overall assessment", "findings": \[ { "check": "checklist
+item", "severity": "critical|major|moderate|minor", "issue": "description",
 "recommendation": "fix" } \] }
