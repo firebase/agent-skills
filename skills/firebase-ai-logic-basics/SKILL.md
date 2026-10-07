@@ -128,6 +128,32 @@ specific steps to enable model usage in the Chrome browser, more info in the
 > you MUST set up App Check on your app. This prevents unauthorized clients from
 > using your API quota and accessing your backend resources.
 
+#### App Check Debug Tokens for Local Development & CI/CD
+
+Because App Check attestation providers (like Play Integrity or DeviceCheck)
+reject emulators, simulators, or CI environments, you must use **App Check Debug
+Tokens** during development and testing to bypass standard attestation.
+
+##### Local Development (Auto-Generated)
+
+1. Configure your code's App Check provider to use the debug factory:
+   - **Android**: Install `DebugAppCheckProviderFactory.getInstance()`.
+1. Run your app in the emulator/localhost.
+1. Look at your runtime debugger console / Logcat logs for the generated UUID:
+   - *Example:* `AppCheck debug token: "123a4567-b89c-12d3-e456-789012345678"`
+1. Register this token in the Firebase Console under **Security > App Check >
+   Apps > Manage debug tokens**.
+
+##### CI/CD Pipelines (Pre-Provisioned)
+
+1. Generate and register a new debug token in the Firebase Console under
+   **Security > App Check > Apps > Manage debug tokens**.
+1. Add this token string as an encrypted secret in your CI system (e.g.
+   `APP_CHECK_DEBUG_TOKEN`).
+1. Configure your build to pass this secret as an environment variable to the
+   SDK during test execution (e.g.
+   `self.FIREBASE_APPCHECK_DEBUG_TOKEN = process.env.APP_CHECK_DEBUG_TOKEN`).
+
 ### Remote Config
 
 Consider that you do not need to hardcode model names (e.g., a specific model
