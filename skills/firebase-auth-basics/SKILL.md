@@ -8,17 +8,21 @@ metadata:
 
 ## Prerequisites
 
-- **Firebase Project**: Created via `npx -y firebase-tools@latest projects:create` (see `firebase-basics`).
+- **Firebase Project**: Created via
+  `npx -y firebase-tools@latest projects:create` (see `firebase-basics`).
 - **Firebase CLI**: Installed and logged in (see `firebase-basics`).
 
 ## Core Concepts
 
-Firebase Authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users to your app.
+Firebase Authentication provides backend services, easy-to-use SDKs, and
+ready-made UI libraries to authenticate users to your app.
 
 ### Users
 
-A user is an entity that can sign in to your app. Each user is identified by a unique ID (`uid`) which is guaranteed to be unique across all providers.
-User properties include:
+A user is an entity that can sign in to your app. Each user is identified by a
+unique ID (`uid`) which is guaranteed to be unique across all providers. User
+properties include:
+
 - `uid`: Unique identifier.
 - `email`: User's email address (if available).
 - `displayName`: User's display name (if available).
@@ -28,17 +32,23 @@ User properties include:
 ### Identity Providers
 
 Firebase Auth supports multiple ways to sign in:
+
 - **Email/Password**: Basic email and password authentication.
-- **Federated Identity Providers**: Google, Facebook, Twitter, GitHub, Microsoft, Apple, etc.
+- **Federated Identity Providers**: Google, Facebook, Twitter, GitHub,
+  Microsoft, Apple, etc.
 - **Phone Number**: SMS-based authentication.
-- **Anonymous**: Temporary guest accounts that can be linked to permanent accounts later.
+- **Anonymous**: Temporary guest accounts that can be linked to permanent
+  accounts later.
 - **Custom Auth**: Integrate with your existing auth system.
 
 Google Sign In is recommended as a good and secure default provider.
 
 ### Tokens
 
-When a user signs in, they receive an ID Token (JWT). This token is used to identify the user when making requests to Firebase services (Realtime Database, Cloud Storage, Firestore) or your own backend.
+When a user signs in, they receive an ID Token (JWT). This token is used to
+identify the user when making requests to Firebase services (Realtime Database,
+Cloud Storage, Firestore) or your own backend.
+
 - **ID Token**: Short-lived (1 hour), verifies identity.
 - **Refresh Token**: Long-lived, used to get new ID tokens.
 
@@ -48,7 +58,8 @@ When a user signs in, they receive an ID Token (JWT). This token is used to iden
 
 #### Option 1. Enabling Authentication via CLI
 
-Only Google Sign In, anonymous auth, and email/password auth can be enabled via CLI. For other providers, use the Firebase Console.
+Only Google Sign In, anonymous auth, and email/password auth can be enabled via
+CLI. For other providers, use the Firebase Console.
 
 Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
 
@@ -68,13 +79,19 @@ Configure Firebase Authentication in `firebase.json` by adding an 'auth' block:
 }
 ```
 
-> [!NOTE]
-> If the Google Sign-In popup opens and immediately closes with the error `[firebase_auth/unauthorized-domain]`, it means the domain is not authorized.
-> For local development, ensure `localhost` is included in the **Authorized Domains** list in the Firebase Console or via the `authorizedDomains` field in `firebase.json`.
-> **CRITICAL**: Do NOT include the protocol or port number in the Authorized Domains list (e.g., use `localhost`, NOT `http://localhost:9090`).
+> [!NOTE] If the Google Sign-In popup opens and immediately closes with the
+> error `[firebase_auth/unauthorized-domain]`, it means the domain is not
+> authorized. For local development, ensure `localhost` is included in the
+> **Authorized Domains** list in the Firebase Console or via the
+> `authorizedDomains` field in `firebase.json`. **CRITICAL**: Do NOT include the
+> protocol or port number in the Authorized Domains list (e.g., use `localhost`,
+> NOT `http://localhost:9090`).
 
+**CRITICAL**: After configuring `firebase.json`, you MUST deploy the auth
+configuration to the Firebase backend for the changes to take effect. This is
+essential for auth providers like Google Sign-In, email/password, etc. to
+auto-generate the necessary OAuth clients for your app platforms. Run:
 
-**CRITICAL**: After configuring `firebase.json`, you MUST deploy the auth configuration to the Firebase backend for the changes to take effect. This is essential for auth providers like Google Sign-In, email/password, etc. to auto-generate the necessary OAuth clients for your app platforms. Run:
 ```bash
 npx -y firebase-tools@latest deploy --only auth
 ```
@@ -83,14 +100,15 @@ npx -y firebase-tools@latest deploy --only auth
 
 Enable other providers in the Firebase Console.
 
-1.  Go to the https://console.firebase.google.com/project/_/authentication/providers
-2.  Select your project.
-3.  Enable the desired Sign-in providers (e.g., Email/Password, Google).
+1. Go to the
+   https://console.firebase.google.com/project/_/authentication/providers
+1. Select your project.
+1. Enable the desired Sign-in providers (e.g., Email/Password, Google).
 
 ### 2. Client Setup & Usage
 
-**Android (Kotlin)**
-See [references/client_sdk_android.md](references/client_sdk_android.md).
+**Android (Kotlin)** See
+[references/client_sdk_android.md](references/client_sdk_android.md).
 
 ### 3. Security Rules
 

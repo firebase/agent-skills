@@ -1,6 +1,7 @@
 # Security Reference
 
 ## Contents
+
 - [@auth Directive](#auth-directive)
 - [Access Levels](#access-levels)
 - [CEL Expressions](#cel-expressions)
@@ -8,11 +9,12 @@
 - [Authorization Patterns](#authorization-patterns)
 - [Anti-Patterns](#anti-patterns)
 
----
+______________________________________________________________________
 
 ## @auth Directive
 
-Every deployable query/mutation must have `@auth`. Without it, operations default to `NO_ACCESS`.
+Every deployable query/mutation must have `@auth`. Without it, operations
+default to `NO_ACCESS`.
 
 ```graphql
 query PublicData @auth(level: PUBLIC) { ... }
@@ -20,51 +22,52 @@ query UserData @auth(level: USER) { ... }
 query AdminOnly @auth(expr: "auth.token.admin == true") { ... }
 ```
 
-| Argument | Description |
-|----------|-------------|
-| `level` | Preset access level |
-| `expr` | CEL expression (alternative to level) |
+| Argument         | Description                                        |
+| ---------------- | -------------------------------------------------- |
+| `level`          | Preset access level                                |
+| `expr`           | CEL expression (alternative to level)              |
 | `insecureReason` | Suppress deploy warning for PUBLIC/unfiltered USER |
 
----
+______________________________________________________________________
 
 ## Access Levels
 
-| Level | Who Can Access | CEL Equivalent |
-|-------|----------------|----------------|
-| `PUBLIC` | Anyone, authenticated or not | `true` |
-| `USER_ANON` | Any authenticated user (including anonymous) | `auth.uid != nil` |
-| `USER` | Authenticated users (excludes anonymous) | `auth.uid != nil && auth.token.firebase.sign_in_provider != 'anonymous'` |
-| `USER_EMAIL_VERIFIED` | Users with verified email | `auth.uid != nil && auth.token.email_verified` |
-| `NO_ACCESS` | Admin SDK only | `false` |
+| Level                 | Who Can Access                               | CEL Equivalent                                                           |
+| --------------------- | -------------------------------------------- | ------------------------------------------------------------------------ |
+| `PUBLIC`              | Anyone, authenticated or not                 | `true`                                                                   |
+| `USER_ANON`           | Any authenticated user (including anonymous) | `auth.uid != nil`                                                        |
+| `USER`                | Authenticated users (excludes anonymous)     | `auth.uid != nil && auth.token.firebase.sign_in_provider != 'anonymous'` |
+| `USER_EMAIL_VERIFIED` | Users with verified email                    | `auth.uid != nil && auth.token.email_verified`                           |
+| `NO_ACCESS`           | Admin SDK only                               | `false`                                                                  |
 
-> **Important:** Levels like `USER` are starting points. Always add filters or expressions to verify the user can access specific data.
+> **Important:** Levels like `USER` are starting points. Always add filters or
+> expressions to verify the user can access specific data.
 
----
+______________________________________________________________________
 
 ## CEL Expressions
 
 ### Available Bindings
 
-| Binding | Description |
-|---------|-------------|
-| `auth.uid` | Current user's Firebase UID |
-| `auth.token` | Auth token claims (see below) |
-| `vars` | Operation variables (e.g., `vars.movieId`) |
-| `request.time` | Server timestamp |
-| `request.operationName` | "query" or "mutation" |
+| Binding                 | Description                                |
+| ----------------------- | ------------------------------------------ |
+| `auth.uid`              | Current user's Firebase UID                |
+| `auth.token`            | Auth token claims (see below)              |
+| `vars`                  | Operation variables (e.g., `vars.movieId`) |
+| `request.time`          | Server timestamp                           |
+| `request.operationName` | "query" or "mutation"                      |
 
 ### auth.token Fields
 
-| Field | Description |
-|-------|-------------|
-| `email` | User's email address |
-| `email_verified` | Boolean: email verified |
-| `phone_number` | User's phone |
-| `name` | Display name |
-| `sub` | Firebase UID (same as auth.uid) |
+| Field                       | Description                                 |
+| --------------------------- | ------------------------------------------- |
+| `email`                     | User's email address                        |
+| `email_verified`            | Boolean: email verified                     |
+| `phone_number`              | User's phone                                |
+| `name`                      | Display name                                |
+| `sub`                       | Firebase UID (same as auth.uid)             |
 | `firebase.sign_in_provider` | `password`, `google.com`, `anonymous`, etc. |
-| `<custom_claim>` | Custom claims set via Admin SDK |
+| `<custom_claim>`            | Custom claims set via Admin SDK             |
 
 ### Expression Examples
 
@@ -104,13 +107,14 @@ mutation UpdateMyPost($id: UUID!, $title: String!) @auth(level: USER) {
 }
 ```
 
----
+______________________________________________________________________
 
 ## @check and @redact
 
 Use `@check` to validate data and `@redact` to hide results from client:
 
 ### @check
+
 Validates a field value; aborts if check fails.
 
 ```graphql
@@ -119,13 +123,14 @@ Validates a field value; aborts if check fails.
 @check(expr: "this.exists(p, p.role == 'admin')", message: "No admin found")
 ```
 
-| Argument | Description |
-|----------|-------------|
-| `expr` | CEL expression; `this` = current field value |
-| `message` | Error message if check fails |
-| `optional` | If `true`, pass when field not present |
+| Argument   | Description                                  |
+| ---------- | -------------------------------------------- |
+| `expr`     | CEL expression; `this` = current field value |
+| `message`  | Error message if check fails                 |
+| `optional` | If `true`, pass when field not present       |
 
 ### @redact
+
 Hides field from response (still evaluated for @check):
 
 ```graphql
@@ -162,7 +167,7 @@ mutation MustDeleteMovie($id: UUID!) @auth(level: USER) @transaction {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Authorization Patterns
 
@@ -242,7 +247,7 @@ query ProContent @auth(expr: "auth.token.plan == 'pro'") {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Anti-Patterns
 
@@ -286,4 +291,5 @@ query MyDocs @auth(level: USER) {
 
 ### ❌ Don't Use PUBLIC/USER for Prototyping
 
-During development, set operations to `NO_ACCESS` until you implement proper authorization. Use emulator and VS Code extension for testing.
+During development, set operations to `NO_ACCESS` until you implement proper
+authorization. Use emulator and VS Code extension for testing.

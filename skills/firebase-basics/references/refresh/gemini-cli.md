@@ -1,6 +1,7 @@
 # Refresh Gemini CLI Local Environment
 
-Follow these steps to refresh Gemini CLI's local environment, ensuring that their agent skills and plugins are fully up-to-date.
+Follow these steps to refresh Gemini CLI's local environment, ensuring that
+their agent skills and plugins are fully up-to-date.
 
 Use the native Gemini CLI extension manager instead of `npx`.
 
@@ -8,4 +9,5 @@ Use the native Gemini CLI extension manager instead of `npx`.
    ```bash
    gemini extensions update firebase
    ```
-   *Note: If the extension is named differently, replace `firebase` with the correct name from `gemini extensions list`.*
+   *Note: If the extension is named differently, replace `firebase` with the
+   correct name from `gemini extensions list`.*

@@ -1,20 +1,23 @@
 # Firebase Authentication on Android (Kotlin)
 
-This guide walks you through using Firebase Authentication in your Android app using Kotlin DSL (`build.gradle.kts`) and Kotlin code.
+This guide walks you through using Firebase Authentication in your Android app
+using Kotlin DSL (`build.gradle.kts`) and Kotlin code.
 
 ### 1, Enable Authentication via CLI
 
-Before adding dependencies in your app, make sure you enable the Auth service in your Firebase Project using the Firebase CLI:
+Before adding dependencies in your app, make sure you enable the Auth service in
+your Firebase Project using the Firebase CLI:
 
 ```bash
 npx -y firebase-tools@latest init auth
 ```
 
- ---
+______________________________________________________________________
 
 ### 2. Add Dependencies
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add the dependency for Firebase Authentication:
+In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
+the dependency for Firebase Authentication:
 
 ```kotlin
 dependencies {
@@ -27,7 +30,7 @@ dependencies {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 3. Initialize FirebaseAuth
 
@@ -82,7 +85,7 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 4. Check Current Auth State
 
@@ -101,7 +104,7 @@ public override fun onStart() {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 5. Sign Up New Users (Email/Password)
 
@@ -123,7 +126,7 @@ fun signUpUser(email: String, password: String) {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 6. Sign In Existing Users (Email/Password)
 
@@ -145,7 +148,7 @@ fun signInUser(email: String, password: String) {
 }
 ```
 
----
+______________________________________________________________________
 
 ### 7. Sign Out
 

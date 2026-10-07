@@ -1,20 +1,34 @@
 # Cloud Functions Integration Reference
 
-Use this reference to handle database events in SQL Connect by triggering Cloud Functions in response to mutation executions.
+Use this reference to handle database events in SQL Connect by triggering Cloud
+Functions in response to mutation executions.
 
----
+______________________________________________________________________
 
 ## Core Trigger Configuration
 
 To handle a mutation execution, define the `onMutationExecuted` event handler.
 
 ### 🚨 Critical Infinite Loop Constraint
-Unlike document-based database triggers (like Firestore or Realtime Database), **SQL Connect event triggers do not provide a "before" snapshot of the data.** Because SQL Connect proxies requests directly to PostgreSQL, "before" states cannot be resolved transactionally.
-* **Warning**: If `onMutationExecuted` executes a SQL Connect mutation, it can trigger another `onMutationExecuted` trigger in a cascading loop. Make sure that `onMutationExecuted` has a filter on `operation` to reduce the chance of infinite loops.
-* **Rule**: Ensure that no mutation executed inside the function can ever trigger the handler itself, even indirectly.
+
+Unlike document-based database triggers (like Firestore or Realtime Database),
+**SQL Connect event triggers do not provide a "before" snapshot of the data.**
+Because SQL Connect proxies requests directly to PostgreSQL, "before" states
+cannot be resolved transactionally.
+
+- **Warning**: If `onMutationExecuted` executes a SQL Connect mutation, it can
+  trigger another `onMutationExecuted` trigger in a cascading loop. Make sure
+  that `onMutationExecuted` has a filter on `operation` to reduce the chance of
+  infinite loops.
+- **Rule**: Ensure that no mutation executed inside the function can ever
+  trigger the handler itself, even indirectly.
 
 ### Location & Region Matching Rule
-**The Cloud Function region option must match your SQL Connect service location.** You **must** explicitly configure the `region` parameter (e.g., `'us-central1'`) in the trigger options to match the `location` specified in `dataconnect.yaml`.
+
+**The Cloud Function region option must match your SQL Connect service
+location.** You **must** explicitly configure the `region` parameter (e.g.,
+`'us-central1'`) in the trigger options to match the `location` specified in
+`dataconnect.yaml`.
 
 ```typescript
 import { onMutationExecuted } from "firebase-functions/dataconnect";
@@ -33,14 +47,18 @@ export const logMutation = onMutationExecuted(
 );
 ```
 
----
+______________________________________________________________________
 
 ## Event Filtering
 
-To prevent unnecessary function invocations and infinite execution loops, **always specify narrow filters** using `service` and `operation` attributes. 
+To prevent unnecessary function invocations and infinite execution loops,
+**always specify narrow filters** using `service` and `operation` attributes.
 
-*   **`service` & `operation` (Recommended)**: Always specify these to restrict the trigger to a specific mutation in your project.
-*   **`connector` (Optional)**: Can be omitted if you want to trigger on the same operation name across multiple connectors. Specify it only if you need to restrict the trigger to a specific connector.
+- **`service` & `operation` (Recommended)**: Always specify these to restrict
+  the trigger to a specific mutation in your project.
+- **`connector` (Optional)**: Can be omitted if you want to trigger on the same
+  operation name across multiple connectors. Specify it only if you need to
+  restrict the trigger to a specific connector.
 
 ### Comprehensive Example
 
@@ -74,22 +92,22 @@ export const onMutationCaptures = onMutationExecuted(
 );
 ```
 
-
----
+______________________________________________________________________
 
 ## Accessing User Authentication Context
 
-Extract security credentials about the caller who executed the mutation using `event.authType` and `event.authId`.
+Extract security credentials about the caller who executed the mutation using
+`event.authType` and `event.authId`.
 
 ### Auth Context Mappings
 
-| Triggered Principal | `event.authType` | `event.authId` |
-| :--- | :--- | :--- |
-| **Authenticated end user** | `"app_user"` | Firebase Auth token UID |
-| **Unauthenticated end user** | `"unauthenticated"` | Empty |
-| **Admin SDK (Impersonating User)** | `"app_user"` | Firebase Auth token UID of the impersonated user |
-| **Admin SDK (Impersonating Unauth)**| `"unauthenticated"` | Empty |
-| **Admin SDK (Full privileges)** | `"admin"` | Empty |
+| Triggered Principal                  | `event.authType`    | `event.authId`                                   |
+| :----------------------------------- | :------------------ | :----------------------------------------------- |
+| **Authenticated end user**           | `"app_user"`        | Firebase Auth token UID                          |
+| **Unauthenticated end user**         | `"unauthenticated"` | Empty                                            |
+| **Admin SDK (Impersonating User)**   | `"app_user"`        | Firebase Auth token UID of the impersonated user |
+| **Admin SDK (Impersonating Unauth)** | `"unauthenticated"` | Empty                                            |
+| **Admin SDK (Full privileges)**      | `"admin"`           | Empty                                            |
 
 ### Auth Extraction Example
 
@@ -106,11 +124,12 @@ export const processSensitiveMutation = onMutationExecuted(
 );
 ```
 
----
+______________________________________________________________________
 
 ## Parsing Event Data Payloads
 
-The trigger payload provides inputs passed to the mutation (`payload.variables`) and return values generated from the execution (`payload.data`).
+The trigger payload provides inputs passed to the mutation (`payload.variables`)
+and return values generated from the execution (`payload.data`).
 
 ### Event Payload Structure
 
@@ -135,9 +154,10 @@ The trigger payload provides inputs passed to the mutation (`payload.variables`)
 }
 ```
 
-* **`event.data.payload.variables`**: Inputs passed to the mutation.
-* **`event.data.payload.data`**: Fields returned by the mutation execution.
-* **`event.data.payload.errors`**: Array of execution errors. Empty if successful.
+- **`event.data.payload.variables`**: Inputs passed to the mutation.
+- **`event.data.payload.data`**: Fields returned by the mutation execution.
+- **`event.data.payload.errors`**: Array of execution errors. Empty if
+  successful.
 
 ### Payload Extraction Example
 

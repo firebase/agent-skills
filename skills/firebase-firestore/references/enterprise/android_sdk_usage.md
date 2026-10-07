@@ -1,18 +1,23 @@
 # Android SDK Usage (Enterprise Native Mode)
 
-This guide covers the Firestore Android SDK (Kotlin) setup and usage patterns optimized for Firestore Enterprise edition in Native mode.
+This guide covers the Firestore Android SDK (Kotlin) setup and usage patterns
+optimized for Firestore Enterprise edition in Native mode.
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 1. Initialization
 
 ### Add Dependencies
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add the Firebase Kotlin Bill of Materials (BoM) and the dependency for Cloud Firestore:
+In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
+the Firebase Kotlin Bill of Materials (BoM) and the dependency for Cloud
+Firestore:
 
-> [!IMPORTANT]
-> **[AGENT] RESOLVING THE RESOLVED SDK VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date SDK version. Before adding dependencies, you MUST query the latest available versions directly from the Google Maven Repository:
+> [!IMPORTANT] **[AGENT] RESOLVING THE RESOLVED SDK VERSION DETERMINISTICALLY**
+> Never guess or hardcode a memorized out-of-date SDK version. Before adding
+> dependencies, you MUST query the latest available versions directly from the
+> Google Maven Repository:
+>
 > ```bash
 > # Find the latest Firebase BoM version
 > curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
@@ -20,7 +25,10 @@ In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add th
 > # Find the latest firebase-firestore version
 > curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-firestore/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
 > ```
-> If the dependency is already declared, fetch the exact resolved version currently active in the workspace's build graph:
+>
+> If the dependency is already declared, fetch the exact resolved version
+> currently active in the workspace's build graph:
+>
 > ```bash
 > ./gradlew -q :app:dependencyInsight --dependency firebase-firestore --configuration releaseRuntimeClasspath
 > ```
@@ -38,7 +46,8 @@ dependencies {
 
 ### Initialize Firestore
 
-Initialize the `FirebaseFirestore` instance in your ComponentActivity (Jetpack Compose) or standard Activity/Fragment:
+Initialize the `FirebaseFirestore` instance in your ComponentActivity (Jetpack
+Compose) or standard Activity/Fragment:
 
 ```kotlin
 import android.os.Bundle
@@ -64,37 +73,58 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 2. Decision Framework: Mandatory Pipeline Architecture
 
-> [!CRITICAL] **MANDATORY PIPELINE ARCHITECTURE (ZERO TOLERANCE)**
-> You are strictly forbidden from using standard collection queries (e.g., `db.collection(...).where(...)` or client-side mapping loops) as the primary implementation for relational joins, aggregations, or search algorithms.
-> 
-> Server-side execution via pipelines is the superior, non-negotiable core architecture for Enterprise instances.
+> [!CRITICAL] **MANDATORY PIPELINE ARCHITECTURE (ZERO TOLERANCE)** You are
+> strictly forbidden from using standard collection queries (e.g.,
+> `db.collection(...).where(...)` or client-side mapping loops) as the primary
+> implementation for relational joins, aggregations, or search algorithms.
+>
+> Server-side execution via pipelines is the superior, non-negotiable core
+> architecture for Enterprise instances.
 
 ### Strict Rules & Accountability
 
-1. **Mandatory Execution Engine**: Every repository lookup requiring related data mapping, textual relevance scoring, or multi-document counting MUST be authored natively using the server-side `db.pipeline()` API.
-2. **Required Proof of Use**: In your task execution summaries, you MUST explicitly highlight the exact pipeline stages (`.define()`, `.addFields()`, `.search()`, `.aggregate()`) integrated into your primary data layer return paths. Failure to implement pipelines natively constitutes an immediate violation of instructions.
-3. **Check API References**: 
-   - **Locate**: Locate the standard Maven sources JAR (`-sources.jar`) corresponding to the resolved `firebase-firestore` dependency version inside your local Gradle or Maven dependency cache.
-   - **Extract Once**: Extract the documentation files `pipeline.docs.txt` and `expressions.docs.txt` from the root directory of that `-sources.jar` archive into a temporary workspace scratch directory of your choice.
+1. **Mandatory Execution Engine**: Every repository lookup requiring related
+   data mapping, textual relevance scoring, or multi-document counting MUST be
+   authored natively using the server-side `db.pipeline()` API.
+1. **Required Proof of Use**: In your task execution summaries, you MUST
+   explicitly highlight the exact pipeline stages (`.define()`, `.addFields()`,
+   `.search()`, `.aggregate()`) integrated into your primary data layer return
+   paths. Failure to implement pipelines natively constitutes an immediate
+   violation of instructions.
+1. **Check API References**:
+   - **Locate**: Locate the standard Maven sources JAR (`-sources.jar`)
+     corresponding to the resolved `firebase-firestore` dependency version
+     inside your local Gradle or Maven dependency cache.
+   - **Extract Once**: Extract the documentation files `pipeline.docs.txt` and
+     `expressions.docs.txt` from the root directory of that `-sources.jar`
+     archive into a temporary workspace scratch directory of your choice.
    - **Read & Reference**:
-     * **Read** the extracted `pipeline.docs.txt` once fully to understand core pipeline structure and stage capabilities.
-     * **Reference** the extracted `expressions.docs.txt` on-demand for specific function overloads and parameters.
+     - **Read** the extracted `pipeline.docs.txt` once fully to understand core
+       pipeline structure and stage capabilities.
+     - **Reference** the extracted `expressions.docs.txt` on-demand for specific
+       function overloads and parameters.
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 3. Pipeline Examples
 
 ### Relational Joins Pattern
 
-When querying related data (e.g., articles and their author profiles), perform the join at the database level via pipeline stages instead of executing multiple sequential lookups on the client-side.
-*   Use `.define()` to bind parameters or document properties as variables.
-*   Use `.addFields()` and a nested subquery with a matching filter.
-*   Use `.toScalarExpression()` to convert a nested pipeline subquery to a single field value.
-*   Assign variable and field aliases using `.alias(...)` (note: while the Web SDK uses `.as()`, the Kotlin SDK uses `.alias()` to avoid keyword conflicts with Kotlin's `as` operator).
+When querying related data (e.g., articles and their author profiles), perform
+the join at the database level via pipeline stages instead of executing multiple
+sequential lookups on the client-side.
+
+- Use `.define()` to bind parameters or document properties as variables.
+- Use `.addFields()` and a nested subquery with a matching filter.
+- Use `.toScalarExpression()` to convert a nested pipeline subquery to a single
+  field value.
+- Assign variable and field aliases using `.alias(...)` (note: while the Web SDK
+  uses `.as()`, the Kotlin SDK uses `.alias()` to avoid keyword conflicts with
+  Kotlin's `as` operator).
 
 ```kotlin
 import com.google.firebase.firestore.pipeline.Expression.field
@@ -114,7 +144,8 @@ val articlesWithAuthProfile = db.pipeline().collection("articles")
 
 ### Full-Text Search
 
-Leverage the database-native `.search()` stage within your pipelines to run high-performance text query matches on the database level.
+Leverage the database-native `.search()` stage within your pipelines to run
+high-performance text query matches on the database level.
 
 ```kotlin
 import com.google.firebase.firestore.pipeline.Expression.documentMatches
@@ -130,11 +161,13 @@ val searchPipeline = db.pipeline()
     .limit(5)
 ```
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 4. Real-Time Listener & Document Operations
 
-When real-time data sync or transaction-based document mutations are strictly required by application specifications, write clean operations as shown in this comprehensive example.
+When real-time data sync or transaction-based document mutations are strictly
+required by application specifications, write clean operations as shown in this
+comprehensive example.
 
 ```kotlin
 import android.util.Log
