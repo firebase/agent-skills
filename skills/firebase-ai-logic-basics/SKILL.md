@@ -4,6 +4,7 @@ description: Official skill for integrating Firebase AI Logic (Gemini API) into 
 version: 1.0.1
 metadata:
   author: Google LLC
+  category: AiAndMachineLearning
 ---
 
 # Firebase AI Logic Basics
