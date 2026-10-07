@@ -1,10 +1,7 @@
 ---
 name: firebase-basics
 description: >-
-  Provides foundational setup, authentication, and project management workflows
-  for Firebase using the Firebase CLI. Use when checking Firebase CLI version
-  (must use 'npx -y firebase-tools@latest --version'), initializing a Firebase
-  environment, authenticating, setting active projects, or setting up `google-services.json` files.
+  Provides foundational Firebase CLI setup, CLI installation, version checks (`firebase-tools@latest --version`), CLI login (including --no-localhost), project creation, project selection (`firebase use`), and app config file downloads (`google-services.json`). Use ONLY for CLI login, project creation/switching, or downloading app config files. Don't use for Firebase Hosting deploy, Firestore, Auth, App Hosting, Data Connect, Crashlytics, or Remote Config.
 metadata:
   author: Google LLC
 ---
@@ -60,10 +57,13 @@ Complete these setup steps before proceeding:
    - **If using an existing Project ID:**
 
      1. Check the current project by running `npx -y firebase-tools@latest use`.
+
      1. If the command outputs `Active Project: <project-id>`, confirm with the
         user if this is the intended project.
+
      1. If not, or if no project is active, set the project provided by the
         user:
+
         ```bash
         npx -y firebase-tools@latest use <PROJECT_ID>
         ```
@@ -120,7 +120,8 @@ Adhere to these principles:
    - For Android:
      `npx -y firebase-tools@latest apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>`
      Save the output to the appropriate location (e.g.,
-     `app/google-services.json` for Android).
+     `app/google-services.json` for Android, or a path to be linked by
+     `xcode-project-setup` for iOS).
 
 # References
 
@@ -137,7 +138,9 @@ Adhere to these principles:
 
 - **Login Issues:** If the browser fails to open during the login step, use
   `npx -y firebase-tools@latest login --no-localhost` instead.
+
 - **Genkit:** If using Genkit, install the skills:
+
   ```bash
   npx skills add genkit-ai/skills
   ```
