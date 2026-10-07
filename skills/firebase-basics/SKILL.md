@@ -116,14 +116,13 @@ Adhere to these principles:
      [references/refresh/android_studio.md](references/refresh/android_studio.md)
    - **Others**: Follow
      [references/refresh/other-agents.md](references/refresh/other-agents.md)
-1. **Automate Config File Retrieval:** When setting up iOS or Android apps, do
-   NOT direct users to the Firebase Console to download `google-services.json`.
+1. **Automate Config File Retrieval:** When setting up Android apps, do NOT
+   direct users to the Firebase Console to download `google-services.json`.
    Instead, use the Firebase CLI to fetch the config programmatically:
    - For Android:
      `npx -y firebase-tools@latest apps:sdkconfig ANDROID <APP_ID> --project <PROJECT_ID>`
      Save the output to the appropriate location (e.g.,
-     `app/google-services.json` for Android, or a path to be linked by
-     `xcode-project-setup` for iOS).
+     `app/google-services.json` for Android).
 
 # References
 
