@@ -120,8 +120,4 @@ Consider that you do not need to hardcode model names (e.g., a specific model ve
 ## References
 
 
-
 [Android (Kotlin) SDK usage patterns](references/usage_patterns_android.md)
-
-
-
