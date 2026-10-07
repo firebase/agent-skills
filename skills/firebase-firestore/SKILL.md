@@ -52,8 +52,7 @@ corresponding reference guides:
 ### Standard Edition (`references/standard/`)
 
 - **Provisioning**: Read [provisioning.md](references/standard/provisioning.md)
-- **Security Rules**: Read
-  [security_rules.md](references/standard/security_rules.md)
+- **Security Rules**: See the `firestore-rules-creation` skill
 - **SDK Usage**: Read
   [android_sdk_usage.md](references/standard/android_sdk_usage.md)
 - **Indexes**: Read [indexes.md](references/standard/indexes.md)
@@ -65,8 +64,7 @@ corresponding reference guides:
 
 - **Data Model**: Read [data_model.md](references/enterprise/data_model.md)
 
-- **Security Rules**: Read
-  [security_rules.md](references/enterprise/security_rules.md)
+- **Security Rules**: See the `firestore-rules-creation` skill
 
 - **SDK Usage**:
 

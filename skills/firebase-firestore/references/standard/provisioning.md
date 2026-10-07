@@ -65,7 +65,7 @@ service cloud.firestore {
 }
 ```
 
-*See [security_rules.md](security_rules.md) for how to write actual rules.*
+*See the `firestore-rules-creation` skill for how to write actual rules.*
 
 ### 3. Create `firestore.indexes.json`
 
