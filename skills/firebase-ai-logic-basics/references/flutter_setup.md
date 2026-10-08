@@ -96,3 +96,40 @@ final chat = model.startChat(history: [
 
 final response = await chat.sendMessage(Content.text('What is CBT?'));
 ```
+
+## App Check Debug Provider
+
+For App Check debug tokens during local development and CI/CD, add the plugin
+with `flutter pub add firebase_app_check`, then activate the debug providers
+right after `Firebase.initializeApp()`:
+
+```dart
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
+
+// In main(), after `await Firebase.initializeApp();`
+if (kDebugMode) {
+  await FirebaseAppCheck.instance.activate(
+    providerAndroid: const AndroidDebugProvider(),
+    providerApple: const AppleDebugProvider(),
+    providerWeb: WebDebugProvider(),
+  );
+}
+```
+
+- Use `providerAndroid`, `providerApple`, and `providerWeb`. The older
+  `androidProvider` and `appleProvider` parameters (`AndroidProvider.debug`,
+  `AppleProvider.debug`) still appear in many examples but are deprecated.
+- Only use the debug providers in debug builds, as gated by `kDebugMode` above.
+  Release builds must activate the production providers (Play Integrity, App
+  Attest or DeviceCheck, and reCAPTCHA Enterprise) instead; see
+  [App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt).
+- **CI/CD**: Pass the pre-provisioned token to all three debug providers, e.g.
+  `debugToken: const String.fromEnvironment('APP_CHECK_DEBUG_TOKEN')`, and build
+  with `--dart-define=APP_CHECK_DEBUG_TOKEN=<token>`.
+- **Flutter web**: `providerWeb` is required on web; without it, `activate()`
+  throws. `WebDebugProvider` turns on the web debug token itself, so
+  `web/index.html` doesn't need `self.FIREBASE_APPCHECK_DEBUG_TOKEN`.
+- If the app uses `firebase_ai` 3.11.0 or lower, also set the `appCheck`
+  parameter of `FirebaseAI.googleAI(...)` to `FirebaseAppCheck.instance`. Newer
+  versions don't need this.

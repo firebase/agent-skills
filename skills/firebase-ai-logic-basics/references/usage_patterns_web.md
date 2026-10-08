@@ -1,4 +1,12 @@
-# Firebase AI Logic Basics
+# Firebase AI Logic on Web (JavaScript)
+
+## Installation
+
+The library is part of the standard Firebase Web SDK:
+
+```bash
+npm install firebase@latest
+```
 
 ## Initialization Pattern
 
@@ -206,16 +214,39 @@ async function getJsonData(prompt) {
 On-Device AI (Hybrid) Automatically switch between local Gemini Nano and cloud
 models based on device capability.
 
+The Firebase JavaScript SDK checks for Gemini Nano's availability (after
+installation) and switches between on-device or cloud-hosted prompt execution.
+This requires specific steps to enable model usage in the Chrome browser, more
+info in the
+[hybrid inference documentation for Web](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started.md.txt).
+
 ```JavaScript
 import {getGenerativeModel, InferenceMode } from "firebase/ai";
 
 const hybridModel = getGenerativeModel(ai, { mode: InferenceMode.PREFER_ON_DEVICE });
 ```
 
-## App Check (Debug Token Persistence)
+## App Check
 
-When testing AI Logic on Web with App Check, avoid debug token churn when
-clearing browser data or testing across private windows:
+See
+[App Check with reCAPTCHA Enterprise](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider.md.txt)
+for setup instructions.
+
+App Check debug tokens for local development and CI/CD:
+
+- **Local development**: Set `self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;` before
+  initializing App Check (generates a token in the browser console; do not
+  hardcode secret strings in client code).
+- **CI/CD**: Pass the pre-provisioned token from the environment instead (e.g.
+  `self.FIREBASE_APPCHECK_DEBUG_TOKEN = process.env.APP_CHECK_DEBUG_TOKEN`).
+
+### Debug Token Persistence
+
+When testing AI Logic on Web with App Check, clearing site data, using
+incognito/private windows, or switching browsers generates a new debug token
+when `self.FIREBASE_APPCHECK_DEBUG_TOKEN = true` is used. To avoid this debug
+token churn without leaking secrets into client bundles, load a stable token
+from a gitignored local environment file:
 
 > [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Never hardcode
 > debug token strings in web source code. Always load them from a local,
