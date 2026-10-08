@@ -1,0 +1,39 @@
+# Firebase Agent Skills Code Owners
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# NOTE: Reviews requested by CODEOWNERS are NON-BLOCKING per repository ruleset
+# ("require_code_owner_review: false"). Any maintainer with write access can approve and merge.
+
+# Default maintainers for the skills catalog
+/skills/ @firebase/firebase-skills-contributors
+
+# Cloud Firestore
+/skills/firebase-firestore/ @firebase/firestore-js-team @firebase/firebase-skills-contributors
+/skills/firestore-rules-creation/ @firebase/firestore-js-team @firebase/firebase-skills-contributors
+/skills/firebase-security-rules-auditor/ @firebase/firebase-skills-contributors
+
+# Authentication
+/skills/firebase-auth-basics/ @firebase/firebase-skills-contributors
+
+# App Hosting & Hosting
+/skills/firebase-app-hosting-basics/ @firebase/app-hosting-administrators @firebase/firebase-skills-contributors
+/skills/firebase-hosting-basics/ @firebase/firebase-skills-contributors
+
+# Data Connect
+/skills/firebase-data-connect-basics/ @firebase/firebase-skills-contributors
+
+# Crashlytics
+/skills/firebase-crashlytics/ @firebase/firebase-skills-contributors
+
+# Remote Config
+/skills/firebase-remote-config-basics/ @firebase/firebase-skills-contributors
+
+# AI Logic & Core Basics
+/skills/firebase-ai-logic-basics/ @firebase/firebase-skills-contributors
+/skills/firebase-basics/ @firebase/firebase-skills-contributors
+
+# Extensions & Cloud Functions
+/skills/extension-to-functions-codebase/ @firebase/extensions-contributors @firebase/firebase-skills-contributors
+
+# Apple / iOS
+/skills/xcode-project-setup/ @firebase/firebase-apple-sdk-team @firebase/firebase-skills-contributors
