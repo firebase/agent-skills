@@ -92,6 +92,32 @@ To improve the user experience by showing partial results as they arrive (like a
 typing effect), use `generateContentStream` instead of `generateContent` for
 faster display of results.
 
+### Text-to-Speech (TTS) Generation
+
+Generate spoken audio directly on client devices without a custom speech
+backend. Firebase AI Logic supports speech synthesis using dedicated Gemini TTS
+models:
+
+-   **Supported Models**: `gemini-3.8-flash-tts` and
+    `gemini-3.1-flash-tts-preview`
+-   **Capabilities**:
+    -   Single-speaker voice persona selection (`voiceName`) and multi-speaker
+        dialogues (up to 2 distinct speakers) via `SpeechConfig` /
+        `MultiSpeakerVoiceConfig`
+    -   Direct audio responses via `responseModalities: [.audio]` / `["AUDIO"]`
+    -   Streaming speech responses with `generateContentStream` for low-latency
+        playback
+    -   Audio directives (`[Audio Profile: ...]`, `[Scene: ...]`,
+        `[Director's Note: ...]`) and emotional tags (`[whispers]`, `[laughs]`,
+        `[slowly]`)
+    -   Client-side decoding of 24 kHz 16-bit linear PCM (`audio/l16`) via
+        `AVAudioEngine` (iOS) / `AudioTrack` (Android) or WAV container format
+        (`audio/x-wav`) via `AVAudioPlayer` (iOS) / `MediaPlayer` (Android)
+
+See the [Text-to-Speech (TTS) Generation Guide](references/tts_generation.md)
+for full implementation details, streaming patterns, and copy-paste code
+snippets for iOS (Swift), Android (Kotlin), and Web.
+
 ### Generate Images with Nano Banana
 
 > [!WARNING] **Use current Image model names:** Always check the
@@ -203,3 +229,4 @@ without deploying new client code. See
 [Flutter SDK code examples and usage patterns](references/flutter_setup.md)
 
 [Android (Kotlin) SDK usage patterns](references/usage_patterns_android.md)
+[Client-side Text-to-Speech (TTS) generation](references/tts_generation.md)
