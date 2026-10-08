@@ -3,37 +3,44 @@
 #
 # NOTE: Reviews requested by CODEOWNERS are NON-BLOCKING per repository ruleset
 # ("require_code_owner_review: false"). Any maintainer with write access can approve and merge.
+#
+# Each skill maps to its individual product owners/contributors and the corresponding
+# DevSite technical writers (from third_party/devsite/firebase/en/docs/METADATA).
 
 # Default maintainers for the skills catalog
-/skills/ @firebase/firebase-skills-contributors
+/skills/ @joehan @chkuang-g
 
-# Cloud Firestore
-/skills/firebase-firestore/ @firebase/firestore-js-team @firebase/firebase-skills-contributors
-/skills/firestore-rules-creation/ @firebase/firestore-js-team @firebase/firebase-skills-contributors
-/skills/firebase-security-rules-auditor/ @firebase/firebase-skills-contributors
+# Cloud Firestore (docs/firestore -> kevincheung, swatimohanty)
+/skills/firebase-firestore/ @wu-hui @peterfriese @kevinthecheung
 
-# Authentication
-/skills/firebase-auth-basics/ @firebase/firebase-skills-contributors
+# Firestore Security Rules & Auditor (docs/rules -> nithyakrishnan, kevincheung, swatimohanty)
+/skills/firestore-rules-creation/ @maneesht @peterfriese @nk-1983 @kevinthecheung
+/skills/firebase-security-rules-auditor/ @maneesht @annajowang @nk-1983 @kevinthecheung
 
-# App Hosting & Hosting
-/skills/firebase-app-hosting-basics/ @firebase/app-hosting-administrators @firebase/firebase-skills-contributors
-/skills/firebase-hosting-basics/ @firebase/firebase-skills-contributors
+# Authentication (docs/auth -> kevincheung)
+/skills/firebase-auth-basics/ @charlotteliang @weixifan @kevinthecheung
 
-# Data Connect
-/skills/firebase-data-connect-basics/ @firebase/firebase-skills-contributors
+# App Hosting & Hosting (docs/app-hosting & docs/hosting -> egilmore)
+/skills/firebase-app-hosting-basics/ @samedson @inlined @egilmorez
+/skills/firebase-hosting-basics/ @bkendall @samedson @egilmorez
 
-# Crashlytics
-/skills/firebase-crashlytics/ @firebase/firebase-skills-contributors
+# Data Connect (docs/sql-connect -> kevincheung)
+/skills/firebase-data-connect-basics/ @fredzqm @mtr002 @kevinthecheung
 
-# Remote Config
-/skills/firebase-remote-config-basics/ @firebase/firebase-skills-contributors
+# Crashlytics (docs/crashlytics -> orlandriah)
+/skills/firebase-crashlytics/ @maxl0rd @OrlandriaH-G
 
-# AI Logic & Core Basics
-/skills/firebase-ai-logic-basics/ @firebase/firebase-skills-contributors
-/skills/firebase-basics/ @firebase/firebase-skills-contributors
+# Remote Config (docs/remote-config -> nithyakrishnan)
+/skills/firebase-remote-config-basics/ @rathovarun1032 @jakeouellette @nk-1983
 
-# Extensions & Cloud Functions
-/skills/extension-to-functions-codebase/ @firebase/extensions-contributors @firebase/firebase-skills-contributors
+# AI Logic (docs/ai-logic -> rachelsaunders)
+/skills/firebase-ai-logic-basics/ @AustinBenoit @peterfriese @rachelsaunders
 
-# Apple / iOS
-/skills/xcode-project-setup/ @firebase/firebase-apple-sdk-team @firebase/firebase-skills-contributors
+# Core Basics & CLI (docs/cli, docs/projects, docs/ai-assistance -> rachelsaunders, egilmore)
+/skills/firebase-basics/ @joehan @chkuang-g @rachelsaunders @egilmorez
+
+# Extensions & Cloud Functions (docs/extensions -> kevincheung, docs/functions -> egilmore)
+/skills/extension-to-functions-codebase/ @shettyvarun268 @inlined @kevinthecheung @egilmorez
+
+# Apple / iOS (docs/ios -> rachelsaunders)
+/skills/xcode-project-setup/ @ncooke3 @paulb777 @rachelsaunders
