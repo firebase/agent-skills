@@ -1,14 +1,13 @@
 # Firebase SQL Connect - Android Setup Guide (Kotlin)
 
-This guide describes the SDK setup and basic usage patterns for
-Firebase SQL Connect in an Android app using
-Kotlin DSL (`build.gradle.kts`) and Kotlin code.
+This guide describes the SDK setup and basic usage patterns for Firebase SQL
+Connect in an Android app using Kotlin DSL (`build.gradle.kts`) and Kotlin code.
 
 ## Prerequisites
 
-IMPORTANT: Before specifically working with Firebase SQL Connect, make sure
-to use the skill and reference `firebase_basics/references/android_setup` to
-ensure the following is done.
+IMPORTANT: Before specifically working with Firebase SQL Connect, make sure to
+use the skill and reference `firebase_basics/references/android_setup` to ensure
+the following is done.
 
 - The Firebase CLI is available and authenticated.
 - An Android project exists and is registered with a Firebase Project.
@@ -35,10 +34,10 @@ ______________________________________________________________________
 
 ## 1. Add dependencies to Gradle build files
 
-> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date SDK or plugin version.
-> Before adding dependencies, you MUST query the latest available versions
-> directly from the Google Maven Repository:
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY** Never
+> guess or hardcode a memorized out-of-date SDK or plugin version. Before adding
+> dependencies, you MUST query the latest available versions directly from the
+> Google Maven Repository:
 >
 > ```bash
 > # Find the latest Firebase Android BoM version
@@ -56,37 +55,37 @@ ______________________________________________________________________
 > ```
 
 In the **module (app-level)** `build.gradle.kts` (usually
-`<project>/<app-module>/build.gradle.kts`), add the
-Kotlin serialization plugin and the dependency for Firebase SQL Connect:
+`<project>/<app-module>/build.gradle.kts`), add the Kotlin serialization plugin
+and the dependency for Firebase SQL Connect:
 
-1.  Add the Kotlin serialization plugin to the `plugins` block:
+1. Add the Kotlin serialization plugin to the `plugins` block:
 
-    ```kotlin
-    plugins {
-        // ... other plugins
-        kotlin("plugin.serialization") version "1.8.22" // Must match Kotlin version
-    }
-    ```
+   ```kotlin
+   plugins {
+       // ... other plugins
+       kotlin("plugin.serialization") version "1.8.22" // Must match Kotlin version
+   }
+   ```
 
-2.  Add the required Firebase SQL Connect dependencies to the `dependencies`
-    block:
+1. Add the required Firebase SQL Connect dependencies to the `dependencies`
+   block:
 
-    ```kotlin
-    dependencies {
-        // ... other dependencies
+   ```kotlin
+   dependencies {
+       // ... other dependencies
 
-        // [AGENT] Fetch the latest resolved version using the Gradle command above
-        implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
+       // [AGENT] Fetch the latest resolved version using the Gradle command above
+       implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
-        // Add the dependency for the Firebase SQL Connect library
-        // When using the BoM, don't specify versions in Firebase library dependencies
-        implementation("com.google.firebase:firebase-dataconnect")
+       // Add the dependency for the Firebase SQL Connect library
+       // When using the BoM, don't specify versions in Firebase library dependencies
+       implementation("com.google.firebase:firebase-dataconnect")
 
-        // Add additional required dependencies
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
-    }
-    ```
+       // Add additional required dependencies
+       implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+       implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
+   }
+   ```
 
 ______________________________________________________________________
 

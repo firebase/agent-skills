@@ -47,15 +47,15 @@ schema:
 connectorDirs: ["./connector"]
 ```
 
-| Field               | Description                                                                              |
-| ------------------- | ---------------------------------------------------------------------------------------- |
-| `specVersion`       | Always `"v1"`                                                                            |
-| `serviceId`         | Unique identifier for the service                                                        |
-| `location`          | GCP region (us-central1, us-east4, europe-west1, etc.)                                   |
+| Field                                           | Description                                                                              |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `specVersion`                                   | Always `"v1"`                                                                            |
+| `serviceId`                                     | Unique identifier for the service                                                        |
+| `location`                                      | GCP region (us-central1, us-east4, europe-west1, etc.)                                   |
 | `schema.datasource.postgresql.schemaValidation` | Deployment mode: `"STRICT"` (must match exactly) or `"COMPATIBLE"` (backward compatible) |
-| `schema.source`     | Path to schema directory                                                                 |
-| `schema.datasource` | PostgreSQL connection config                                                             |
-| `connectorDirs`     | List of connector directories                                                            |
+| `schema.source`                                 | Path to schema directory                                                                 |
+| `schema.datasource`                             | PostgreSQL connection config                                                             |
+| `connectorDirs`                                 | List of connector directories                                                            |
 
 ### Cloud SQL Configuration
 

@@ -111,3 +111,60 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 }
 ```
+
+## 4. App Check (Debug Token Persistence)
+
+When using App Check in local development or the iOS Simulator, the Firebase iOS
+SDK generates a new UUID debug token whenever `NSUserDefaults` is erased (such
+as during a simulator reset or fresh install). This causes debug token churn and
+invalidates tokens previously registered in the Firebase console.
+
+> [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** App Check debug
+> tokens allow clients to bypass attestation and access backend resources
+> without a genuine device. Treat them as sensitive secrets. **Never commit
+> debug tokens into version control or hardcode them directly into source
+> code.** If a token is compromised, revoke it immediately in the Firebase
+> Console.
+
+To persist a stable debug token across simulator resets without committing
+secrets:
+
+1. Obtain or generate a stable UUID debug token and register it in the Firebase
+   Console under **Security > App Check > Apps > Manage debug tokens**.
+
+1. Supply `AppCheckDebugToken` via your local environment instead of hardcoding
+   it in code:
+
+   - **Xcode Scheme Environment Variables (Recommended):**
+
+     - Select **Product > Scheme > Edit Scheme...** (or `Cmd + <`).
+     - Navigate to **Run > Arguments > Environment Variables**.
+     - Add `AppCheckDebugToken = <YOUR_DEBUG_TOKEN>`.
+     - *Tip:* Keep your personal scheme unshared or ensure user scheme data
+       (`xcuserdata/`) is included in `.gitignore` so your personal debug token
+       is not committed.
+
+   - **In Code (Only with Secure / Gitignored Loading):** If setting the
+     environment variable in code before initializing
+     `AppCheckDebugProviderFactory`, load the token dynamically from a
+     gitignored local file or build configuration—never hardcode the raw token
+     string:
+
+     ```swift
+     #if DEBUG
+     // ⛔️ DO NOT hardcode literal tokens: setenv("AppCheckDebugToken", "secret-uuid", 0)
+     // ✅ SAFE: Load dynamically from a gitignored local file, xcconfig, or process environment
+     // Note: loadGitIgnoredDebugToken() is a placeholder for your custom helper (e.g., reading from a gitignored plist)
+     if let debugToken = loadGitIgnoredDebugToken() {
+       setenv("AppCheckDebugToken", debugToken, 0)
+     }
+     let providerFactory = AppCheckDebugProviderFactory()
+     AppCheck.setAppCheckProviderFactory(providerFactory)
+     #endif
+
+     FirebaseApp.configure() // Must be called AFTER setting the App Check provider factory
+     ```
+
+Setting this environment variable avoids invalidating tokens registered in the
+Firebase console by ensuring a consistent debug token is reused across simulator
+resets and fresh app installs.

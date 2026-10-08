@@ -1,8 +1,8 @@
 # Authentication in Security Rules
 
 Firebase Security Rules work with Firebase Authentication to provide rule-based
-access control. For Firestore Security Rules (`firestore.rules`), delegate to the
-`firestore-rules-author` subagent if subagent delegation is available, or
+access control. For Firestore Security Rules (`firestore.rules`), delegate to
+the `firestore-rules-author` subagent if subagent delegation is available, or
 see the `firestore-rules-creation` skill otherwise. For Cloud Storage rules,
 enable the `firebase-storage-basics` skill.
 

@@ -1,14 +1,13 @@
 # Firebase Remote Config - Android Setup Guide (Kotlin)
 
-This guide describes the SDK setup and basic usage patterns for
-Firebase Remote Config in an Android app using
-Kotlin DSL (`build.gradle.kts`) and Kotlin code.
+This guide describes the SDK setup and basic usage patterns for Firebase Remote
+Config in an Android app using Kotlin DSL (`build.gradle.kts`) and Kotlin code.
 
 ## Prerequisites
 
-IMPORTANT: Before specifically working with Firebase Remote Config, make sure
-to use the skill and reference `firebase_basics/references/android_setup` to
-ensure the following is done.
+IMPORTANT: Before specifically working with Firebase Remote Config, make sure to
+use the skill and reference `firebase_basics/references/android_setup` to ensure
+the following is done.
 
 - The Firebase CLI is available and authenticated.
 - An Android project exists and is registered with a Firebase Project.
@@ -17,10 +16,10 @@ ensure the following is done.
 
 ## 1. Add dependencies to Gradle build files
 
-> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date SDK or plugin version.
-> Before adding dependencies, you MUST query the latest available versions
-> directly from the Google Maven Repository:
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY** Never
+> guess or hardcode a memorized out-of-date SDK or plugin version. Before adding
+> dependencies, you MUST query the latest available versions directly from the
+> Google Maven Repository:
 >
 > ```bash
 > # Find the latest Firebase Android BoM version
@@ -45,8 +44,8 @@ Google Analytics is required (see "Before you begin" in
 https://firebase.google.com/docs/analytics/android/get-started.md.txt)
 
 In the **module (app-level)** `build.gradle.kts` (usually
-`<project>/<app-module>/build.gradle.kts`), add the dependencies for
-Firebase Remote Config and Google Analytics:
+`<project>/<app-module>/build.gradle.kts`), add the dependencies for Firebase
+Remote Config and Google Analytics:
 
 ```kotlin
 dependencies {
@@ -64,31 +63,31 @@ ______________________________________________________________________
 
 ## 2. Set in-app defaults
 
-1.  Define default values so the app has functional logic before it ever fetches
-    a template from the server. Create an XML file (e.g.,
-    `res/xml/remote_config_defaults.xml`):
+1. Define default values so the app has functional logic before it ever fetches
+   a template from the server. Create an XML file (e.g.,
+   `res/xml/remote_config_defaults.xml`):
 
-    ```xml
-    <?xml version="1.0" encoding="utf-8"?>
-    <!-- Example Remote Config Defaults File -->
-    <defaultsMap>
-        <entry>
-            <key>welcome_message</key>
-            <value>Welcome to the app!</value>
-        </entry>
-        <entry>
-            <key>is_feature_enabled</key>
-            <value>false</value>
-        </entry>
-    </defaultsMap>
-    ```
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <!-- Example Remote Config Defaults File -->
+   <defaultsMap>
+       <entry>
+           <key>welcome_message</key>
+           <value>Welcome to the app!</value>
+       </entry>
+       <entry>
+           <key>is_feature_enabled</key>
+           <value>false</value>
+       </entry>
+   </defaultsMap>
+   ```
 
-2.  Initialize the SDK in the Activity or Application class:
+1. Initialize the SDK in the Activity or Application class:
 
-    ```kotlin
-    val remoteConfig = Firebase.remoteConfig
-    remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-    ```
+   ```kotlin
+   val remoteConfig = Firebase.remoteConfig
+   remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+   ```
 
 ______________________________________________________________________
 

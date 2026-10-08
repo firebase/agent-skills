@@ -19,22 +19,24 @@ platform-specific quirks.
 
 - **Initialization Requirement**: In 7.x, you must call
   `await GoogleSignIn.instance.initialize();` globally before using the plugin.
+
 - **Web Client ID Constraint**: On Flutter Web, if you call `initialize()`
   without passing a `clientId` argument OR specifying the
   `<meta name="google-signin-client_id" ... />` tag in `web/index.html`, the
   Dart Web Debug Service (DWDS) and the app will throw an assertion error and
   **hang infinitely**, resulting in a blank screen.
--   **Common Workaround**: If you intend to use Firebase Auth's
-    `signInWithPopup(GoogleAuthProvider())` for the web, you can conditionally
-    skip the local `GoogleSignIn` package initialization entirely:
 
-    ```dart
-    import 'package:flutter/foundation.dart' show kIsWeb;
+- **Common Workaround**: If you intend to use Firebase Auth's
+  `signInWithPopup(GoogleAuthProvider())` for the web, you can conditionally
+  skip the local `GoogleSignIn` package initialization entirely:
 
-    if (!kIsWeb) {
-    await GoogleSignIn.instance.initialize();
-    }
-    ```
+  ```dart
+  import 'package:flutter/foundation.dart' show kIsWeb;
+
+  if (!kIsWeb) {
+  await GoogleSignIn.instance.initialize();
+  }
+  ```
 
 ## 3. Web Logout Crashes
 
@@ -43,15 +45,16 @@ platform-specific quirks.
   `await GoogleSignIn.instance.signOut();` during the user's logout flow on the
   Web platform evaluates against an uninitialized context or unsupported
   environment, crashing the app.
--   **Solution**: Conditionally separate the logout logic for Web to rely
-    entirely on `FirebaseAuth`:
 
-    ```dart
-    if (!kIsWeb) {
-      await GoogleSignIn.instance.signOut();
-    }
-    await FirebaseAuth.instance.signOut();
-    ```
+- **Solution**: Conditionally separate the logout logic for Web to rely entirely
+  on `FirebaseAuth`:
+
+  ```dart
+  if (!kIsWeb) {
+    await GoogleSignIn.instance.signOut();
+  }
+  await FirebaseAuth.instance.signOut();
+  ```
 
 ## 4. Prototyping Workaround: Bypassing Firestore Composite Indices
 
@@ -140,8 +143,8 @@ closes.
   `Sign-in failed: [firebase_auth/unauthorized-domain] This domain is not authorized for OAuth operation for your Firebase project.`
 - **Cause**: The domain (usually `localhost` during local testing) is not listed
   in the Authorized Domains in the Firebase Console.
--   **Solution**: Add `localhost` to the Authorized Domains list in the Firebase
-    Console (Authentication > Settings > Authorized domains).
+- **Solution**: Add `localhost` to the Authorized Domains list in the Firebase
+  Console (Authentication > Settings > Authorized domains).
 - **CRITICAL**: Do NOT include the protocol or port number when adding the
   domain (e.g., use `localhost`, NOT `http://localhost:9090`). Flutter Web often
   runs on random ports or specific ports, but Firebase Auth only cares about the

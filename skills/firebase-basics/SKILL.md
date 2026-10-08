@@ -59,11 +59,13 @@ Complete these setup steps before proceeding:
    - **If using an existing Project ID:**
 
      1. Check the current project by running `npx -y firebase-tools@latest use`.
+
      1. If the command outputs `Active Project: <project-id>`, confirm with the
         user if this is the intended project.
+
      1. If not, or if no project is active, set the project provided by the
         user:
-        
+
         ```bash
         npx -y firebase-tools@latest use <PROJECT_ID>
         ```
@@ -143,8 +145,9 @@ Adhere to these principles:
 
 - **Login Issues:** If the browser fails to open during the login step, use
   `npx -y firebase-tools@latest login --no-localhost` instead.
+
 - **Genkit:** If using Genkit, install the skills:
-  
+
   ```bash
   npx skills add genkit-ai/skills
   ```

@@ -1,14 +1,14 @@
 # Cloud Firestore (Enterprise edition) - Android Setup Guide (Kotlin)
 
-This guide describes the SDK setup and basic usage patterns for
-Cloud Firestore (Enterprise edition in Native mode) in an Android app using
-Kotlin DSL (`build.gradle.kts`) and Kotlin code.
+This guide describes the SDK setup and basic usage patterns for Cloud Firestore
+(Enterprise edition in Native mode) in an Android app using Kotlin DSL
+(`build.gradle.kts`) and Kotlin code.
 
 ## Prerequisites
 
-IMPORTANT: Before specifically working with Cloud Firestore, make sure
-to use the skill and reference `firebase_basics/references/android_setup` to
-ensure the following is done.
+IMPORTANT: Before specifically working with Cloud Firestore, make sure to use
+the skill and reference `firebase_basics/references/android_setup` to ensure the
+following is done.
 
 - The Firebase CLI is available and authenticated.
 - An Android project exists and is registered with a Firebase Project.
@@ -33,10 +33,10 @@ ______________________________________________________________________
 
 ## 2. Add dependencies to Gradle build files
 
-> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date SDK or plugin version.
-> Before adding dependencies, you MUST query the latest available versions
-> directly from the Google Maven Repository:
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY** Never
+> guess or hardcode a memorized out-of-date SDK or plugin version. Before adding
+> dependencies, you MUST query the latest available versions directly from the
+> Google Maven Repository:
 >
 > ```bash
 > # Find the latest Firebase Android BoM version
@@ -54,8 +54,8 @@ ______________________________________________________________________
 > ```
 
 In the **module (app-level)** `build.gradle.kts` (usually
-`<project>/<app-module>/build.gradle.kts`), add the dependency for
-Cloud Firestore:
+`<project>/<app-module>/build.gradle.kts`), add the dependency for Cloud
+Firestore:
 
 ```kotlin
 dependencies {
@@ -113,26 +113,26 @@ ______________________________________________________________________
 
 ### Strict rules & accountability
 
-1.  **Mandatory Execution Engine**: Every repository lookup requiring related
-    data mapping, textual relevance scoring, or multi-document counting MUST be
-    authored natively using the server-side `db.pipeline()` API.
-1.  **Required Proof of Use**: In your task execution summaries, you MUST
-    explicitly highlight the exact pipeline stages (`.define()`, `.addFields()`,
-    `.search()`, `.aggregate()`) integrated into your primary data layer return
-    paths. Failure to implement pipelines natively constitutes an immediate
-    violation of instructions.
-1.  **Check API References**:
-    - **Locate**: Locate the standard Maven sources JAR (`-sources.jar`)
-      corresponding to the resolved `firebase-firestore` dependency version
-      inside your local Gradle or Maven dependency cache.
-    - **Extract Once**: Extract the documentation files `pipeline.docs.txt` and
-      `expressions.docs.txt` from the root directory of that `-sources.jar`
-      archive into a temporary workspace scratch directory of your choice.
-    - **Read & Reference**:
-      - **Read** the extracted `pipeline.docs.txt` once fully to understand core
-        pipeline structure and stage capabilities.
-      - **Reference** the extracted `expressions.docs.txt` on-demand for
-        specific function overloads and parameters.
+1. **Mandatory Execution Engine**: Every repository lookup requiring related
+   data mapping, textual relevance scoring, or multi-document counting MUST be
+   authored natively using the server-side `db.pipeline()` API.
+1. **Required Proof of Use**: In your task execution summaries, you MUST
+   explicitly highlight the exact pipeline stages (`.define()`, `.addFields()`,
+   `.search()`, `.aggregate()`) integrated into your primary data layer return
+   paths. Failure to implement pipelines natively constitutes an immediate
+   violation of instructions.
+1. **Check API References**:
+   - **Locate**: Locate the standard Maven sources JAR (`-sources.jar`)
+     corresponding to the resolved `firebase-firestore` dependency version
+     inside your local Gradle or Maven dependency cache.
+   - **Extract Once**: Extract the documentation files `pipeline.docs.txt` and
+     `expressions.docs.txt` from the root directory of that `-sources.jar`
+     archive into a temporary workspace scratch directory of your choice.
+   - **Read & Reference**:
+     - **Read** the extracted `pipeline.docs.txt` once fully to understand core
+       pipeline structure and stage capabilities.
+     - **Reference** the extracted `expressions.docs.txt` on-demand for specific
+       function overloads and parameters.
 
 ______________________________________________________________________
 
