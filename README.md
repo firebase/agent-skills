@@ -122,6 +122,31 @@ For example, to test with Cursor:
 ln -s /path/to/firebase-skills/skills /path/to/your/test-project/.cursor/rules
 ```
 
+## 🔒 Security review workflow
+
+Four skills give agents a context-aware security workflow for Firebase apps,
+bringing the capabilities of the
+[Gemini CLI Security extension](https://github.com/gemini-cli-extensions/security)
+to every supported agent:
+
+| Skill                       | What it does                                                                                             |
+| --------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `firebase-security-review`  | Two-pass (Recon -> Investigate) SAST of code, config and Security Rules with a Firebase context map      |
+| `firebase-dependency-scan`  | Known-vulnerability scan of lockfiles via OSV-Scanner or the OSV.dev API (no install needed)             |
+| `firebase-security-poc`     | Safe, local Proof-of-Concepts, including rules exploits against the Emulator Suite on a `demo-*` project |
+| `firebase-security-patcher` | PoC -> patch -> verify loop with a Firebase-specific remediation knowledge base                          |
+
+The skills double as slash commands:
+
+- Gemini CLI: `/firebase-security-review` (add `pre-deploy` for review +
+  dependency scan), `/firebase-dependency-scan`
+- Claude Code: `/firebase:firebase-security-review [pre-deploy]`,
+  `/firebase:firebase-dependency-scan`
+- Any agent: natural language (_"Run a security review of my app"_).
+
+Results are written to `.firebase-security/`. This is an AI-assisted first pass,
+not a replacement for a full security audit.
+
 ## 🤝 Contributing
 
 1. Fork the repository
