@@ -23,7 +23,10 @@ based on what you're querying:
 List queries require explicit `@refresh` to tell SQL Connect which mutations
 affect the result set.
 
-Clients consume all three using `subscribe()` instead of `execute()`. See [sdk_web.md](sdk_web.md), [sdk_android.md](sdk_android.md), [sdk_ios.md](sdk_ios.md), and [sdk_flutter.md](sdk_flutter.md) for per-platform subscribe patterns.
+Clients consume all three using `subscribe()` instead of `execute()`. See
+[sdk_web.md](sdk_web.md), [sdk_android.md](sdk_android.md),
+[sdk_ios.md](sdk_ios.md), and [sdk_flutter.md](sdk_flutter.md) for per-platform
+subscribe patterns.
 
 ______________________________________________________________________
 

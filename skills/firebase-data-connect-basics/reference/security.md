@@ -32,13 +32,13 @@ ______________________________________________________________________
 
 ## Access Levels
 
-| Level                 | Who Can Access                               | CEL Equivalent                                                           |
-| --------------------- | -------------------------------------------- | ------------------------------------------------------------------------ |
-| `PUBLIC`              | Anyone, authenticated or not                 | `true`                                                                   |
-| `USER_ANON`           | Any authenticated user (including anonymous) | `auth != null`                                                           |
-| `USER`                | Authenticated users (excludes anonymous)     | `auth != null && auth.token.firebase.sign_in_provider != 'anonymous'`    |
-| `USER_EMAIL_VERIFIED` | Users with verified email                    | `auth != null && auth.token.email_verified`                              |
-| `NO_ACCESS`           | Admin SDK only                               | `false`                                                                  |
+| Level                 | Who Can Access                               | CEL Equivalent                                                        |
+| --------------------- | -------------------------------------------- | --------------------------------------------------------------------- |
+| `PUBLIC`              | Anyone, authenticated or not                 | `true`                                                                |
+| `USER_ANON`           | Any authenticated user (including anonymous) | `auth != null`                                                        |
+| `USER`                | Authenticated users (excludes anonymous)     | `auth != null && auth.token.firebase.sign_in_provider != 'anonymous'` |
+| `USER_EMAIL_VERIFIED` | Users with verified email                    | `auth != null && auth.token.email_verified`                           |
+| `NO_ACCESS`           | Admin SDK only                               | `false`                                                               |
 
 > **Important:** Levels like `USER` are starting points. Always add filters or
 > expressions to verify the user can access specific data.
@@ -49,12 +49,12 @@ ______________________________________________________________________
 
 ### Available Bindings
 
-| Binding                 | Description                                |
-| ----------------------- | ------------------------------------------ |
-| `auth.uid`              | Current user's Firebase UID                |
-| `auth.token`            | Auth token claims (see below)              |
-| `vars`                  | Operation variables (e.g., `vars.movieId`) |
-| `request.time`          | Server timestamp                           |
+| Binding                 | Description                                                       |
+| ----------------------- | ----------------------------------------------------------------- |
+| `auth.uid`              | Current user's Firebase UID                                       |
+| `auth.token`            | Auth token claims (see below)                                     |
+| `vars`                  | Operation variables (e.g., `vars.movieId`)                        |
+| `request.time`          | Server timestamp                                                  |
 | `request.operationName` | Name of the GraphQL operation being executed (e.g., `"GetMovie"`) |
 
 ### auth.token Fields

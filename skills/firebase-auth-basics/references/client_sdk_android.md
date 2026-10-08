@@ -1,8 +1,8 @@
 # Firebase Authentication - Android Setup Guide (Kotlin)
 
-This guide describes the SDK setup and basic usage patterns for
-Firebase Authentication in an Android app using
-Kotlin DSL (`build.gradle.kts`) and Kotlin code.
+This guide describes the SDK setup and basic usage patterns for Firebase
+Authentication in an Android app using Kotlin DSL (`build.gradle.kts`) and
+Kotlin code.
 
 ## Prerequisites
 
@@ -30,10 +30,10 @@ ______________________________________________________________________
 
 ## 2. Add dependencies to Gradle build files
 
-> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date SDK or plugin version.
-> Before adding dependencies, you MUST query the latest available versions
-> directly from the Google Maven Repository:
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY** Never
+> guess or hardcode a memorized out-of-date SDK or plugin version. Before adding
+> dependencies, you MUST query the latest available versions directly from the
+> Google Maven Repository:
 >
 > ```bash
 > # Find the latest Firebase Android BoM version
@@ -51,8 +51,8 @@ ______________________________________________________________________
 > ```
 
 In the **module (app-level)** `build.gradle.kts` (usually
-`<project>/<app-module>/build.gradle.kts`), add the dependency for
-Firebase Authentication:
+`<project>/<app-module>/build.gradle.kts`), add the dependency for Firebase
+Authentication:
 
 ```kotlin
 dependencies {

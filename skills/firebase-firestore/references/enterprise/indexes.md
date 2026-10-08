@@ -53,7 +53,8 @@ create index entries with duplicate values.
   - Index Required: **Composite Index** on field `a` and `b`
 - **Multiple Ranges**: `where("a", ">", 1).where("b", ">", 2)`
   - Index Required: **Composite Index** on field `a` and `b`
-- **Array Contains + Equality**: `where("tags", "array-contains", "news").where("active", "==", true)`
+- **Array Contains + Equality**:
+  `where("tags", "array-contains", "news").where("active", "==", true)`
   - Index Required: **Composite Index** on field `tags` and `active`
 
 If no indexes is present, Firestore Enterprise will perform a full collection

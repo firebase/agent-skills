@@ -106,9 +106,14 @@ await executeQuery(queryRef, { fetchPolicy: QueryFetchPolicy.SERVER_ONLY });
 
 ### Subscriptions (Realtime)
 
-Use `subscribe()` to receive live updates. It accepts either an observer object (`SubscriptionOptions`) or positional callbacks:
+Use `subscribe()` to receive live updates. It accepts either an observer object
+(`SubscriptionOptions`) or positional callbacks:
 
-> **Note:** When passing an observer object literal, the error callback property is named **`onErr`** (`{ onNext, onErr, onComplete }`). Passing `onError` in an object literal fails TypeScript compilation (`TS2769`) and is ignored at runtime. The name `onError` is only used as the parameter name in the positional callback overload (`subscribe(ref, onNext, onError, onComplete)`).
+> **Note:** When passing an observer object literal, the error callback property
+> is named **`onErr`** (`{ onNext, onErr, onComplete }`). Passing `onError` in
+> an object literal fails TypeScript compilation (`TS2769`) and is ignored at
+> runtime. The name `onError` is only used as the parameter name in the
+> positional callback overload (`subscribe(ref, onNext, onError, onComplete)`).
 
 #### Web (Vanilla JS / TypeScript)
 

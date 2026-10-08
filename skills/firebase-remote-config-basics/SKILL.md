@@ -101,7 +101,7 @@ history through the terminal:
   ```
 
   - Deploy: Execute the partial deployment command
-    
+
     ```bash
     npx -y firebase-tools@latest deploy --only remoteconfig
     ```

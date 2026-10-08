@@ -51,7 +51,8 @@ specific index.
   - Index Required: **Composite Index**
 - **Multiple Ranges**: `where("a", ">", 1).where("b", ">", 2)`
   - Index Required: **Composite Index** (limited query support)
-- **Array Contains + Equality**: `where("tags", "array-contains", "news").where("active", "==", true)`
+- **Array Contains + Equality**:
+  `where("tags", "array-contains", "news").where("active", "==", true)`
   - Index Required: **Composite Index**
 
 ## Best Practices & Exemptions
