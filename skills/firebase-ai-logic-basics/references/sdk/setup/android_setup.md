@@ -256,61 +256,6 @@ Instrumentation tests and CI *can* use a pre-provisioned token through
 
 ______________________________________________________________________
 
-## 5. Multimodal Input (Text and Images)
-
-Pass bitmap data along with text prompts:
-
-```kotlin
-val image1: Bitmap = ... // Load your bitmap
-val image2: Bitmap = ...
-
-val response = model.generateContent(
-    content {
-        image(image1)
-        image(image2)
-        text("Analyze these images for me. Compare these two items.")
-    }
-)
-Log.d(TAG, response.text)
-```
-
-______________________________________________________________________
-
-## 6. Chat Session (Multi-turn)
-
-Maintain chat history automatically:
-
-```kotlin
-val chat = model.startChat(
-    history = listOf(
-        content("user") { text("Hello, I am a software engineer.") },
-        content("model") { text("Hello! How can I help you today?") }
-    )
-)
-
-lifecycleScope.launch {
-    val response = chat.sendMessage("What should I learn next?")
-    Log.d(TAG, response.text)
-}
-```
-
-______________________________________________________________________
-
-## 7. Streaming Responses
-
-For faster display, stream the response:
-
-```kotlin
-lifecycleScope.launch {
-    model.generateContentStream("Tell me a long story.")
-        .collect { chunk ->
-            print(chunk.text) // Update UI incrementally
-        }
-}
-```
-
-______________________________________________________________________
-
 ## Next Steps
 
 The SDK is now ready. Pick the capability guide that matches the feature you are

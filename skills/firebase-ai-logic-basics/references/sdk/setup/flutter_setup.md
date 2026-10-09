@@ -227,17 +227,6 @@ scheme; Web: `self.FIREBASE_APPCHECK_DEBUG_TOKEN = '<token>'` in
 `web/index.html`), but `--dart-define` keeps a single, uncommitted path for all
 three platforms.
 
-## 5. Multi-turn Chat
-
-```dart
-final chat = model.startChat(history: [
-  Content.text('Hello, I am a user.'),
-  Content.model([TextPart('Hello! How can I help you today?')]),
-]);
-
-final response = await chat.sendMessage(Content.text('What is CBT?'));
-```
-
 ## Next Steps
 
 The SDK is now ready. Pick the capability guide that matches the feature you are

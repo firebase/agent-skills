@@ -152,84 +152,10 @@ const appCheck = initializeAppCheck(app, {
 });
 ```
 
-## 4. Usage
+## 4. Web-Only Patterns
 
-### Text-Only Generation
-
-```javascript
-async function generateText(prompt) {
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  return response.text();
-}
-```
-
-### Multimodal (Text + Images/Audio/Video/PDF input)
-
-Firebase AI Logic accepts Base64 encoded data or specific file references.
-
-```javascript
-// Helper to convert file to base64 generic object
-async function fileToGenerativePart(file) {
-  const base64EncodedDataPromise = new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-    reader.readAsDataURL(file);
-  });
-  
-  return {
-    inlineData: {
-      data: await base64EncodedDataPromise,
-      mimeType: file.type,
-    },
-  };
-}
-
-async function analyzeImage(prompt, imageFile) {
-  const imagePart = await fileToGenerativePart(imageFile);
-  const result = await model.generateContent([prompt, imagePart]);
-  return result.response.text();
-}
-```
-
-### Chat Session (Multi-turn)
-
-Maintain history automatically using `startChat`.
-
-```javascript
-const chat = model.startChat({
-  history: [
-    {
-      role: "user",
-      parts: [{ text: "Hello, I am a developer." }],
-    },
-    {
-      role: "model",
-      parts: [{ text: "Great to meet you. How can I help with code?" }],
-    },
-  ],
-});
-
-async function sendMessage(msg) {
-  const result = await chat.sendMessage(msg);
-  return result.response.text();
-}
-```
-
-### Streaming Responses
-
-For real-time UI updates (like a typing effect).
-
-```javascript
-async function streamResponse(prompt) {
-  const result = await model.generateContentStream(prompt);
-  for await (const chunk of result.stream) {
-    const chunkText = chunk.text();
-    console.log("Stream chunk:", chunkText);
-    // Update UI here
-  }
-}
-```
+These patterns currently have Web samples only. They stay here until each gets a
+dedicated cross-platform capability guide.
 
 ### Generate Images with Nano Banana
 
@@ -275,8 +201,6 @@ try {
   console.error('Prompt or candidate was blocked:', err);
 }
 ```
-
-## 5. Advanced Features
 
 ### Structured Output (JSON)
 
