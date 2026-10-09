@@ -207,18 +207,18 @@ The SDK provides the same capabilities on every platform. Each capability guide
 explains the concept once and then gives Android (Kotlin), iOS (Swift), Flutter
 (Dart), and Web (JavaScript) code. Read only the guides the task needs.
 
-| Capability        | When to read                                                                             | Reference                                                                |
-| :---------------- | :--------------------------------------------------------------------------------------- | :----------------------------------------------------------------------- |
-| Text generation   | Single-turn `generateContent`, system instructions, generation config, safety            | [text_generation.md](references/sdk/capabilities/text_generation.md)     |
-| Multimodal input  | Passing images, audio, video, or PDFs alongside a text prompt                            | [multimodal_input.md](references/sdk/capabilities/multimodal_input.md)   |
-| Multi-turn chat   | Back-and-forth conversation (`startChat` / `sendMessage`) with history                   | [chat.md](references/sdk/capabilities/chat.md)                           |
-| Streaming         | Rendering partial responses as chunks arrive (`generateContentStream`, chat streams)     | [streaming.md](references/sdk/capabilities/streaming.md)                 |
-| Structured output | Enforcing a JSON `Schema` on the response (`responseMimeType` + `responseSchema`)        | [structured_output.md](references/sdk/capabilities/structured_output.md) |
-| Function calling  | Letting the model invoke app-defined tools (`FunctionDeclaration`) and returning results | [function_calling.md](references/sdk/capabilities/function_calling.md)   |
-| Search grounding  | Grounding answers in live Google Search results (`googleSearch` tool + attributions)     | [search_grounding.md](references/sdk/capabilities/search_grounding.md)   |
-| Image generation  | Generating images (Nano Banana); requires Blaze                                          | [web_setup.md](references/sdk/setup/web_setup.md)                        |
-| Text-to-speech    | Spoken audio generated on the client with Gemini TTS models                              | [text_to_speech.md](references/sdk/capabilities/text_to_speech.md)       |
-| On-device hybrid  | Web only: prefer Gemini Nano in Chrome with cloud fallback                               | [web_setup.md](references/sdk/setup/web_setup.md)                        |
+| Capability        | Use when                                                                             | Reference                                                                |
+| ----------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| Text generation   | A text prompt should produce text; also covers generation config and safety settings | [text_generation.md](references/sdk/capabilities/text_generation.md)     |
+| Multimodal input  | Images, audio, video, or PDFs are part of the prompt                                 | [multimodal_input.md](references/sdk/capabilities/multimodal_input.md)   |
+| Chat              | Multi-turn conversations with automatically maintained history                       | [chat.md](references/sdk/capabilities/chat.md)                           |
+| Streaming         | Partial results should render as they arrive (typing effect)                         | [streaming.md](references/sdk/capabilities/streaming.md)                 |
+| Structured output | The response must be JSON matching a schema                                          | [structured_output.md](references/sdk/capabilities/structured_output.md) |
+| Function calling  | The model should call app-defined tools (APIs, local data)                           | [function_calling.md](references/sdk/capabilities/function_calling.md)   |
+| Search grounding  | Responses must be grounded in current web content                                    | [search_grounding.md](references/sdk/capabilities/search_grounding.md)   |
+| Image generation  | Generate or edit images (Nano Banana); requires Blaze                                | [image_generation.md](references/sdk/capabilities/image_generation.md)   |
+| Text-to-speech    | Spoken audio generated on the client with Gemini TTS models                          | [text_to_speech.md](references/sdk/capabilities/text_to_speech.md)       |
+| On-device hybrid  | Android & Web: prefer on-device Gemini Nano with cloud fallback                      | [on_device_hybrid.md](references/sdk/capabilities/on_device_hybrid.md)   |
 
 Each guide starts with the concept and its configuration, then has one section
 per platform. Read the concept section and the user's platform section only;
