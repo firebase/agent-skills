@@ -98,8 +98,7 @@ Generate spoken audio directly on client devices without a custom speech
 backend. Firebase AI Logic supports speech synthesis using dedicated Gemini TTS
 models:
 
-- **Supported Models**: `gemini-3.8-flash-tts` and
-  `gemini-3.1-flash-tts-preview`
+- **Supported Models**: `gemini-3.1-flash-tts-preview`
 - **Capabilities**:
   - Single-speaker voice persona selection (`voiceName`) and multi-speaker
     dialogues (up to 2 distinct speakers) via `SpeechConfig` /
