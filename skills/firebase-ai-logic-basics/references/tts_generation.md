@@ -12,10 +12,9 @@ ______________________________________________________________________
 
 Always specify a dedicated Gemini TTS model when generating audio:
 
-| Model ID                       | Description                                                  |
-| :----------------------------- | :----------------------------------------------------------- |
-| `gemini-3.8-flash-tts`         | High-quality, production-ready low-latency speech synthesis. |
-| `gemini-3.1-flash-tts-preview` | Preview model for experimental voice synthesis capabilities. |
+| Model ID                       | Description                                                                        |
+| :----------------------------- | :--------------------------------------------------------------------------------- |
+| `gemini-3.1-flash-tts-preview` | Low-latency speech synthesis (preview); supports single- and multi-speaker output. |
 
 > [!WARNING] Always verify currently supported model availability in the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt).
@@ -287,7 +286,7 @@ final class SpeechStreamingManager {
         )
         
         let model = ai.generativeModel(
-            modelName: "gemini-3.8-flash-tts",
+            modelName: "gemini-3.1-flash-tts-preview",
             generationConfig: genConfig
         )
         
@@ -425,7 +424,7 @@ class SpeechStreamingManager {
         }
 
         val generativeModel = FirebaseAI.getInstance().getGenerativeModel(
-            modelName = "gemini-3.8-flash-tts",
+            modelName = "gemini-3.1-flash-tts-preview",
             generationConfig = config
         )
 
@@ -532,7 +531,7 @@ const app = initializeApp(firebaseConfig);
 const ai = getAI(app, { backend: new GoogleAIBackend() });
 
 const model = getGenerativeModel(ai, {
-  model: "gemini-3.8-flash-tts",
+  model: "gemini-3.1-flash-tts-preview",
   generationConfig: {
     responseModalities: ["AUDIO"],
     speechConfig: {
@@ -671,7 +670,7 @@ ______________________________________________________________________
   `generateContentStream`, queue buffers sequentially with exact timestamps or
   frame offsets to avoid audio stutter or gaps.
 - **Model Compatibility**: TTS features require Gemini models with dedicated
-  audio synthesis capabilities (`gemini-3.8-flash-tts` or
-  `gemini-3.1-flash-tts-preview`). Do not use standard text-only model IDs.
+  audio synthesis capabilities (`gemini-3.1-flash-tts-preview`). Do not use
+  standard text-only model IDs.
 - **App Check Protection**: Generating audio consumes quota. Protect your API
   endpoints by enforcing App Check on every client build.
