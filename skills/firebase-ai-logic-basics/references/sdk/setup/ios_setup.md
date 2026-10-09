@@ -209,47 +209,10 @@ AppCheck.setAppCheckProviderFactory(providerFactory)
 FirebaseApp.configure() // Configure Firebase AFTER setting the App Check provider factory
 ```
 
-## 4. Safety Settings
+## 4. Function Calling (Tools)
 
-You can configure safety thresholds to prevent the model from generating harmful
-content.
-
-```swift
-let safetySettings = [
-  SafetySetting(harmCategory: .harassment, threshold: .blockLowAndAbove),
-  SafetySetting(harmCategory: .hateSpeech, threshold: .blockMediumAndAbove)
-]
-
-let model = FirebaseAI.firebaseAI().generativeModel(
-  modelName: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-  safetySettings: safetySettings
-)
-```
-
-## 5. Advanced Features
-
-### Chat Session (Multi-turn)
-
-Chat sessions persist state across multiple interactions, which is essential for
-ongoing conversations or when using tools like function calling.
-
-```swift
-let chat = model.startChat()
-
-Task {
-    do {
-        let response1 = try await chat.sendMessage("Hello! I have two dogs in my house.")
-        print(response1.text ?? "")
-
-        let response2 = try await chat.sendMessage("How many paws are in my house?")
-        print(response2.text ?? "")
-    } catch {
-        print("Error in chat: \(error)")
-    }
-}
-```
-
-### Function Calling (Tools)
+This pattern currently has an iOS sample only. It stays here until it gets a
+dedicated cross-platform capability guide.
 
 Define functions that the model can request to execute to interact with external
 systems. *Note: Advanced workflows like function calling generally require a
