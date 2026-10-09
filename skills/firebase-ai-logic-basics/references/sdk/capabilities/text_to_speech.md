@@ -1,10 +1,14 @@
 # Client-Side Text-to-Speech (TTS) Generation with Gemini
 
+> [!WARNING] **Preview:** Using the Firebase AI Logic SDKs for text-to-speech
+> (TTS) generation is in Preview and may change in backwards-incompatible ways.
+
 Firebase AI Logic enables client-side Text-to-Speech (TTS) generation directly
-from your mobile and web applications without maintaining custom backend speech
-services. Using specialized Gemini TTS models, apps can synthesize natural,
-expressive audio with custom voice personas, multi-speaker dialogues, and
-in-flight audio streaming.
+from your Android, iOS, Flutter, and Web applications without maintaining custom
+backend speech services. Using Gemini TTS models, apps can synthesize
+controllable speech from exact text transcripts with single- or two-speaker
+voices, natural-language style guidance, inline audio tags, and low-latency
+streaming.
 
 ______________________________________________________________________
 
@@ -12,169 +16,222 @@ ______________________________________________________________________
 
 Always specify a dedicated Gemini TTS model when generating audio:
 
-| Model ID                       | Description                                                                        |
-| :----------------------------- | :--------------------------------------------------------------------------------- |
-| `gemini-3.1-flash-tts-preview` | Low-latency speech synthesis (preview); supports single- and multi-speaker output. |
+| Model ID                       | Description                                                                                                   |
+| :----------------------------- | :------------------------------------------------------------------------------------------------------------ |
+| `gemini-3.1-flash-tts-preview` | Low-latency speech synthesis (preview); supports single-speaker, 2-speaker dialogue, streaming, and `[tags]`. |
 
-> [!WARNING] Always verify currently supported model availability in the
-> [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt).
+> [!NOTE] Firebase AI Logic also supports Gemini 2.x TTS models, but streaming
+> (`generateContentStream`), inline audio tags (`[whispers]`, `[laughs]`), and
+> expanded auto-detected languages are only supported on Gemini 3.x TTS models
+> (`gemini-3.1-flash-tts-preview`). Always check the
+> [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
+> for newly released TTS models.
+
+> [!IMPORTANT] **Model-specific API differences
+> (`gemini-3.1-flash-tts-preview`):**
+>
+> - **Raw PCM output on both unary and streaming calls:** Both `generateContent`
+>   and `generateContentStream` return **headerless raw 16-bit linear PCM**
+>   (`audio/pcm`, 24 kHz, mono, little-endian). Do **not** assume unary
+>   `generateContent` responses include a WAV header — always play via a raw PCM
+>   API (`AudioTrack`, `AVAudioEngine`, Web Audio `AudioContext`) or prepend a
+>   44-byte WAV (RIFF) header before passing bytes to `MediaPlayer`,
+>   `AVAudioPlayer`, `<audio>`, or file-based players.
+> - **Prompt-based style & square-bracket tags:** Pass style guidance in the
+>   text prompt (using `[Audio Profile]` / `[Director's Notes]` or a
+>   natural-language prefix like `"Say cheerfully: ..."`), speaker turns as
+>   `SpeakerName: ...` prefixes in the prompt text, and inline vocal tags in
+>   **square brackets** (`[whispers]`, `[laughs]`, `[sighs]`). Do **not** use
+>   `speech_metadata` part fields or angle-bracket tags (`<sigh>`).
+> - **Omit text-sampling parameters:** Do not pass `temperature`, `topP`,
+>   `topK`, `candidateCount`, or `systemInstruction` on TTS requests.
 
 ______________________________________________________________________
 
-## Core Concepts & Configurations
+## Configuration
 
 ### 1. Response Modality
 
-To instruct Gemini to synthesize and return audio, configure
-`responseModalities` in the generation configuration to include audio:
+Configure `responseModalities` in `GenerationConfig` to request `AUDIO` output:
 
-- **Swift**: `generationConfig = GenerationConfig(responseModalities: [.audio])`
-- **Kotlin**:
+- **Android (Kotlin)**:
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
-- **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
+- **iOS (Swift)**:
+  `GenerationConfig(responseModalities: [.audio], speechConfig: ...)`
+- **Flutter (Dart)**:
+  `GenerationConfig(responseModalities: [ResponseModalities.audio], speechConfig: ...)`
+- **Web (JS/TS)**:
+  `generationConfig: { responseModalities: [ResponseModality.AUDIO], speechConfig: ... }`
 
 ### 2. Single-Speaker `SpeechConfig`
 
-Configure voice persona and optional language code (`languageCode`, e.g.
-`"en-US"`, `"es-ES"`, `"ja-JP"`) using `SpeechConfig`. Voice names map to Google
-prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
-`Aoede`):
+Configure a voice name from the 30 supported multilingual HD voices (for
+example: `Kore`, `Puck`, `Charon`, `Fenrir`, `Aoede`) and an optional BCP-47
+`languageCode` (such as `"en-US"`, `"es-ES"`, `"ja-JP"`, `"hi-IN"`). If you omit
+`languageCode`, the model automatically detects the language from the prompt.
 
-- **Swift**:
+- **Android (Kotlin)**:
+  ```kotlin
+  @OptIn(PublicPreviewAPI::class)
+  val config = generationConfig {
+      responseModalities = listOf(ResponseModality.AUDIO)
+      speechConfig = SpeechConfig(
+          voice = Voice("Kore"),
+          languageCode = "en-US"
+      )
+  }
+  ```
+- **iOS (Swift)**:
   ```swift
-  let speechConfig = SpeechConfig(
-      voiceConfig: VoiceConfig(
-          prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
+  let config = GenerationConfig(
+      responseModalities: [.audio],
+      speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
+  )
+  ```
+- **Flutter (Dart)**:
+  ```dart
+  final config = GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+  );
+  ```
+- **Web (JavaScript)**:
+  ```javascript
+  const generationConfig = {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+      languageCode: "en-US",
+    },
+  };
+  ```
+
+### 3. Multi-Speaker `MultiSpeakerVoiceConfig` (Exactly 2 Speakers)
+
+For dialogues or conversations, map speaker names (used as `Speaker: ...`
+prefixes in your prompt) to voices using `MultiSpeakerVoiceConfig`:
+
+- **Constraint:** Multi-speaker configuration supports **exactly 2 speakers**.
+
+- **Multilingual dialogues:** You can mix languages in a single multi-speaker
+  request (for example, one speaker in Japanese and another in Portuguese). For
+  mixed-language prompts, **do not** set `languageCode` in `SpeechConfig` so the
+  model automatically detects and switches languages on each speaker's turn.
+
+- **Android (Kotlin)**:
+
+  ```kotlin
+  @OptIn(PublicPreviewAPI::class)
+  val multiSpeechConfig = SpeechConfig(
+      multiSpeakerVoiceConfig = MultiSpeakerVoiceConfig(
+          speakerVoiceConfigs = listOf(
+              SpeakerVoiceConfig(speaker = "Joe", voice = Voice("Puck")),
+              SpeakerVoiceConfig(speaker = "Jane", voice = Voice("Kore"))
+          )
+      ),
+      languageCode = "en-US"
+  )
+  ```
+
+- **iOS (Swift)**:
+
+  ```swift
+  let multiSpeechConfig = SpeechConfig(
+      multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+          speakerVoiceConfigs: [
+              SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+              SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
+          ]
       ),
       languageCode: "en-US"
   )
   ```
-- **Kotlin**:
-  ```kotlin
-  val speechConfig = speechConfig {
-      voiceConfig = voiceConfig {
-          prebuiltVoiceConfig = prebuiltVoiceConfig {
-              voiceName = "Puck"
-          }
-      }
-      languageCode = "en-US"
-  }
-  ```
-- **Web**:
-  ```javascript
-  speechConfig: {
-    voiceConfig: {
-      prebuiltVoiceConfig: {
-        voiceName: "Puck"
-      }
-    },
-    languageCode: "en-US"
-  }
-  ```
 
-### 3. Multi-Speaker `MultiSpeakerVoiceConfig` (2-Speaker Dialogues)
+- **Flutter (Dart)** (use the `SpeechConfig.multiSpeaker` named constructor):
 
-For scripts with two distinct characters or roles (e.g., host and guest,
-narrator and character), configure `MultiSpeakerVoiceConfig` with
-`speakerVoiceConfigs` linking speaker names to specific voices:
-
-- **Swift**:
-  ```swift
-  let multiSpeakerConfig = SpeechConfig(
-      multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
-          speakerVoiceConfigs: [
-              SpeakerVoiceConfig(
-                  speaker: "Host",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-                  )
-              ),
-              SpeakerVoiceConfig(
-                  speaker: "Guest",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Aoede")
-                  )
-              )
-          ]
-      )
-  )
-  ```
-- **Kotlin**:
-  ```kotlin
-  val multiSpeakerConfig = speechConfig {
-      multiSpeakerVoiceConfig = multiSpeakerVoiceConfig {
-          speakerVoiceConfigs = listOf(
-              speakerVoiceConfig {
-                  speaker = "Host"
-                  voiceConfig = voiceConfig {
-                      prebuiltVoiceConfig = prebuiltVoiceConfig { voiceName = "Puck" }
-                  }
-              },
-              speakerVoiceConfig {
-                  speaker = "Guest"
-                  voiceConfig = voiceConfig {
-                      prebuiltVoiceConfig = prebuiltVoiceConfig { voiceName = "Aoede" }
-                  }
-              }
-          )
-      }
-  }
-  ```
-- **Web**:
-  ```javascript
-  speechConfig: {
-    multiSpeakerVoiceConfig: {
+  ```dart
+  final multiSpeechConfig = SpeechConfig.multiSpeaker(
+    multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
       speakerVoiceConfigs: [
-        {
-          speaker: "Host",
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } }
-        },
-        {
-          speaker: "Guest",
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } }
-        }
-      ]
-    }
-  }
+        SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+        SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+      ],
+    ),
+    languageCode: 'en-US',
+  );
+  ```
+
+- **Web (JavaScript)**:
+
+  ```javascript
+  const generationConfig = {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      multiSpeakerVoiceConfig: {
+        speakerVoiceConfigs: [
+          {
+            speaker: "Joe",
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } },
+          },
+          {
+            speaker: "Jane",
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+          },
+        ],
+      },
+      languageCode: "en-US",
+    },
+  };
   ```
 
 ______________________________________________________________________
 
-## Audio Directives and Emotional Tags
+## Control Speech Output with Prompts
 
-Gemini TTS models accept natural-language directives and inline tags in prompts
-to control tone, cadence, pacing, and emotional expression.
+### 1. Prompt Structure
 
-### Directives
+For best results (and to prevent the speech classifier from rejecting vague
+prompts or reading instructions aloud), structure prompts with these components:
 
-Include directives at the start of your prompt to set the overall tone and
-scene:
-
-- `[Audio Profile: Warm, conversational podcast co-host with energetic delivery]`
-- `[Scene: Quiet bedtime story in a calm room]`
-- `[Director's Note: Speak deliberately, pausing for reflection after major questions]`
-
-### Emotional Tags & Delivery Cues
-
-Embed delivery markers inline within dialogue or narration:
-
-- `[whispers]` — Soft, confidential whisper.
-- `[laughs]` / `[chuckles]` — Lighthearted laughter during delivery.
-- `[sighs]` — Expressive exhale.
-- `[slowly]` — Reduced tempo for emphasis or dramatic effect.
-- `[excited]` — Higher energy and faster pacing.
-- `[pause]` — Deliberate silence.
-
-### Multi-Speaker Prompt Example
+- **`Audio Profile`**: Speaker persona, core identity, and archetype (e.g.,
+  `A warm, professional narrator`).
+- **`Scene`**: Environment and emotional vibe (e.g., `In a quiet library` or
+  `A lively sports broadcast`).
+- **`Director's Notes`**: Emotion, pace, style, and accent (e.g.,
+  `Speak fast, with high energy and excitement`).
+- **`Sample Context`**: Starting context for delivery (e.g.,
+  `The game just ended with a last-second touchdown`).
+- **Transcript**: The exact text to be spoken.
 
 ```text
-[Scene: A lively coffee-shop tech discussion]
-[Director's Note: Host is upbeat and curious; Guest is thoughtful and explanatory]
+[Audio Profile: A young, energetic voice]
+[Scene: A lively sports broadcast]
+[Director's Notes: Speak fast, with high energy and excitement]
+[Sample Context: The game just ended with a last-second touchdown]
+Welcome back fans! What an incredible game we're witnessing today!
+```
 
-Host: Welcome back! [excited] Today we are diving into client-side audio.
-Guest: [laughs] It's about time! No servers in between means virtually zero latency.
-Host: [whispers] Tell us the secret... how does it stream?
-Guest: [slowly] Pure linear PCM, chunk by chunk, directly to your device's audio engine.
+### 2. Audio Tags (`gemini-3.1-flash-tts-preview`)
+
+Insert square-bracket formatting tags directly in the text prompt to guide vocal
+performance:
+
+- `[whispers]` — Speak in a whisper
+- `[laughs]` / `[giggles]` — Add laughter or giggles
+- `[sighs]` / `[gasp]` — Add a sigh or gasp
+- `[shouting]` — Shout
+- `[excited]` / `[serious]` — Shift emotional tone
+- `[sighs whispers]` — Combine multiple tags in one bracket
+
+Rules when using audio tags:
+
+- **No fixed list:** Experiment with descriptive expressions such as `[bored]`
+  or `[sarcastically]`.
+- **Always use English tags:** Even when the spoken transcript is in another
+  language, write the bracketed audio tags in English.
+
+```text
+I have a secret to tell you. [whispers] I found the hidden treasure. [laughs] I can't believe it!
 ```
 
 ______________________________________________________________________
@@ -183,47 +240,31 @@ ______________________________________________________________________
 
 ### Format Specifications
 
-Gemini TTS audio format depends on whether the request is unary or streaming:
+`gemini-3.1-flash-tts-preview` returns **raw PCM audio data** for **both** unary
+(`generateContent`) and streaming (`generateContentStream`) calls:
 
-- **Unary Requests (`generateContent`)**: Returns complete **WAV (`audio/wav`)**
-  audio with a standard 44-byte RIFF header included by default (24 kHz, mono,
-  16-bit signed little-endian PCM). These bytes can be passed directly to
-  standard media players (`AVAudioPlayer`, `MediaPlayer`, `<audio>`).
+- **Encoding**: 16-bit signed linear PCM, little-endian (`audio/pcm` or
+  `audio/l16`)
+- **Sample Rate**: 24,000 Hz (24 kHz)
+- **Channels**: 1 channel (mono)
+- **Container Header**: **None** (raw headerless PCM bytes)
 
-- **Streaming Requests (`generateContentStream`)**: Returns headerless raw
-  **Linear PCM (`audio/l16; rate=24000; channels=1`)** chunks (24 kHz, mono,
-  16-bit signed little-endian PCM) so chunks can be streamed or concatenated
-  continuously without per-chunk container headers.
+Because the response bytes have no container header (like WAV or MP3), standard
+media players (`AVAudioPlayer`, `MediaPlayer`, `<audio>`) cannot play the raw
+bytes directly. Choose one of two playback options:
 
-- **Audio Parameters**:
+1. **Option 1 — Low-level raw PCM playback (recommended for streaming):** Pass
+   raw 24 kHz 16-bit mono PCM buffers directly to `AudioTrack` (Android),
+   `AVAudioEngine` + `AVAudioPlayerNode` (iOS), or the Web Audio API
+   `AudioContext` (Web).
+1. **Option 2 — Prepend a 44-byte WAV (RIFF) header (unary or buffered):**
+   Prepend a standard 44-byte WAV header to the raw PCM bytes so standard
+   players (`MediaPlayer`, `AVAudioPlayer`, `<audio>`, or Flutter audio plugins)
+   can play the buffer or temporary `.wav` file directly.
 
-  - **Sample Rate**: 24,000 Hz (24 kHz)
-  - **Channels**: 1 channel (mono)
-  - **Bit Depth**: 16-bit linear PCM (little-endian signed integer)
-  - **MIME Types**: `audio/l16` (streaming chunks) or `audio/wav` /
-    `audio/x-wav` (unary)
+#### Standard 44-Byte WAV (RIFF) Header Layout
 
-### Playback Approaches
-
-1. **Direct Low-Latency PCM Streaming**:
-   - Stream raw PCM chunks directly into low-level audio renderers without
-     waiting for the full response:
-     - **iOS**: `AVAudioEngine` + `AVAudioPlayerNode` scheduling
-       `AVAudioPCMBuffer`.
-     - **Android**: `AudioTrack` configured with `ENCODING_PCM_16BIT` and
-       `CHANNEL_OUT_MONO`.
-     - **Web**: Web Audio API (`AudioContext`) scheduling PCM chunks into
-       `AudioBufferSourceNode`.
-1. **WAV Container Format**:
-   - Standard media players (`AVAudioPlayer` on iOS, `MediaPlayer` on Android,
-     `<audio>` on Web) expect a container header (RIFF/WAV).
-   - For unary responses, the RIFF header is already present. For assembled
-     streaming PCM chunks, prepend a standard **44-byte RIFF header** to make
-     the complete audio immediately playable or saveable as `.wav`.
-
-#### Standard 44-Byte WAV (RIFF) Header Construction
-
-```
+```text
 Offset  Size  Field              Value
 0       4     ChunkID            "RIFF"
 4       4     ChunkSize          36 + Subchunk2Size (file size - 8)
@@ -243,148 +284,96 @@ Offset  Size  Field              Value
 
 ______________________________________________________________________
 
-## Platform Code Snippets
+## Android (Kotlin)
 
-### Swift (iOS)
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
 
-#### 1. Streaming Playback with `AVAudioEngine`
+```kotlin
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.InlineDataPart
+import com.google.firebase.ai.type.MultiSpeakerVoiceConfig
+import com.google.firebase.ai.type.PublicPreviewAPI
+import com.google.firebase.ai.type.ResponseModality
+import com.google.firebase.ai.type.SpeakerVoiceConfig
+import com.google.firebase.ai.type.SpeechConfig
+import com.google.firebase.ai.type.Voice
+import com.google.firebase.ai.type.generationConfig
 
-```swift
-import AVFoundation
-import FirebaseAILogic
-
-@MainActor
-final class SpeechStreamingManager {
-    private let audioEngine = AVAudioEngine()
-    private let playerNode = AVAudioPlayerNode()
-    
-    // 24 kHz, 16-bit Mono PCM
-    private let audioFormat = AVAudioFormat(
-        commonFormat: .pcmFormatInt16,
-        sampleRate: 24000,
-        channels: 1,
-        interleaved: false
-    )!
-
-    init() {
-        audioEngine.attach(playerNode)
-        audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: audioFormat)
+@OptIn(PublicPreviewAPI::class)
+suspend fun generateSingleSpeakerSpeech(): ByteArray? {
+    val config = generationConfig {
+        responseModalities = listOf(ResponseModality.AUDIO)
+        speechConfig = SpeechConfig(
+            voice = Voice("Kore"),
+            languageCode = "en-US"
+        )
     }
 
-    func streamSpeech(prompt: String) async throws {
-        let ai = FirebaseAI.firebaseAI()
-        
-        let speechConfig = SpeechConfig(
-            voiceConfig: VoiceConfig(
-                prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
+    val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.1-flash-tts-preview",
+        generationConfig = config
+    )
+
+    val response = model.generateContent("Say cheerfully: Have a wonderful day!")
+    val part = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()
+    if (part is InlineDataPart) {
+        return part.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+    }
+    return null
+}
+
+@OptIn(PublicPreviewAPI::class)
+suspend fun generateMultiSpeakerSpeech(): ByteArray? {
+    val multiSpeechConfig = SpeechConfig(
+        multiSpeakerVoiceConfig = MultiSpeakerVoiceConfig(
+            speakerVoiceConfigs = listOf(
+                SpeakerVoiceConfig(speaker = "Joe", voice = Voice("Puck")),
+                SpeakerVoiceConfig(speaker = "Jane", voice = Voice("Kore"))
             )
-        )
-        
-        let genConfig = GenerationConfig(
-            responseModalities: [.audio],
-            speechConfig: speechConfig
-        )
-        
-        let model = ai.generativeModel(
-            modelName: "gemini-3.1-flash-tts-preview",
-            generationConfig: genConfig
-        )
-        
-        if !audioEngine.isRunning {
-            try audioEngine.start()
-        }
-        playerNode.play()
+        ),
+        languageCode = "en-US"
+    )
 
-        let stream = model.generateContentStream(prompt)
-        for try await chunk in stream {
-            for part in chunk.candidates.first?.content.parts ?? [] {
-                if let inlineData = part as? InlineDataPart,
-                   inlineData.mimeType.contains("audio/pcm") || inlineData.mimeType.contains("audio/l16") {
-                    schedulePCMBuffer(data: inlineData.data)
-                }
-            }
+    val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.1-flash-tts-preview",
+        generationConfig = generationConfig {
+            responseModalities = listOf(ResponseModality.AUDIO)
+            speechConfig = multiSpeechConfig
         }
-    }
+    )
 
-    private func schedulePCMBuffer(data: Data) {
-        let frameCount = UInt32(data.count) / audioFormat.streamDescription.pointee.mBytesPerFrame
-        guard frameCount > 0,
-              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount) else {
-            return
-        }
-        buffer.frameLength = frameCount
-        
-        data.withUnsafeBytes { rawBufferPointer in
-            guard let src = rawBufferPointer.baseAddress else { return }
-            if let dest = buffer.int16ChannelData?[0] {
-                UnsafeMutableRawPointer(dest).copyMemory(from: src, byteCount: data.count)
-            }
-        }
-        
-        playerNode.scheduleBuffer(buffer)
-    }
+    val prompt = """
+        Joe: How's it going today Jane?
+        Jane: [excited] Not too bad, how about you?
+    """.trimIndent()
 
-    func stop() {
-        playerNode.stop()
-        audioEngine.stop()
-    }
+    val response = model.generateContent(prompt)
+    val part = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()
+    return (part as? InlineDataPart)?.inlineData
 }
 ```
 
-#### 2. WAV Converter for `AVAudioPlayer`
-
-```swift
-func addWavHeader(to pcmData: Data, sampleRate: Int = 24000, channels: Int = 1, bitDepth: Int = 16) -> Data {
-    var header = Data()
-    let byteRate = sampleRate * channels * bitDepth / 8
-    let blockAlign = channels * bitDepth / 8
-    let totalDataLen = Int32(pcmData.count)
-    let totalLength = totalDataLen + 36
-
-    header.append(contentsOf: "RIFF".utf8)
-    header.append(Data(from: totalLength.littleEndian))
-    header.append(contentsOf: "WAVE".utf8)
-    header.append(contentsOf: "fmt ".utf8)
-    header.append(Data(from: Int32(16).littleEndian))       // Subchunk1Size for PCM
-    header.append(Data(from: Int16(1).littleEndian))        // AudioFormat 1 = PCM
-    header.append(Data(from: Int16(channels).littleEndian))
-    header.append(Data(from: Int32(sampleRate).littleEndian))
-    header.append(Data(from: Int32(byteRate).littleEndian))
-    header.append(Data(from: Int16(blockAlign).littleEndian))
-    header.append(Data(from: Int16(bitDepth).littleEndian))
-    header.append(contentsOf: "data".utf8)
-    header.append(Data(from: totalDataLen.littleEndian))
-
-    return header + pcmData
-}
-
-private extension Data {
-    init<T>(from value: T) {
-        var val = value
-        self = Swift.withUnsafeBytes(of: &val) { Data($0) }
-    }
-}
-```
-
-______________________________________________________________________
-
-### Kotlin (Android)
-
-#### Streaming Playback with `AudioTrack`
+### 2. Streaming Playback with `AudioTrack` (`generateContentStream`)
 
 ```kotlin
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
-import com.google.firebase.ai.FirebaseAI
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.InlineDataPart
+import com.google.firebase.ai.type.PublicPreviewAPI
 import com.google.firebase.ai.type.ResponseModality
+import com.google.firebase.ai.type.SpeechConfig
+import com.google.firebase.ai.type.Voice
 import com.google.firebase.ai.type.generationConfig
-import com.google.firebase.ai.type.prebuiltVoiceConfig
-import com.google.firebase.ai.type.speechConfig
-import com.google.firebase.ai.type.voiceConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@OptIn(PublicPreviewAPI::class)
 class SpeechStreamingManager {
     private val sampleRate = 24000
     private val minBufferSize = AudioTrack.getMinBufferSize(
@@ -414,29 +403,21 @@ class SpeechStreamingManager {
     suspend fun streamSpeech(prompt: String) = withContext(Dispatchers.IO) {
         val config = generationConfig {
             responseModalities = listOf(ResponseModality.AUDIO)
-            speechConfig = speechConfig {
-                voiceConfig = voiceConfig {
-                    prebuiltVoiceConfig = prebuiltVoiceConfig {
-                        voiceName = "Puck"
-                    }
-                }
-            }
+            speechConfig = SpeechConfig(voice = Voice("Kore"))
         }
 
-        val generativeModel = FirebaseAI.getInstance().getGenerativeModel(
+        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
             modelName = "gemini-3.1-flash-tts-preview",
             generationConfig = config
         )
 
         audioTrack.play()
         try {
-            val responseStream = generativeModel.generateContentStream(prompt)
-            responseStream.collect { chunk ->
-                chunk.candidates.firstOrNull()?.content?.parts?.forEach { part ->
-                    if (part is com.google.firebase.ai.type.InlineDataPart) {
-                        val audioBytes = part.data
-                        audioTrack.write(audioBytes, 0, audioBytes.size)
-                    }
+            model.generateContentStream(prompt).collect { chunk ->
+                val part = chunk.candidates.firstOrNull()?.content?.parts?.firstOrNull()
+                if (part is InlineDataPart) {
+                    val pcmChunk = part.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+                    audioTrack.write(pcmChunk, 0, pcmChunk.size)
                 }
             }
         } finally {
@@ -450,7 +431,7 @@ class SpeechStreamingManager {
 }
 ```
 
-#### 2. Convert PCM to WAV for `MediaPlayer`
+### 3. Convert Raw PCM to WAV for `MediaPlayer`
 
 ```kotlin
 import android.content.Context
@@ -490,7 +471,8 @@ fun addWavHeader(
     return header + pcmBytes
 }
 
-fun playWavAudio(context: Context, wavBytes: ByteArray) {
+fun playWavAudio(context: Context, pcmBytes: ByteArray) {
+    val wavBytes = addWavHeader(pcmBytes)
     val tempFile = File.createTempFile("tts_", ".wav", context.cacheDir).apply {
         deleteOnExit()
         FileOutputStream(this).use { it.write(wavBytes) }
@@ -515,17 +497,381 @@ fun playWavAudio(context: Context, wavBytes: ByteArray) {
 
 ______________________________________________________________________
 
-### Web (JavaScript/TypeScript)
+## iOS (Swift)
 
-#### 1. Streaming Playback with Web Audio API
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```swift
+import FirebaseAILogic
+
+func generateSingleSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let config = GenerationConfig(
+        responseModalities: [.audio],
+        speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: config
+    )
+
+    let response = try await model.generateContent("Say cheerfully: Have a wonderful day!")
+    for part in response.inlineDataParts {
+        let pcmData = part.data // Raw PCM audio bytes (24kHz, 1 channel, 16-bit)
+        playRawPcm(data: pcmData)
+    }
+}
+
+func generateMultiSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let multiSpeechConfig = SpeechConfig(
+        multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+            speakerVoiceConfigs: [
+                SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+                SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
+            ]
+        ),
+        languageCode: "en-US"
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: GenerationConfig(
+            responseModalities: [.audio],
+            speechConfig: multiSpeechConfig
+        )
+    )
+
+    let prompt = """
+    Joe: How's it going today Jane?
+    Jane: [excited] Not too bad, how about you?
+    """
+
+    let response = try await model.generateContent(prompt)
+    for part in response.inlineDataParts {
+        playRawPcm(data: part.data)
+    }
+}
+```
+
+### 2. Streaming Playback with `AVAudioEngine` (`generateContentStream`)
+
+```swift
+import AVFoundation
+import FirebaseAILogic
+
+@MainActor
+final class SpeechStreamingManager {
+    private let audioEngine = AVAudioEngine()
+    private let playerNode = AVAudioPlayerNode()
+
+    // AVAudioEngine requires 32-bit float non-interleaved PCM for node connections;
+    // convert incoming 24 kHz 16-bit signed integer PCM samples to Float32 [-1.0, 1.0].
+    private let audioFormat = AVAudioFormat(
+        commonFormat: .pcmFormatFloat32,
+        sampleRate: 24000,
+        channels: 1,
+        interleaved: false
+    )!
+
+    init() {
+        audioEngine.attach(playerNode)
+        audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: audioFormat)
+    }
+
+    func streamSpeech(prompt: String) async throws {
+        let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+        let config = GenerationConfig(
+            responseModalities: [.audio],
+            speechConfig: SpeechConfig(voiceName: "Kore")
+        )
+
+        let model = ai.generativeModel(
+            modelName: "gemini-3.1-flash-tts-preview",
+            generationConfig: config
+        )
+
+        if !audioEngine.isRunning {
+            try audioEngine.start()
+        }
+        playerNode.play()
+
+        let responseStream = try model.generateContentStream(prompt)
+        for try await chunk in responseStream {
+            for part in chunk.inlineDataParts {
+                // Raw PCM audio bytes (24kHz, 1 channel, 16-bit signed little-endian)
+                schedulePCMBuffer(data: part.data)
+            }
+        }
+    }
+
+    private func schedulePCMBuffer(data: Data) {
+        let sampleCount = data.count / MemoryLayout<Int16>.size
+        let frameCount = AVAudioFrameCount(sampleCount)
+        guard frameCount > 0,
+              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount),
+              let floatChannel = buffer.floatChannelData?[0] else {
+            return
+        }
+        buffer.frameLength = frameCount
+
+        data.withUnsafeBytes { rawBufferPointer in
+            let int16Buffer = rawBufferPointer.bindMemory(to: Int16.self)
+            for i in 0..<sampleCount {
+                let sample = Int16(littleEndian: int16Buffer[i])
+                floatChannel[i] = Float(sample) / 32768.0
+            }
+        }
+
+        playerNode.scheduleBuffer(buffer)
+    }
+
+    func stop() {
+        playerNode.stop()
+        audioEngine.stop()
+    }
+}
+```
+
+### 3. Prepend WAV Header for `AVAudioPlayer`
+
+```swift
+import AVFoundation
+
+var audioPlayer: AVAudioPlayer?
+
+func playRawPcm(data: Data) {
+    let wavData = addWavHeader(to: data)
+    do {
+        audioPlayer = try AVAudioPlayer(data: wavData)
+        audioPlayer?.prepareToPlay()
+        audioPlayer?.play()
+    } catch {
+        print("Error playing audio: \(error)")
+    }
+}
+
+func addWavHeader(to pcmData: Data, sampleRate: Int = 24000, channels: Int = 1, bitDepth: Int = 16) -> Data {
+    var header = Data()
+    let byteRate = sampleRate * channels * bitDepth / 8
+    let blockAlign = channels * bitDepth / 8
+    let totalDataLen = Int32(pcmData.count)
+    let totalLength = totalDataLen + 36
+
+    header.append(contentsOf: "RIFF".utf8)
+    header.append(Data(from: totalLength.littleEndian))
+    header.append(contentsOf: "WAVE".utf8)
+    header.append(contentsOf: "fmt ".utf8)
+    header.append(Data(from: Int32(16).littleEndian))       // Subchunk1Size for PCM
+    header.append(Data(from: Int16(1).littleEndian))        // AudioFormat 1 = PCM
+    header.append(Data(from: Int16(channels).littleEndian))
+    header.append(Data(from: Int32(sampleRate).littleEndian))
+    header.append(Data(from: Int32(byteRate).littleEndian))
+    header.append(Data(from: Int16(blockAlign).littleEndian))
+    header.append(Data(from: Int16(bitDepth).littleEndian))
+    header.append(contentsOf: "data".utf8)
+    header.append(Data(from: totalDataLen.littleEndian))
+
+    return header + pcmData
+}
+
+private extension Data {
+    init<T>(from value: T) {
+        var val = value
+        self = Swift.withUnsafeBytes(of: &val) { Data($0) }
+    }
+}
+```
+
+______________________________________________________________________
+
+## Flutter (Dart)
+
+### 1. Single-Speaker Generation (`generateContent`)
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+Future<Uint8List?> generateSpeech(String prompt) async {
+  final config = GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+  );
+
+  final model = FirebaseAI.googleAI().generativeModel(
+    model: 'gemini-3.1-flash-tts-preview',
+    generationConfig: config,
+  );
+
+  final response = await model.generateContent([Content.text(prompt)]);
+
+  for (final part in response.inlineDataParts) {
+    if (part.mimeType.startsWith('audio/')) {
+      final Uint8List pcmData = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+      return addWavHeader(pcmData);
+    }
+  }
+  return null;
+}
+```
+
+### 2. Multi-Speaker Dialogue
+
+```dart
+final multiSpeechConfig = SpeechConfig.multiSpeaker(
+  multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+    speakerVoiceConfigs: [
+      SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+      SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+    ],
+  ),
+  languageCode: 'en-US',
+);
+
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: multiSpeechConfig,
+  ),
+);
+
+const prompt = '''
+Joe: How's it going today Jane?
+Jane: [excited] Not too bad, how about you?
+''';
+
+final response = await model.generateContent([Content.text(prompt)]);
+```
+
+### 3. Streaming with `generateContentStream`
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+Future<Uint8List> streamSpeech(String prompt) async {
+  final model = FirebaseAI.googleAI().generativeModel(
+    model: 'gemini-3.1-flash-tts-preview',
+    generationConfig: GenerationConfig(
+      responseModalities: [ResponseModalities.audio],
+      speechConfig: SpeechConfig(voiceName: 'Kore'),
+    ),
+  );
+
+  final pcm = BytesBuilder(copy: false);
+  final responseStream = model.generateContentStream([Content.text(prompt)]);
+
+  await for (final chunk in responseStream) {
+    for (final part in chunk.inlineDataParts) {
+      if (part.mimeType.startsWith('audio/')) {
+        final Uint8List pcmChunk = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+        // Low-latency path: feed `pcmChunk` directly to a raw-PCM audio stream.
+        pcm.add(pcmChunk);
+      }
+    }
+  }
+
+  // Buffered path: prepend a 44-byte WAV header for standard audio players.
+  return addWavHeader(pcm.takeBytes());
+}
+```
+
+### 4. Prepend WAV Header in Dart
+
+```dart
+import 'dart:typed_data';
+
+Uint8List addWavHeader(
+  Uint8List pcmBytes, {
+  int sampleRate = 24000,
+  int channels = 1,
+  int bitDepth = 16,
+}) {
+  final byteRate = sampleRate * channels * bitDepth ~/ 8;
+  final blockAlign = channels * bitDepth ~/ 8;
+
+  final header = ByteData(44)
+    ..setUint32(4, 36 + pcmBytes.length, Endian.little) // ChunkSize
+    ..setUint32(16, 16, Endian.little) // Subchunk1Size for PCM
+    ..setUint16(20, 1, Endian.little) // AudioFormat 1 = PCM
+    ..setUint16(22, channels, Endian.little)
+    ..setUint32(24, sampleRate, Endian.little)
+    ..setUint32(28, byteRate, Endian.little)
+    ..setUint16(32, blockAlign, Endian.little)
+    ..setUint16(34, bitDepth, Endian.little)
+    ..setUint32(40, pcmBytes.length, Endian.little); // Subchunk2Size
+
+  final headerBytes = header.buffer.asUint8List()
+    ..setAll(0, 'RIFF'.codeUnits)
+    ..setAll(8, 'WAVE'.codeUnits)
+    ..setAll(12, 'fmt '.codeUnits)
+    ..setAll(36, 'data'.codeUnits);
+
+  return (BytesBuilder(copy: false)
+        ..add(headerBytes)
+        ..add(pcmBytes))
+      .takeBytes();
+}
+```
+
+______________________________________________________________________
+
+## Web (JavaScript)
+
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```javascript
+import { initializeApp } from "firebase/app";
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  ResponseModality,
+} from "firebase/ai";
+
+const firebaseApp = initializeApp(firebaseConfig);
+const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
+
+const model = getGenerativeModel(ai, {
+  model: "gemini-3.1-flash-tts-preview",
+  generationConfig: {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+      languageCode: "en-US",
+    },
+  },
+});
+
+const result = await model.generateContent(
+  "Say cheerfully: Have a wonderful day!"
+);
+const inlineDataParts = result.response.inlineDataParts();
+if (inlineDataParts?.[0]) {
+  const pcmBase64 = inlineDataParts[0].inlineData.data; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+  const pcmBuffer = Uint8Array.from(atob(pcmBase64), (c) =>
+    c.charCodeAt(0)
+  ).buffer;
+  playAudio(pcmBuffer);
+}
+```
+
+### 2. Streaming Playback with Web Audio API (`generateContentStream`)
 
 ```typescript
 import { initializeApp } from "firebase/app";
-import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
-
-const firebaseConfig = {
-  // your firebase configuration
-};
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  ResponseModality,
+} from "firebase/ai";
 
 const app = initializeApp(firebaseConfig);
 const ai = getAI(app, { backend: new GoogleAIBackend() });
@@ -533,11 +879,11 @@ const ai = getAI(app, { backend: new GoogleAIBackend() });
 const model = getGenerativeModel(ai, {
   model: "gemini-3.1-flash-tts-preview",
   generationConfig: {
-    responseModalities: ["AUDIO"],
+    responseModalities: [ResponseModality.AUDIO],
     speechConfig: {
       voiceConfig: {
         prebuiltVoiceConfig: {
-          voiceName: "Puck",
+          voiceName: "Kore",
         },
       },
     },
@@ -551,7 +897,9 @@ export class WebSpeechPlayer {
   private getAudioContext(): AudioContext {
     if (!this.audioCtx) {
       if (typeof window === "undefined") {
-        throw new Error("AudioContext is only available in browser environments.");
+        throw new Error(
+          "AudioContext is only available in browser environments."
+        );
       }
       const AudioContextClass =
         window.AudioContext ||
@@ -572,14 +920,12 @@ export class WebSpeechPlayer {
     const responseStream = await model.generateContentStream(prompt);
 
     for await (const chunk of responseStream.stream) {
-      const candidates = chunk.candidates || [];
-      for (const candidate of candidates) {
-        for (const part of candidate.content?.parts || []) {
-          if ("inlineData" in part && part.inlineData?.data) {
-            const rawPcm = this.base64ToArrayBuffer(part.inlineData.data);
-            this.queuePcmChunk(rawPcm, ctx);
-          }
-        }
+      const inlineDataParts = chunk.inlineDataParts();
+      if (inlineDataParts?.[0]) {
+        const rawPcm = this.base64ToArrayBuffer(
+          inlineDataParts[0].inlineData.data
+        );
+        this.queuePcmChunk(rawPcm, ctx);
       }
     }
   }
@@ -617,7 +963,7 @@ export class WebSpeechPlayer {
 }
 ```
 
-#### 2. Convert PCM Base64 to Playable WAV Blob for `<audio>` Elements
+### 3. Convert Raw PCM to Playable WAV `Blob` for `<audio>` Elements
 
 ```typescript
 export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
@@ -637,8 +983,8 @@ export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
 
   // fmt subchunk
   writeString(view, 12, "fmt ");
-  view.setUint32(16, 16, true);             // Subchunk1Size
-  view.setUint16(20, 1, true);              // AudioFormat (PCM = 1)
+  view.setUint32(16, 16, true); // Subchunk1Size
+  view.setUint16(20, 1, true); // AudioFormat (PCM = 1)
   view.setUint16(22, numChannels, true);
   view.setUint32(24, sampleRate, true);
   view.setUint32(28, byteRate, true);
@@ -649,7 +995,7 @@ export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
   writeString(view, 36, "data");
   view.setUint32(40, dataSize, true);
 
-  return new Blob([header, pcmBytes], { type: "audio/wav" });
+  return new Blob([header, new Uint8Array(pcmBytes)], { type: "audio/wav" });
 }
 
 function writeString(view: DataView, offset: number, string: string) {
@@ -661,16 +1007,29 @@ function writeString(view: DataView, offset: number, string: string) {
 
 ______________________________________________________________________
 
-## Best Practices & Troubleshooting
+## Constraints & Troubleshooting (`gemini-3.1-flash-tts-preview`)
 
-- **Audio Session & Permissions**: On iOS and Android, make sure the app's audio
-  session/category is configured to allow playback (e.g.,
-  `AVAudioSessionCategoryPlayback`).
+- **Occasional Text Token Returns (`500` Error)**:
+  `gemini-3.1-flash-tts-preview` occasionally returns text tokens instead of
+  audio tokens on a small percentage of requests, causing the call to fail with
+  a `500` error. Always implement retry logic around TTS generation calls.
+- **Classifier False Rejections (`PROHIBITED_CONTENT` or Spoken Instructions)**:
+  Vague prompts can trigger the speech synthesis safety classifier
+  (`PROHIBITED_CONTENT`) or cause the model to read style instructions aloud.
+  Use a structured prompt preamble (`[Audio Profile: ...]`,
+  `[Director's Notes: ...]`) before the transcript.
+- **Voice Inconsistency**: Output may deviate from the selected speaker voice if
+  the prompt's tone or persona contradicts the voice's profile. Keep prompt
+  directions aligned with the chosen voice.
+- **Longer Outputs Drift**: Speech quality and consistency can degrade on
+  outputs longer than a few minutes. Split long transcripts into smaller chunks.
+- **Audio Session & Permissions**: On iOS and Android, configure the app's audio
+  session/category for playback (e.g., `AVAudioSession.Category.playback`).
 - **Buffering & Jitter Prevention**: When streaming audio chunks via
-  `generateContentStream`, queue buffers sequentially with exact timestamps or
-  frame offsets to avoid audio stutter or gaps.
-- **Model Compatibility**: TTS features require Gemini models with dedicated
-  audio synthesis capabilities (`gemini-3.1-flash-tts-preview`). Do not use
-  standard text-only model IDs.
-- **App Check Protection**: Generating audio consumes quota. Protect your API
-  endpoints by enforcing App Check on every client build.
+  `generateContentStream`, schedule buffers sequentially with exact frame or
+  timestamp offsets to avoid gaps.
+- **App Check Protection**: Generating audio consumes quota; enforce App Check
+  with `useLimitedUseAppCheckTokens` enabled in production.
+
+Last verified against
+https://firebase.google.com/docs/ai-logic/generate-speech.md.txt on 2026-10-09.
