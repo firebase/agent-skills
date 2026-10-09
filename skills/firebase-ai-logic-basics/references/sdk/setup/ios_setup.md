@@ -209,42 +209,6 @@ AppCheck.setAppCheckProviderFactory(providerFactory)
 FirebaseApp.configure() // Configure Firebase AFTER setting the App Check provider factory
 ```
 
-## 4. Function Calling (Tools)
-
-This pattern currently has an iOS sample only. It stays here until it gets a
-dedicated cross-platform capability guide.
-
-Define functions that the model can request to execute to interact with external
-systems. *Note: Advanced workflows like function calling generally require a
-multi-turn Chat Session to handle the back-and-forth execution.*
-
-```swift
-let getStockPriceTool = Tool.functionDeclarations([
-  FunctionDeclaration(
-    name: "getStockPrice",
-    description: "Get the current stock price for a given symbol.",
-    parameters: [
-      "symbol": .string(
-        description: "The stock symbol, e.g. AAPL"
-      )
-    ]
-  )
-])
-
-let model = FirebaseAI.firebaseAI().generativeModel(
-  modelName: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-  tools: [getStockPriceTool]
-)
-
-// In your task (using a chat session):
-let chat = model.startChat()
-let response = try await chat.sendMessage("What is the stock price of Apple?")
-if let functionCall = response.functionCalls.first {
-    // Handle the function call (e.g. call a local API and send the result back)
-    print("Model requested function: \(functionCall.name) with args: \(functionCall.args)")
-}
-```
-
 ## Next Steps
 
 The SDK is now ready. Pick the capability guide that matches the feature you are

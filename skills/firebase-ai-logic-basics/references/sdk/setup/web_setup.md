@@ -202,27 +202,6 @@ try {
 }
 ```
 
-### Structured Output (JSON)
-
-Enforce a specific JSON schema for the response.
-
-```javascript
-import { getGenerativeModel, Schema } from "firebase/ai";
-const jsonModel = getGenerativeModel(ai, {
-    model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-    generationConfig: {
-        responseMimeType: "application/json",
-        // Optional: Define a schema
-        responseSchema: Schema.object({ ... })
-    }
-});
-
-async function getJsonData(prompt) {
-    const result = await jsonModel.generateContent(prompt);
-    return JSON.parse(result.response.text());
-}
-```
-
 ### On-Device AI (Hybrid)
 
 Automatically switch between local Gemini Nano and cloud models based on device
