@@ -10,28 +10,28 @@
 # Default maintainers for the skills catalog
 /skills/ @joehan @chkuang-g
 
-# Cloud Firestore (docs/firestore -> kevincheung, swatimohanty)
-/skills/firebase-firestore/ @wu-hui @peterfriese @kevinthecheung
+# Cloud Firestore (docs/firestore -> kevincheung, swatimohanty, rachelsaunders)
+/skills/firebase-firestore/ @wu-hui @peterfriese @kevinthecheung @rachelsaunders
 
-# Firestore Security Rules & Auditor (docs/rules -> nithyakrishnan, kevincheung, swatimohanty)
-/skills/firestore-rules-creation/ @maneesht @peterfriese @nk-1983 @kevinthecheung
-/skills/firebase-security-rules-auditor/ @maneesht @annajowang @nk-1983 @kevinthecheung
+# Firestore Security Rules & Auditor (docs/rules -> nithyakrishnan, kevincheung, swatimohanty, rachelsaunders)
+/skills/firestore-rules-creation/ @maneesht @peterfriese @nk-1983 @kevinthecheung @rachelsaunders
+/skills/firebase-security-rules-auditor/ @maneesht @annajowang @nk-1983 @kevinthecheung @rachelsaunders
 
-# Authentication (docs/auth -> kevincheung)
-/skills/firebase-auth-basics/ @charlotteliang @weixifan @kevinthecheung
+# Authentication (docs/auth -> kevincheung, rachelsaunders)
+/skills/firebase-auth-basics/ @charlotteliang @weixifan @kevinthecheung @rachelsaunders
 
-# App Hosting & Hosting (docs/app-hosting & docs/hosting -> egilmore)
-/skills/firebase-app-hosting-basics/ @samedson @inlined @egilmorez
-/skills/firebase-hosting-basics/ @bkendall @samedson @egilmorez
+# App Hosting & Hosting (docs/app-hosting & docs/hosting -> egilmore, rachelsaunders)
+/skills/firebase-app-hosting-basics/ @samedson @inlined @egilmorez @rachelsaunders
+/skills/firebase-hosting-basics/ @bkendall @samedson @egilmorez @rachelsaunders
 
-# Data Connect (docs/sql-connect -> kevincheung)
-/skills/firebase-data-connect-basics/ @fredzqm @mtr002 @kevinthecheung
+# Data Connect (docs/sql-connect -> kevincheung, rachelsaunders)
+/skills/firebase-data-connect-basics/ @fredzqm @mtr002 @kevinthecheung @rachelsaunders
 
-# Crashlytics (docs/crashlytics -> orlandriah)
-/skills/firebase-crashlytics/ @maxl0rd @OrlandriaH-G
+# Crashlytics (docs/crashlytics -> orlandriah, rachelsaunders)
+/skills/firebase-crashlytics/ @maxl0rd @OrlandriaH-G @rachelsaunders
 
-# Remote Config (docs/remote-config -> nithyakrishnan)
-/skills/firebase-remote-config-basics/ @rathovarun1032 @jakeouellette @nk-1983
+# Remote Config (docs/remote-config -> nithyakrishnan, rachelsaunders)
+/skills/firebase-remote-config-basics/ @rathovarun1032 @jakeouellette @nk-1983 @rachelsaunders
 
 # AI Logic (docs/ai-logic -> rachelsaunders)
 /skills/firebase-ai-logic-basics/ @AustinBenoit @peterfriese @rachelsaunders
@@ -39,8 +39,8 @@
 # Core Basics & CLI (docs/cli, docs/projects, docs/ai-assistance -> rachelsaunders, egilmore)
 /skills/firebase-basics/ @joehan @chkuang-g @rachelsaunders @egilmorez
 
-# Extensions & Cloud Functions (docs/extensions -> kevincheung, docs/functions -> egilmore)
-/skills/extension-to-functions-codebase/ @shettyvarun268 @inlined @kevinthecheung @egilmorez
+# Extensions & Cloud Functions (docs/extensions -> orlandriah, docs/functions -> egilmore, rachelsaunders)
+/skills/extension-to-functions-codebase/ @shettyvarun268 @inlined @OrlandriaH-G @egilmorez @rachelsaunders
 
 # Apple / iOS (docs/ios -> rachelsaunders)
 /skills/xcode-project-setup/ @ncooke3 @paulb777 @rachelsaunders
