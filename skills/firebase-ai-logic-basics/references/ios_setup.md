@@ -3,6 +3,8 @@
 ## 1. Import and Initialize
 
 Ensure you have installed the `FirebaseAILogic` SDK via Swift Package Manager.
+Use the `xcode-project-setup` skill to automate adding the SPM dependency to the
+Xcode project.
 
 ```swift
 import FirebaseAILogic
@@ -128,6 +130,68 @@ let model = FirebaseAI.firebaseAI().generativeModel(
 )
 ```
 
+## 4. App Check Debug Provider
+
+For App Check debug tokens during local development and CI/CD, add the
+`FirebaseAppCheck` product to the app target (with the `xcode-project-setup`
+skill), then set the debug provider factory in debug builds *before*
+`FirebaseApp.configure()`. Otherwise the debug provider isn't used.
+
+```swift
+import FirebaseAppCheck
+import FirebaseCore
+
+// In your app's init(), before configuring Firebase:
+#if DEBUG
+AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+#endif
+FirebaseApp.configure()
+```
+
+For CI/CD, add an `AppCheckDebugToken` environment variable to the Xcode test
+scheme with a value like `$(APP_CHECK_DEBUG_TOKEN)`, then pass the token from
+the CI test command:
+
+```bash
+xcodebuild test -scheme <scheme> -workspace <project>.xcworkspace \
+  APP_CHECK_DEBUG_TOKEN=<token>
+```
+
+### Debug Token Persistence
+
+When running on simulators or during development, the Firebase iOS SDK generates
+a new debug token UUID whenever `NSUserDefaults` is cleared (e.g., simulator
+reset or fresh install). To avoid invalidating tokens registered in the Firebase
+Console and prevent token churn, persist a stable token by setting the
+`AppCheckDebugToken` environment variable, which the SDK reads automatically at
+runtime:
+
+> [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Debug tokens
+> grant access to backend resources without device attestation. Never commit
+> debug tokens to version control or hardcode token strings in source code.
+
+- **In Xcode Scheme (Recommended):** Edit Scheme -> Run -> Arguments ->
+  Environment Variables -> Add `AppCheckDebugToken = <YOUR_DEBUG_TOKEN>`. Keep
+  user schemes (`xcuserdata/`) unshared and gitignored.
+- **In Code (Safe Dynamic Loading Only):** If setting the environment variable
+  in code before configuring `AppCheckDebugProviderFactory`, load the token
+  dynamically from a gitignored local file or environment rather than hardcoding
+  the token literal:
+
+```swift
+#if DEBUG
+// ✅ SAFE: Load from gitignored local file or process environment
+// Note: loadGitIgnoredDebugToken() is a placeholder for your custom helper (e.g., reading from a gitignored plist)
+if let debugToken = loadGitIgnoredDebugToken() {
+  setenv("AppCheckDebugToken", debugToken, 0)
+}
+let providerFactory = AppCheckDebugProviderFactory()
+AppCheck.setAppCheckProviderFactory(providerFactory)
+#endif
+
+FirebaseApp.configure() // Configure Firebase AFTER setting the App Check provider factory
+```
+
 # Advanced Features
 
 ### Chat Session (Multi-turn)
@@ -182,38 +246,4 @@ if let functionCall = response.functionCalls.first {
     // Handle the function call (e.g. call a local API and send the result back)
     print("Model requested function: \(functionCall.name) with args: \(functionCall.args)")
 }
-```
-
-### App Check (Debug Token Persistence)
-
-When running on simulators or during development, the Firebase iOS SDK generates
-a new debug token UUID whenever `NSUserDefaults` is cleared (e.g., simulator
-reset or fresh install). To avoid invalidating tokens registered in the Firebase
-Console and prevent token churn, persist a stable token by setting the
-`AppCheckDebugToken` environment variable:
-
-> [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Debug tokens
-> grant access to backend resources without device attestation. Never commit
-> debug tokens to version control or hardcode token strings in source code.
-
-- **In Xcode Scheme (Recommended):** Edit Scheme -> Run -> Arguments ->
-  Environment Variables -> Add `AppCheckDebugToken = <YOUR_DEBUG_TOKEN>`. Keep
-  user schemes (`xcuserdata/`) unshared and gitignored.
-- **In Code (Safe Dynamic Loading Only):** If setting the environment variable
-  in code before configuring `AppCheckDebugProviderFactory`, load the token
-  dynamically from a gitignored local file or environment rather than hardcoding
-  the token literal:
-
-```swift
-#if DEBUG
-// ✅ SAFE: Load from gitignored local file or process environment
-// Note: loadGitIgnoredDebugToken() is a placeholder for your custom helper (e.g., reading from a gitignored plist)
-if let debugToken = loadGitIgnoredDebugToken() {
-  setenv("AppCheckDebugToken", debugToken, 0)
-}
-let providerFactory = AppCheckDebugProviderFactory()
-AppCheck.setAppCheckProviderFactory(providerFactory)
-#endif
-
-FirebaseApp.configure() // Configure Firebase AFTER setting the App Check provider factory
 ```
