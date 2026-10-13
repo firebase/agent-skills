@@ -126,3 +126,9 @@ if #available(iOS 27.0, macOS 27.0, *) {
 > `GenerativeModelSession`, or `FirebaseAI.SystemLanguageModel`—ignore older
 > samples or docs (such as `hybrid/ios/get-started`) that still reference them,
 > and use `ai.geminiLanguageModel(name:)` above instead.
+
+## Flutter (Dart)
+
+Hybrid on-device inference is not available via Firebase AI Logic on Flutter
+(including Flutter web); the `firebase_ai` package always calls the cloud-hosted
+Gemini API. See https://firebase.google.com/docs/ai-logic/hybrid.md.txt.

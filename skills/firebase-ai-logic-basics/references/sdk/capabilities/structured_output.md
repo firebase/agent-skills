@@ -97,3 +97,50 @@ let response = try await model.generateContent(prompt)
 // `response.text` is a JSON string that conforms to the schema.
 let deck = try JSONDecoder().decode(Deck.self, from: Data((response.text ?? "{}").utf8))
 ```
+
+## Flutter (Dart)
+
+Build the schema with `Schema.object` / `Schema.array` / `Schema.enumString` and
+pass it in `GenerationConfig`. Put `optionalProperties` on the object that owns
+the optional field.
+
+```dart
+import 'dart:convert';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Provide a JSON schema object using a standard format.
+// Later, pass this schema object into `responseSchema` in the generation config.
+final jsonSchema = Schema.object(
+  properties: {
+    'characters': Schema.array(
+      items: Schema.object(
+        properties: {
+          'name': Schema.string(),
+          'age': Schema.integer(),
+          'species': Schema.string(),
+          'accessory': Schema.enumString(enumValues: ['hat', 'belt', 'shoes']),
+        },
+        optionalProperties: ['accessory'],
+      ),
+    ),
+  },
+);
+
+// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+final model = FirebaseAI.googleAI().generativeModel(
+  model: '<latest_supported_model>',
+  // In the generation config, set the `responseMimeType` to `application/json`
+  // and pass the JSON schema object into `responseSchema`.
+  generationConfig: GenerationConfig(
+    responseMimeType: 'application/json',
+    responseSchema: jsonSchema,
+  ),
+);
+
+final prompt = "For use in a children's card game, generate 10 animal-based characters.";
+final response = await model.generateContent([Content.text(prompt)]);
+
+// `response.text` is a JSON string that conforms to the schema.
+final json = jsonDecode(response.text ?? '{}') as Map<String, dynamic>;
+final characters = json['characters'] as List<dynamic>;
+```

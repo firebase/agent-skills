@@ -15,12 +15,19 @@ Flutter applications.
 > 1. **Client Configuration:** Use `flutterfire configure` strictly for
 >    generating `firebase_options.dart`. Avoid manual Console configuration.
 
-> [!NOTE] `firebase_vertexai` has been replaced by `firebase_ai`. Always use
-> `firebase_ai` for new projects.
+> [!NOTE] **Renamed SDK.** Firebase AI Logic was formerly "Vertex AI in
+> Firebase". The package `firebase_vertexai` has been replaced by `firebase_ai`.
+> Always use `firebase_ai` for new projects (`FirebaseAI.googleAI()` for the
+> Gemini Developer API or `FirebaseAI.agentPlatform()` for the Agent Platform
+> Gemini API; `FirebaseAI.vertexAI()` and the `auth:` / `appCheck:` parameters
+> were deprecated in `firebase_ai` v3.15.0 / v4.0.0 and removed on `main`). See
+> the
+> [migration guide](https://firebase.google.com/docs/ai-logic/migrate-to-latest-sdk.md.txt).
 
 ## Installation
 
-Add the necessary Firebase dependencies to your `pubspec.yaml`:
+Add the necessary Firebase dependencies to your `pubspec.yaml` (or run
+`flutter pub add firebase_core firebase_auth firebase_app_check firebase_ai`):
 
 ```yaml
 dependencies:
@@ -28,25 +35,31 @@ dependencies:
     sdk: flutter
   firebase_core: ^4.0.0
   firebase_auth: ^6.0.0
-  firebase_ai: ^3.0.0
+  firebase_app_check: ^0.4.0
+  firebase_ai: ^4.0.0
 ```
 
-Run `flutter pub get` to install the packages.
+Run `flutter pub get` to install the packages. Always add `firebase_auth` and
+`firebase_app_check` alongside `firebase_ai`: the SDK picks up
+`FirebaseAuth.instance` and `FirebaseAppCheck.instance` automatically from the
+`FirebaseApp`, and App Check is required for commonly abused models (see
+[App Check Debug Provider](#app-check-debug-provider) below).
 
 ## Initialization
 
-Initialize Firebase and sign in (anonymously or via authenticated user) before
-using AI Logic.
+Initialize Firebase before using AI Logic.
 
 ```dart
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ai/firebase_ai.dart';
+import 'package:flutter/material.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await FirebaseAuth.instance.signInAnonymously();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 ```
@@ -73,10 +86,13 @@ Use `FirebaseAI.googleAI` for the **Gemini Developer API**.
 
 ```dart
 import 'package:firebase_ai/firebase_ai.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 Future<String> generateText(String prompt) async {
-  final googleAI = FirebaseAI.googleAI(auth: FirebaseAuth.instance);
+  // Always pass useLimitedUseAppCheckTokens: true on the first FirebaseAI.googleAI()
+  // call for a FirebaseApp (the SDK caches the instance per app and backend).
+  final googleAI = FirebaseAI.googleAI(
+    useLimitedUseAppCheckTokens: true,
+  );
   
   // [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
   final model = googleAI.generativeModel(model: '<latest_supported_model>');
@@ -86,35 +102,34 @@ Future<String> generateText(String prompt) async {
 }
 ```
 
-### Chat Session
-
-```dart
-final chat = model.startChat(history: [
-  Content.text('Hello, I am a user.'),
-  Content.model([TextPart('Hello! How can I help you today?')]),
-]);
-
-final response = await chat.sendMessage(Content.text('What is CBT?'));
-```
+`FirebaseAI.googleAI()` selects the Gemini Developer API (the default). For the
+Agent Platform Gemini API use `FirebaseAI.agentPlatform()` (optionally
+`FirebaseAI.agentPlatform(location: 'global')`; 'global' is the default
+location, and `FirebaseAI.vertexAI()` was deprecated in `v3.15.0` / `v4.0.0` and
+removed on `main`).
 
 ## App Check Debug Provider
 
-For App Check debug tokens during local development and CI/CD, add the plugin
-with `flutter pub add firebase_app_check`, then activate the debug providers
-right after `Firebase.initializeApp()`:
+For App Check debug tokens during local development and CI/CD, activate the
+debug providers right after `Firebase.initializeApp()` (the `firebase_app_check`
+plugin is already added in [Installation](#installation)):
 
 ```dart
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 
 // In main(), after `await Firebase.initializeApp();`
-if (kDebugMode) {
-  await FirebaseAppCheck.instance.activate(
-    providerAndroid: const AndroidDebugProvider(),
-    providerApple: const AppleDebugProvider(),
-    providerWeb: WebDebugProvider(),
-  );
-}
+await FirebaseAppCheck.instance.activate(
+  providerAndroid: kDebugMode
+      ? const AndroidDebugProvider()
+      : const AndroidPlayIntegrityProvider(),
+  providerApple: kDebugMode
+      ? const AppleDebugProvider()
+      : const AppleAppAttestProvider(),
+  providerWeb: kDebugMode
+      ? WebDebugProvider()
+      : ReCaptchaEnterpriseProvider('recaptcha-enterprise-site-key'),
+);
 ```
 
 - Use `providerAndroid`, `providerApple`, and `providerWeb`. The older
@@ -124,6 +139,13 @@ if (kDebugMode) {
   Release builds must activate the production providers (Play Integrity, App
   Attest or DeviceCheck, and reCAPTCHA Enterprise) instead; see
   [App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt).
+- **App Check enforcement and replay protection**: Firebase AI Logic requires
+  App Check for commonly abused models (returning
+  `HTTP 403: "To access this model, you must enforce Firebase App Check"` if App
+  Check is not configured and enforced). When **replay protection** is enabled,
+  pass `useLimitedUseAppCheckTokens: true` on the very first
+  `FirebaseAI.googleAI(...)` (or `FirebaseAI.agentPlatform(...)`) call for a
+  `FirebaseApp` so the SDK fetches single-use (5-minute TTL) tokens.
 - **CI/CD**: Pass the pre-provisioned token to all three debug providers, e.g.
   `debugToken: const String.fromEnvironment('APP_CHECK_DEBUG_TOKEN')`, and build
   with `--dart-define=APP_CHECK_DEBUG_TOKEN=<token>`.
@@ -132,4 +154,6 @@ if (kDebugMode) {
   `web/index.html` doesn't need `self.FIREBASE_APPCHECK_DEBUG_TOKEN`.
 - If the app uses `firebase_ai` 3.11.0 or lower, also set the `appCheck`
   parameter of `FirebaseAI.googleAI(...)` to `FirebaseAppCheck.instance`. Newer
-  versions don't need this.
+  versions retrieve `FirebaseAppCheck` and `FirebaseAuth` automatically from
+  `FirebaseApp` (`appCheck:` and `auth:` were deprecated in v3.15.0 / v4.0.0,
+  omitted on `FirebaseAI.agentPlatform()`, and removed on `main`).

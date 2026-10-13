@@ -87,3 +87,41 @@ Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): pass
 in place of the `InlineDataPart` (see
 [Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt)
 for required setup and permissions).
+
+## Flutter (Dart)
+
+Build an `InlineDataPart(mimeType, bytes)` and combine it with a `TextPart` in a
+single `Content.multi` message:
+
+```dart
+import 'dart:io';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+final model = FirebaseAI.googleAI().generativeModel(model: '<latest_supported_model>');
+
+// Provide a text prompt to include with the image
+final prompt = TextPart("What's in the picture?");
+// Prepare the image for input (any Uint8List works, e.g. from image_picker)
+final image = await File('image0.jpg').readAsBytes();
+final imagePart = InlineDataPart('image/jpeg', image);
+// To generate text output, call generateContent with the image and text
+final response = await model.generateContent([
+  Content.multi([imagePart, prompt]),
+]);
+print(response.text);
+```
+
+Other media types only differ in the MIME type passed to `InlineDataPart`:
+
+```dart
+final audio = await File('audio0.mp3').readAsBytes();
+final audioPart = InlineDataPart('audio/mpeg', audio); // or 'application/pdf', 'video/mp4'
+final response = await model.generateContent([
+  Content.multi([audioPart, TextPart("Transcribe what's said in this audio recording.")]),
+]);
+```
+
+Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): use
+`FileData('image/jpeg', 'gs://bucket-name/path/image.jpg')` in place of the
+`InlineDataPart` inside `Content.multi`.
