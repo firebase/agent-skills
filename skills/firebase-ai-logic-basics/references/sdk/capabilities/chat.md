@@ -83,3 +83,33 @@ final chat = model.startChat(history: [
 final response = await chat.sendMessage(Content.text('What is CBT?'));
 print(response.text);
 ```
+
+## Web (JavaScript)
+
+Maintain history automatically using `startChat`.
+
+```javascript
+import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
+
+const ai = getAI(app, { backend: new GoogleAIBackend() });
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
+
+const chat = model.startChat({
+  history: [
+    {
+      role: "user",
+      parts: [{ type: "text", text: "Hello, I am a developer." }],
+    },
+    {
+      role: "model",
+      parts: [{ type: "text", text: "Great to meet you. How can I help with code?" }],
+    },
+  ],
+});
+
+async function sendMessage(msg) {
+  const result = await chat.sendMessage(msg);
+  return result.response.text();
+}
+```

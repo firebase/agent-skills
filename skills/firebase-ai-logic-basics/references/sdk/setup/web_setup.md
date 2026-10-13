@@ -2,17 +2,27 @@
 
 ## Installation
 
-The library is part of the standard Firebase Web SDK:
+The library is part of the standard Firebase Web SDK (`firebase@13.0.0+`
+requires Node.js `>=24.12.0`):
 
 ```bash
 npm install firebase@latest
 ```
 
+> [!NOTE] **Renamed SDK.** Firebase AI Logic was formerly "Vertex AI in
+> Firebase". The current entry point is `firebase/ai` (`getAI`,
+> `getGenerativeModel`, `GoogleAIBackend`, `AgentPlatformBackend`). If the app
+> still imports from `firebase/vertexai`, calls `getVertexAI`, or uses
+> `VertexAIBackend` (removed in `firebase@13.0.0` / `@firebase/ai@3.0.0`),
+> migrate it; do not generate new code against the old entry point. See the
+> [migration guide](https://firebase.google.com/docs/ai-logic/migrate-to-latest-sdk.md.txt).
+
 ## Initialization Pattern
 
-You must initialize the ai-logic service after the main Firebase App.
+First, ensure you have initialized the Firebase App (see `firebase-basics`
+skill). Then, initialize the AI Logic service as below:
 
-```JavaScript
+```javascript
 import { initializeApp } from "firebase/app";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 
@@ -33,32 +43,27 @@ const ai = getAI(app, {
   useLimitedUseAppCheckTokens: true,
 });
 
-const generationConfig = {
-  candidateCount: 1,
-  maxOutputTokens: 2048,
-  stopSequences: [],
-  temperature: 0.7,      // Balanced: creative but focused
-  topP: 0.95,            // Standard: allows a wide range of probable tokens
-  topK: 40,              // Standard: considers the top 40 tokens
-};
-
-// Specify the config as part of creating the `GenerativeModel` instance
 // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-const model = getGenerativeModel(ai, { model: "<latest_supported_model>",  generationConfig });
+const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
 ```
 
-### App Check Replay Protection
+`new GoogleAIBackend()` selects the Gemini Developer API (the default). For the
+Agent Platform Gemini API use `backend: new AgentPlatformBackend()` (optionally
+`new AgentPlatformBackend("us-central1")`; the default location is `global`, and
+`VertexAIBackend` was removed in `firebase@13.0.0`).
 
-Generative and preview models enforce replay protection with 5-minute
-limited-use App Check tokens. If you call a protected model without enabling
-limited-use tokens, the request fails with:
+### App Check Enforcement and Replay Protection
+
+Firebase AI Logic requires Firebase App Check for commonly abused models. If App
+Check is not configured in your app and enforced in the Firebase console,
+requests to those models fail with:
 
 ```text
 HTTP 403: "To access this model, you must enforce Firebase App Check"
 ```
 
-To resolve this error on Web, initialize `getAI` with
-`useLimitedUseAppCheckTokens: true`:
+In addition, when **replay protection** is enabled in App Check, initialize
+`getAI` with `useLimitedUseAppCheckTokens: true`:
 
 ```javascript
 const ai = getAI(app, {
@@ -67,163 +72,22 @@ const ai = getAI(app, {
 });
 ```
 
-This instructs the SDK to fetch fresh, short-lived limited-use tokens (such as
-via reCAPTCHA Enterprise or the debug provider) for requests rather than reusing
-standard cached App Check tokens.
+This instructs the SDK to fetch fresh, single-use (5-minute TTL) App Check
+tokens (such as via reCAPTCHA Enterprise or the debug provider) for requests
+rather than reusing standard cached App Check tokens.
 
 ## Core Capabilities
 
-Text-Only Generation
+### Text-Only Generation
 
-```JavaScript
+```javascript
 async function generateText(prompt) {
   const result = await model.generateContent(prompt);
-  const response = await result.response;
+  // `result.response` is a plain object for generateContent (only the
+  // generateContentStream result's `.response` is a Promise).
+  const response = result.response;
   return response.text();
 }
-```
-
-## Multimodal (Text + Images/Audio/Video/PDF input)
-
-Firebase AI Logic accepts Base64 encoded data or specific file references.
-
-```JavaScript
-// Helper to convert file to base64 generic object
-async function fileToGenerativePart(file) {
-  const base64EncodedDataPromise = new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-    reader.readAsDataURL(file);
-  });
-  
-  return {
-    inlineData: {
-      data: await base64EncodedDataPromise,
-      mimeType: file.type,
-    },
-  };
-}
-
-async function analyzeImage(prompt, imageFile) {
-  const imagePart = await fileToGenerativePart(imageFile);
-  const result = await model.generateContent([prompt, imagePart]);
-  return result.response.text();
-}
-```
-
-## Chat Session (Multi-turn)
-
-Maintain history automatically using startChat.
-
-```JavaScript
-const chat = model.startChat({
-  history: [
-    {
-      role: "user",
-      parts: [{ text: "Hello, I am a developer." }],
-    },
-    {
-      role: "model",
-      parts: [{ text: "Great to meet you. How can I help with code?" }],
-    },
-  ],
-});
-
-async function sendMessage(msg) {
-  const result = await chat.sendMessage(msg);
-  return result.response.text();
-}
-```
-
-## Streaming Responses
-
-For real-time UI updates (like a typing effect).
-
-```JavaScript
-async function streamResponse(prompt) {
-  const result = await model.generateContentStream(prompt);
-  for await (const chunk of result.stream) {
-    const chunkText = chunk.text();
-    console.log("Stream chunk:", chunkText);
-    // Update UI here
-  }
-}
-```
-
-Generate Images with Nano Banana
-
-```Javascript
-import { initializeApp } from "firebase/app";
-import { getAI, getGenerativeModel, GoogleAIBackend, ResponseModality } from "firebase/ai";
-
-
-// Initialize FirebaseApp
-const firebaseApp = initializeApp(firebaseConfig);
-
-// Initialize the Gemini Developer API backend service
-const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
-
-// Create a `GenerativeModel` instance with a model that supports your use case
-const model = getGenerativeModel(ai, {
-  model: "<latest_supported_image_model>", // [AGENT] Replace with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
-  // Configure the model to respond with text and images (required)
-  generationConfig: {
-    responseModalities: [ResponseModality.TEXT, ResponseModality.IMAGE],
-  },
-});
-
-// Provide a text prompt instructing the model to generate an image
-const prompt = 'Generate an image of the Eiffel Tower with fireworks in the background.';
-
-// To generate an image, call `generateContent` with the text input
-const result = await model.generateContent(prompt);
-
-// Handle the generated image
-try {
-  const inlineDataParts = result.response.inlineDataParts();
-  if (inlineDataParts?.[0]) {
-    const image = inlineDataParts[0].inlineData;
-    console.log(image.mimeType, image.data);
-  }
-} catch (err) {
-  console.error('Prompt or candidate was blocked:', err);
-}
-```
-
-## Advanced Features
-
-Structured Output (JSON) Enforce a specific JSON schema for the response.
-
-```JavaScript
-import { getGenerativeModel, Schema } from "firebase/ai";
-const jsonModel = getGenerativeModel(ai, {
-    model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-    generationConfig: {
-        responseMimeType: "application/json",
-        // Optional: Define a schema
-        responseSchema: Schema.object({ ... })
-    }
-});
-
-async function getJsonData(prompt) {
-    const result = await jsonModel.generateContent(prompt);
-    return JSON.parse(result.response.text());
-}
-```
-
-On-Device AI (Hybrid) Automatically switch between local Gemini Nano and cloud
-models based on device capability.
-
-The Firebase JavaScript SDK checks for Gemini Nano's availability (after
-installation) and switches between on-device or cloud-hosted prompt execution.
-This requires specific steps to enable model usage in the Chrome browser, more
-info in the
-[hybrid inference documentation for Web](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started.md.txt).
-
-```JavaScript
-import {getGenerativeModel, InferenceMode } from "firebase/ai";
-
-const hybridModel = getGenerativeModel(ai, { mode: InferenceMode.PREFER_ON_DEVICE });
 ```
 
 ## App Check
@@ -255,20 +119,42 @@ from a gitignored local environment file:
 ```javascript
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 
-if (typeof self !== "undefined") {
-  if (typeof process !== "undefined" && process.env.NODE_ENV === "development") {
-    // ✅ SAFE: Load dynamically from Next.js environment variable; fallback to true to auto-generate
+// Browser only: reCAPTCHA (and `self`) are unavailable during server rendering.
+if (typeof window !== "undefined") {
+  // Each branch checks its framework's exact env variable so a Vite app can't
+  // accidentally match the Next.js branch (and vice versa).
+  if (
+    typeof process !== "undefined" &&
+    process.env.NEXT_PUBLIC_APP_CHECK_DEBUG_TOKEN
+  ) {
+    // ✅ SAFE: Next.js inlines NEXT_PUBLIC_* at build time; keep the value in a gitignored .env.local
     self.FIREBASE_APPCHECK_DEBUG_TOKEN =
-      process.env.NEXT_PUBLIC_APP_CHECK_DEBUG_TOKEN || true;
-  } else if (typeof import.meta !== "undefined" && import.meta.env?.DEV) {
-    // ✅ SAFE: Load dynamically from Vite environment variable; fallback to true to auto-generate
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN =
-      import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
+      process.env.NEXT_PUBLIC_APP_CHECK_DEBUG_TOKEN;
+  } else if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env?.VITE_APPCHECK_DEBUG_TOKEN
+  ) {
+    // ✅ SAFE: Vite inlines VITE_* at build time; keep the value in a gitignored .env.local
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN;
+  } else if (
+    (typeof process !== "undefined" && process.env.NODE_ENV === "development") ||
+    (typeof import.meta !== "undefined" && import.meta.env?.DEV)
+  ) {
+    // Dev fallback: auto-generate a debug token (printed to the browser console).
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
   }
-}
 
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaEnterpriseProvider("/* reCAPTCHA site key */"),
-  isTokenAutoRefreshEnabled: true,
-});
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider("/* reCAPTCHA site key */"),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 ```
+
+> [!IMPORTANT] **Server rendering (Next.js, SvelteKit, etc.):**
+> `initializeAppCheck` and the reCAPTCHA provider only work in the browser. Run
+> the block above from client-side code only (for example a `"use client"`
+> component or inside `useEffect`), never during SSR. If server-rendered code
+> must call Firebase AI Logic, use
+> [`initializeServerApp`](https://firebase.google.com/docs/web/ssr-apps.md.txt)
+> and pass it the App Check token obtained on the client.
