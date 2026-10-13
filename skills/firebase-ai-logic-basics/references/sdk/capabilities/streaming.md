@@ -15,3 +15,27 @@ lifecycleScope.launch {
         }
 }
 ```
+
+## iOS (Swift)
+
+`generateContentStream` returns an `AsyncThrowingStream`; iterate it with
+`for try await`. The call itself is marked `throws` but is not `async`, so the
+`try` sits before `model.generateContentStream` and the `await` on the loop. For
+a chat session call `chat.sendMessageStream("...")` and iterate the same way.
+
+```swift
+import FirebaseAILogic
+
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(modelName: "<latest_supported_model>")
+
+// Provide a prompt that contains text
+let prompt = "Write a story about a magic backpack."
+// To stream generated text output, call generateContentStream with the text input
+let contentStream = try model.generateContentStream(prompt)
+for try await chunk in contentStream {
+  if let text = chunk.text {
+    print(text) // Update UI incrementally
+  }
+}
+```

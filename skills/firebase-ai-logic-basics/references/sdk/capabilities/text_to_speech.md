@@ -30,7 +30,8 @@ To instruct Gemini to synthesize and return audio, configure
 
 - **Android (Kotlin)**:
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
-- **Swift**: `generationConfig = GenerationConfig(responseModalities: [.audio])`
+- **iOS (Swift)**:
+  `GenerationConfig(responseModalities: [.audio], speechConfig: ...)`
 - **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
 
 ### 2. Single-Speaker `SpeechConfig`
@@ -51,13 +52,11 @@ prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
       )
   }
   ```
-- **Swift**:
+- **iOS (Swift)**:
   ```swift
-  let speechConfig = SpeechConfig(
-      voiceConfig: VoiceConfig(
-          prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-      ),
-      languageCode: "en-US"
+  let config = GenerationConfig(
+      responseModalities: [.audio],
+      speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
   )
   ```
 - **Web**:
@@ -93,26 +92,17 @@ narrator and character), configure `MultiSpeakerVoiceConfig` with
   )
   ```
 
-- **Swift**:
+- **iOS (Swift)**:
 
   ```swift
-  let multiSpeakerConfig = SpeechConfig(
+  let multiSpeechConfig = SpeechConfig(
       multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
           speakerVoiceConfigs: [
-              SpeakerVoiceConfig(
-                  speaker: "Host",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-                  )
-              ),
-              SpeakerVoiceConfig(
-                  speaker: "Guest",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Aoede")
-                  )
-              )
+              SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+              SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
           ]
-      )
+      ),
+      languageCode: "en-US"
   )
   ```
 
@@ -453,9 +443,67 @@ fun playWavAudio(context: Context, pcmBytes: ByteArray) {
 
 ______________________________________________________________________
 
-### Swift (iOS)
+## iOS (Swift)
 
-#### 1. Streaming Playback with `AVAudioEngine`
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```swift
+import FirebaseAILogic
+
+func generateSingleSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let config = GenerationConfig(
+        responseModalities: [.audio],
+        speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: config
+    )
+
+    let response = try await model.generateContent("Say cheerfully: Have a wonderful day!")
+    for part in response.inlineDataParts {
+        let pcmData = part.data // Raw PCM audio bytes (24kHz, 1 channel, 16-bit)
+        playRawPcm(data: pcmData)
+    }
+}
+
+func generateMultiSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let multiSpeechConfig = SpeechConfig(
+        multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+            speakerVoiceConfigs: [
+                SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+                SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
+            ]
+        ),
+        languageCode: "en-US"
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: GenerationConfig(
+            responseModalities: [.audio],
+            speechConfig: multiSpeechConfig
+        )
+    )
+
+    let prompt = """
+    Joe: How's it going today Jane?
+    Jane: [excited] Not too bad, how about you?
+    """
+
+    let response = try await model.generateContent(prompt)
+    for part in response.inlineDataParts {
+        playRawPcm(data: part.data)
+    }
+}
+```
+
+### 2. Streaming Playback with `AVAudioEngine` (`generateContentStream`)
 
 ```swift
 import AVFoundation
@@ -465,10 +513,11 @@ import FirebaseAILogic
 final class SpeechStreamingManager {
     private let audioEngine = AVAudioEngine()
     private let playerNode = AVAudioPlayerNode()
-    
-    // 24 kHz, 16-bit Mono PCM
+
+    // AVAudioEngine requires 32-bit float non-interleaved PCM for node connections;
+    // convert incoming 24 kHz 16-bit signed integer PCM samples to Float32 [-1.0, 1.0].
     private let audioFormat = AVAudioFormat(
-        commonFormat: .pcmFormatInt16,
+        commonFormat: .pcmFormatFloat32,
         sampleRate: 24000,
         channels: 1,
         interleaved: false
@@ -480,55 +529,50 @@ final class SpeechStreamingManager {
     }
 
     func streamSpeech(prompt: String) async throws {
-        let ai = FirebaseAI.firebaseAI()
-        
-        let speechConfig = SpeechConfig(
-            voiceConfig: VoiceConfig(
-                prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-            )
-        )
-        
-        let genConfig = GenerationConfig(
+        let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+        let config = GenerationConfig(
             responseModalities: [.audio],
-            speechConfig: speechConfig
+            speechConfig: SpeechConfig(voiceName: "Kore")
         )
-        
+
         let model = ai.generativeModel(
             modelName: "gemini-3.1-flash-tts-preview",
-            generationConfig: genConfig
+            generationConfig: config
         )
-        
+
         if !audioEngine.isRunning {
             try audioEngine.start()
         }
         playerNode.play()
 
-        let stream = model.generateContentStream(prompt)
-        for try await chunk in stream {
-            for part in chunk.candidates.first?.content.parts ?? [] {
-                if let inlineData = part as? InlineDataPart,
-                   inlineData.mimeType.contains("audio/pcm") || inlineData.mimeType.contains("audio/l16") {
-                    schedulePCMBuffer(data: inlineData.data)
-                }
+        let responseStream = try model.generateContentStream(prompt)
+        for try await chunk in responseStream {
+            for part in chunk.inlineDataParts {
+                // Raw PCM audio bytes (24kHz, 1 channel, 16-bit signed little-endian)
+                schedulePCMBuffer(data: part.data)
             }
         }
     }
 
     private func schedulePCMBuffer(data: Data) {
-        let frameCount = UInt32(data.count) / audioFormat.streamDescription.pointee.mBytesPerFrame
+        let sampleCount = data.count / MemoryLayout<Int16>.size
+        let frameCount = AVAudioFrameCount(sampleCount)
         guard frameCount > 0,
-              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount) else {
+              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount),
+              let floatChannel = buffer.floatChannelData?[0] else {
             return
         }
         buffer.frameLength = frameCount
-        
+
         data.withUnsafeBytes { rawBufferPointer in
-            guard let src = rawBufferPointer.baseAddress else { return }
-            if let dest = buffer.int16ChannelData?[0] {
-                UnsafeMutableRawPointer(dest).copyMemory(from: src, byteCount: data.count)
+            let int16Buffer = rawBufferPointer.bindMemory(to: Int16.self)
+            for i in 0..<sampleCount {
+                let sample = Int16(littleEndian: int16Buffer[i])
+                floatChannel[i] = Float(sample) / 32768.0
             }
         }
-        
+
         playerNode.scheduleBuffer(buffer)
     }
 
@@ -539,9 +583,24 @@ final class SpeechStreamingManager {
 }
 ```
 
-#### 2. WAV Converter for `AVAudioPlayer`
+### 3. Prepend WAV Header for `AVAudioPlayer`
 
 ```swift
+import AVFoundation
+
+var audioPlayer: AVAudioPlayer?
+
+func playRawPcm(data: Data) {
+    let wavData = addWavHeader(to: data)
+    do {
+        audioPlayer = try AVAudioPlayer(data: wavData)
+        audioPlayer?.prepareToPlay()
+        audioPlayer?.play()
+    } catch {
+        print("Error playing audio: \(error)")
+    }
+}
+
 func addWavHeader(to pcmData: Data, sampleRate: Int = 24000, channels: Int = 1, bitDepth: Int = 16) -> Data {
     var header = Data()
     let byteRate = sampleRate * channels * bitDepth / 8
