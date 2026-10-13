@@ -2,7 +2,7 @@
 name: firebase-ai-logic-basics
 description: >-
   Integrates Firebase AI Logic (formerly Vertex AI for Firebase) into mobile and web apps (Android, iOS, Web, and Flutter) to call Gemini models from client code. Use when provisioning or initializing Firebase AI Logic, or adding Gemini features to an app: text generation, multimodal input, chat, streaming, structured output, hybrid on-device inference, App Check protection, or switching models with Remote Config.
-version: 1.0.1
+version: 1.1.0
 metadata:
   author: Google LLC
   category: AiAndMachineLearning
@@ -154,7 +154,8 @@ models:
   - Client-side decoding and playback of 24 kHz 16-bit linear PCM (`audio/l16`)
     or WAV container format (`audio/x-wav`)
 
-See the [Text-to-Speech (TTS) Generation Guide](references/tts_generation.md)
+See the
+[Text-to-Speech (TTS) Generation Guide](references/sdk/capabilities/text_to_speech.md)
 for full implementation details, streaming patterns, and copy-paste code
 snippets for iOS (Swift), Android (Kotlin), and Web.
 
@@ -257,22 +258,22 @@ ______________________________________________________________________
 - **Android (Kotlin)**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [usage_patterns_android.md](references/usage_patterns_android.md)
+  - Reference: [android_setup.md](references/sdk/setup/android_setup.md)
 
 - **iOS (Swift)**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [ios_setup.md](references/ios_setup.md)
+  - Reference: [ios_setup.md](references/sdk/setup/ios_setup.md)
 
 - **Web Modular API**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [usage_patterns_web.md](references/usage_patterns_web.md)
+  - Reference: [web_setup.md](references/sdk/setup/web_setup.md)
 
 - **Flutter (Dart)**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [flutter_setup.md](references/flutter_setup.md)
+  - Reference: [flutter_setup.md](references/sdk/setup/flutter_setup.md)
 
 > [!WARNING] **CRITICAL: Use current model names:** Always check the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
@@ -281,9 +282,9 @@ ______________________________________________________________________
 
 ## References
 
-[Android (Kotlin) SDK usage patterns](references/usage_patterns_android.md)
-[iOS SDK code examples and usage patterns](references/ios_setup.md)
-[Web SDK setup, code examples, and usage patterns](references/usage_patterns_web.md)
+[Android (Kotlin) SDK usage patterns](references/sdk/setup/android_setup.md)
+[iOS SDK code examples and usage patterns](references/sdk/setup/ios_setup.md)
+[Web SDK setup, code examples, and usage patterns](references/sdk/setup/web_setup.md)
 
-[Flutter SDK code examples and usage patterns](references/flutter_setup.md)
-[Client-side Text-to-Speech (TTS) generation](references/tts_generation.md)
+[Flutter SDK code examples and usage patterns](references/sdk/setup/flutter_setup.md)
+[Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
