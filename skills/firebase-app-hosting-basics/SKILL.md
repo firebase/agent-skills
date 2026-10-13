@@ -75,6 +75,17 @@ users, and is not required to use App Hosting. See
 [CLI Commands](references/cli_commands.md) for more information on how to set
 this up using CLI commands.
 
+## Runtimes & Automatic Base Image Updates (ABIU)
+
+App Hosting supports versioned Node.js runtimes with Automatic Base Image
+Updates (ABIU) to apply security patches without redeploys.
+
+- **CRITICAL**: AI Assistants **MUST** inspect the project's `package.json` and
+  check the `engines.node` field before recommending a runtime version or
+  creating a backend. Mismatched runtimes trigger build-time errors.
+- For a complete guide on setup, CLI flags, and lifecycle management, see
+  [Runtimes & ABIU](references/runtimes_and_abiu.md).
+
 ## Emulation
 
 See [Emulation](references/emulation.md) for more information on how to test
