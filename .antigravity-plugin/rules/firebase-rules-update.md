@@ -1,0 +1,1 @@
+Whenever you update an application that uses firestore is modified, be sure to update your rules following the firebase-write-rules skill. After that you can deploy using the firebase-rules-deploy skill.

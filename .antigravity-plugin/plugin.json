@@ -1,0 +1,8 @@
+{
+    "name": "firebase-antigravity-plugin",
+    "version": "0.1.0",
+    "description": "Builders Firebase plugin for Antigravity.",
+    "skills": "./skills",
+    "rules": "./rules",
+    "hooks": "hooks.json"
+}
