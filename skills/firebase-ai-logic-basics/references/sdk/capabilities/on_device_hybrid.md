@@ -109,3 +109,75 @@ print(response.content)
 Hybrid on-device inference is not available via Firebase AI Logic on Flutter
 (including Flutter web); the `firebase_ai` package always calls the cloud-hosted
 Gemini API. See https://firebase.google.com/docs/ai-logic/hybrid.md.txt.
+
+## Web (JavaScript)
+
+On Web, on-device inference uses Chrome's built-in
+[Prompt API](https://developer.chrome.com/docs/extensions/ai/prompt-api) on
+Chrome Desktop (v139+, with at least 22 GB free storage and >4 GB VRAM or 16 GB
+RAM). For local development, enable
+`chrome://flags/#prompt-api-for-gemini-nano-multimodal-input` and restart
+Chrome; for end users, serve the
+[Prompt API Chrome Origin Trial](https://developer.chrome.com/origintrials/#/view_trial/2533837740349325313)
+token.
+
+Create the hybrid model with `mode: InferenceMode.PREFER_ON_DEVICE`, call
+`await hybridModel.initializeDeviceModel()` on a user gesture to ensure Gemini
+Nano is downloaded and initialized, then call `generateContent` and inspect
+`result.response.inferenceSource`:
+
+```javascript
+import { getGenerativeModel, InferenceMode, InferenceSource } from "firebase/ai";
+
+const hybridModel = getGenerativeModel(ai, {
+  mode: InferenceMode.PREFER_ON_DEVICE,
+});
+
+// Call initializeDeviceModel() on or after an end-user interaction (e.g. button click)
+document.querySelector("#generate").addEventListener("click", async () => {
+  await hybridModel.initializeDeviceModel((progress) => {
+    console.log(`On-device model download progress: ${Math.round(progress * 100)}%`);
+  });
+
+  const prompt = "Write a story about a magic backpack.";
+  const result = await hybridModel.generateContent(prompt);
+
+  // Compare with InferenceSource.ON_DEVICE ("on_device") or InferenceSource.IN_CLOUD ("in_cloud")
+  const usedOnDevice = result.response.inferenceSource === InferenceSource.ON_DEVICE;
+  console.log(`Source: ${result.response.inferenceSource} (onDevice=${usedOnDevice})`);
+  console.log(result.response.text());
+});
+```
+
+To override the default cloud model (`gemini-3.5-flash-lite` in
+`firebase@13.0.0+`; `gemini-2.5-flash-lite` in `firebase@12.x`) or request
+structured output from both paths, configure `inCloudParams` and
+`onDeviceParams` together:
+
+```javascript
+import { getGenerativeModel, InferenceMode, Schema } from "firebase/ai";
+
+const jsonSchema = Schema.object({
+  properties: { name: Schema.string(), species: Schema.string() },
+});
+
+const hybridModel = getGenerativeModel(ai, {
+  mode: InferenceMode.PREFER_ON_DEVICE,
+  // Cloud-hosted model settings (overrides the SDK's default cloud model)
+  inCloudParams: {
+    model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: jsonSchema,
+    },
+  },
+  // On-device model settings (Chrome Prompt API options)
+  onDeviceParams: {
+    promptOptions: { responseConstraint: jsonSchema },
+  },
+});
+```
+
+For enum output use `Schema.enumString({ enum: [...] })` with
+`responseMimeType: "text/x.enum"` in `inCloudParams` and the same schema as the
+`responseConstraint`.

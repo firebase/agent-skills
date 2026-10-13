@@ -170,3 +170,67 @@ Future<String> generateConfiguredText(String prompt) async {
   return response.text ?? 'No response';
 }
 ```
+
+## Web (JavaScript)
+
+Call `getGenerativeModel(ai, { model })` and pass the prompt to
+`generateContent(prompt)`. `response.text()` returns the generated text:
+
+```javascript
+import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
+
+// Initialize the AI Logic service (defaults to Gemini Developer API)
+const ai = getAI(app, { backend: new GoogleAIBackend() });
+
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
+
+async function generateText(prompt) {
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return response.text();
+}
+```
+
+### Optional: Custom Generation Config & Safety Settings
+
+Pass optional plain objects for `generationConfig` and `safetySettings` in the
+options of `getGenerativeModel`; `HarmCategory` and `HarmBlockThreshold` are
+exported from `firebase/ai`.
+
+```javascript
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  HarmBlockThreshold,
+  HarmCategory,
+} from "firebase/ai";
+
+const ai = getAI(app, { backend: new GoogleAIBackend() });
+
+// Set optional parameter values in a `GenerationConfig`.
+// IMPORTANT: Example values shown here. Make sure to update for your use case.
+const generationConfig = {
+  maxOutputTokens: 200,
+  stopSequences: ["red"],
+};
+
+const safetySettings = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+];
+
+// Specify optional config and safety settings when creating the GenerativeModel instance
+const configuredModel = getGenerativeModel(ai, {
+  model: "<latest_supported_model>",
+  generationConfig,
+  safetySettings,
+});
+```
