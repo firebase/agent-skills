@@ -114,6 +114,10 @@ ______________________________________________________________________
 
 ### Text-Only Generation
 
+See the [Text Generation Guide](references/sdk/capabilities/text_generation.md)
+for single-turn `generateContent`, generation config, and safety settings across
+Android, iOS, Flutter, and Web.
+
 ### Multimodal (Text + Images/Audio/Video/PDF input)
 
 Firebase AI Logic allows Gemini models to analyze image files directly from your
@@ -122,17 +126,20 @@ images, detecting objects, and categorizing images. Beyond images, Gemini can
 analyze other media types like audio, video, and PDFs by passing them as inline
 data with their MIME type. For files larger than 20 megabytes (which can cause
 HTTP 413 errors as inline data), store them in Cloud Storage for Firebase and
-pass their URLs to the Gemini Developer API.
+pass their URLs to the Gemini Developer API. See the
+[Multimodal Input Guide](references/sdk/capabilities/multimodal_input.md).
 
 ### Chat Session (Multi-turn)
 
-Maintain history automatically using `startChat`.
+Maintain history automatically using `startChat`. See the
+[Multi-Turn Chat Guide](references/sdk/capabilities/chat.md).
 
 ### Streaming Responses
 
 To improve the user experience by showing partial results as they arrive (like a
 typing effect), use `generateContentStream` instead of `generateContent` for
-faster display of results.
+faster display of results. See the
+[Streaming Responses Guide](references/sdk/capabilities/streaming.md).
 
 ### Text-to-Speech (TTS) Generation
 
@@ -287,4 +294,8 @@ ______________________________________________________________________
 [Web SDK setup, code examples, and usage patterns](references/sdk/setup/web_setup.md)
 
 [Flutter SDK code examples and usage patterns](references/sdk/setup/flutter_setup.md)
+[Text generation](references/sdk/capabilities/text_generation.md)
+[Multimodal input (images, audio, video, PDF)](references/sdk/capabilities/multimodal_input.md)
+[Multi-turn chat](references/sdk/capabilities/chat.md)
+[Streaming responses](references/sdk/capabilities/streaming.md)
 [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
