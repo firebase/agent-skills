@@ -60,3 +60,67 @@ lifecycleScope.launch {
     }
 }
 ```
+
+## iOS (Swift)
+
+Function arguments arrive as a `JSONObject` (`[String: JSONValue]`), so pattern
+match on the expected case; the function result is also a `JSONObject`:
+
+```swift
+import FirebaseAILogic
+
+// Step 1: the app-side function the model can ask you to run.
+func getStockPrice(symbol: String) -> JSONObject {
+  // TODO(developer): Call a real stock price API. Hardcoded for demo purposes.
+  return ["symbol": .string(symbol), "price": .number(189.84)]
+}
+
+// Step 2: describe the function to the model.
+let getStockPriceDeclaration = FunctionDeclaration(
+  name: "getStockPrice",
+  description: "Get the current stock price for a given symbol.",
+  parameters: [
+    "symbol": .string(
+      description: "The stock symbol, e.g. AAPL"
+    )
+  ]
+)
+
+// Step 3: provide the declaration when creating the model.
+let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
+  modelName: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  tools: [.functionDeclarations([getStockPriceDeclaration])]
+)
+
+// Step 4: in your task, send the prompt in a chat session and run any requested call.
+let chat = model.startChat()
+let response = try await chat.sendMessage("What is the stock price of Apple?")
+
+var functionResponses = [FunctionResponsePart]()
+for functionCall in response.functionCalls {
+  print("Model requested function: \(functionCall.name) with args: \(functionCall.args)")
+  if functionCall.name == "getStockPrice" {
+    // TODO(developer): Handle invalid arguments.
+    guard case let .string(symbol) = functionCall.args["symbol"] else {
+      fatalError("Missing or invalid 'symbol' argument in function call.")
+    }
+    functionResponses.append(FunctionResponsePart(
+      name: functionCall.name,
+      response: getStockPrice(symbol: symbol)
+    ))
+  }
+  // TODO(developer): Handle other potential function calls, if any.
+}
+
+// Step 5: return the result(s) so the model can write its final answer.
+let finalResponse = try await chat.sendMessage(
+  [ModelContent(role: "user", parts: functionResponses)]
+)
+print(finalResponse.text ?? "No text in response.")
+```
+
+> [!WARNING] **`Tool` was renamed in Firebase iOS SDK 13.0.0.** The top-level
+> `Tool` type is now `GenerativeModel.Tool`, so
+> `let tool = Tool.functionDeclarations([...])` no longer compiles. Pass the
+> array literal `tools: [.functionDeclarations([...])]` as above; it works on
+> both old and new SDK versions.
