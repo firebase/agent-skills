@@ -183,3 +183,83 @@ if (response.inlineDataParts.isNotEmpty) {
   print('Error: No images were generated.');
 }
 ```
+
+## Web (JavaScript)
+
+`ai` is the AI Logic service instance created during setup with
+`getAI(app, { backend: new GoogleAIBackend() })`. This sample requests both
+`TEXT` and `IMAGE`, so the model may return text parts alongside the image;
+`inlineDataParts()` returns only the image parts. Drop `ResponseModality.TEXT`
+for image-only output. To display the result, build a data URL from the part:
+`` `data:${image.mimeType};base64,${image.data}` ``.
+
+```javascript
+import { getGenerativeModel, ResponseModality } from "firebase/ai";
+
+// Create a `GenerativeModel` instance with a model that supports your use case
+const model = getGenerativeModel(ai, {
+  model: "<latest_supported_image_model>", // [AGENT] Replace with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  // Configure the model to respond with text and images (required)
+  generationConfig: {
+    responseModalities: [ResponseModality.TEXT, ResponseModality.IMAGE],
+  },
+});
+
+// Provide a text prompt instructing the model to generate an image
+const prompt = 'Generate an image of the Eiffel Tower with fireworks in the background.';
+
+// To generate an image, call `generateContent` with the text input
+const result = await model.generateContent(prompt);
+
+// Handle the generated image
+try {
+  const inlineDataParts = result.response.inlineDataParts();
+  if (inlineDataParts?.[0]) {
+    const image = inlineDataParts[0].inlineData;
+    console.log(image.mimeType, image.data);
+  }
+} catch (err) {
+  console.error('Prompt or candidate was blocked:', err);
+}
+```
+
+### Edit an image
+
+Convert the user's file to an inline data part and pass it with the prompt to
+the same image-capable `model`:
+
+```javascript
+// Prepare an image for the model to edit
+async function fileToGenerativePart(file) {
+  const base64EncodedDataPromise = new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  return {
+    type: "inlineData",
+    inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+  };
+}
+
+// Provide a text prompt instructing the model to edit the image
+const prompt = "Edit this image to make it look like a cartoon";
+
+const fileInputEl = document.querySelector("input[type=file]");
+const imagePart = await fileToGenerativePart(fileInputEl.files[0]);
+
+// To edit the image, call `generateContent` with the image and text input
+const result = await model.generateContent([imagePart, prompt]);
+
+// Handle the generated image
+try {
+  const inlineDataParts = result.response.inlineDataParts();
+  if (inlineDataParts?.[0]) {
+    const image = inlineDataParts[0].inlineData;
+    console.log(image.mimeType, image.data);
+  }
+} catch (err) {
+  console.error('Prompt or candidate was blocked:', err);
+}
+```
