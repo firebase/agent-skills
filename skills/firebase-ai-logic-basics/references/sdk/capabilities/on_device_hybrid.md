@@ -103,3 +103,9 @@ print(response.content)
   removed in `firebase-ios-sdk` v13.0.0 in favor of `GeminiLanguageModel` above
   (or standard cloud `ai.generativeModel(modelName:)` on earlier OS versions).
   See https://firebase.google.com/docs/ai-logic/hybrid.md.txt.
+
+## Flutter (Dart)
+
+Hybrid on-device inference is not available via Firebase AI Logic on Flutter
+(including Flutter web); the `firebase_ai` package always calls the cloud-hosted
+Gemini API. See https://firebase.google.com/docs/ai-logic/hybrid.md.txt.

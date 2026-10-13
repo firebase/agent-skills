@@ -32,6 +32,8 @@ To instruct Gemini to synthesize and return audio, configure
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
 - **iOS (Swift)**:
   `GenerationConfig(responseModalities: [.audio], speechConfig: ...)`
+- **Flutter (Dart)**:
+  `GenerationConfig(responseModalities: [ResponseModalities.audio], speechConfig: ...)`
 - **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
 
 ### 2. Single-Speaker `SpeechConfig`
@@ -58,6 +60,13 @@ prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
       responseModalities: [.audio],
       speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
   )
+  ```
+- **Flutter (Dart)**:
+  ```dart
+  final config = GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+  );
   ```
 - **Web**:
   ```javascript
@@ -104,6 +113,20 @@ narrator and character), configure `MultiSpeakerVoiceConfig` with
       ),
       languageCode: "en-US"
   )
+  ```
+
+- **Flutter (Dart)** (use the `SpeechConfig.multiSpeaker` named constructor):
+
+  ```dart
+  final multiSpeechConfig = SpeechConfig.multiSpeaker(
+    multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+      speakerVoiceConfigs: [
+        SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+        SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+      ],
+    ),
+    languageCode: 'en-US',
+  );
   ```
 
 - **Web**:
@@ -630,6 +653,139 @@ private extension Data {
         var val = value
         self = Swift.withUnsafeBytes(of: &val) { Data($0) }
     }
+}
+```
+
+______________________________________________________________________
+
+## Flutter (Dart)
+
+### 1. Single-Speaker Generation (`generateContent`)
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+Future<Uint8List?> generateSpeech(String prompt) async {
+  final config = GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+  );
+
+  final model = FirebaseAI.googleAI().generativeModel(
+    model: 'gemini-3.1-flash-tts-preview',
+    generationConfig: config,
+  );
+
+  final response = await model.generateContent([Content.text(prompt)]);
+
+  for (final part in response.inlineDataParts) {
+    if (part.mimeType.startsWith('audio/')) {
+      final Uint8List pcmData = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+      return addWavHeader(pcmData);
+    }
+  }
+  return null;
+}
+```
+
+### 2. Multi-Speaker Dialogue
+
+```dart
+final multiSpeechConfig = SpeechConfig.multiSpeaker(
+  multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+    speakerVoiceConfigs: [
+      SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+      SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+    ],
+  ),
+  languageCode: 'en-US',
+);
+
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: multiSpeechConfig,
+  ),
+);
+
+const prompt = '''
+Joe: How's it going today Jane?
+Jane: [excited] Not too bad, how about you?
+''';
+
+final response = await model.generateContent([Content.text(prompt)]);
+```
+
+### 3. Streaming with `generateContentStream`
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+Future<Uint8List> streamSpeech(String prompt) async {
+  final model = FirebaseAI.googleAI().generativeModel(
+    model: 'gemini-3.1-flash-tts-preview',
+    generationConfig: GenerationConfig(
+      responseModalities: [ResponseModalities.audio],
+      speechConfig: SpeechConfig(voiceName: 'Kore'),
+    ),
+  );
+
+  final pcm = BytesBuilder(copy: false);
+  final responseStream = model.generateContentStream([Content.text(prompt)]);
+
+  await for (final chunk in responseStream) {
+    for (final part in chunk.inlineDataParts) {
+      if (part.mimeType.startsWith('audio/')) {
+        final Uint8List pcmChunk = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+        // Low-latency path: feed `pcmChunk` directly to a raw-PCM audio stream.
+        pcm.add(pcmChunk);
+      }
+    }
+  }
+
+  // Buffered path: prepend a 44-byte WAV header for standard audio players.
+  return addWavHeader(pcm.takeBytes());
+}
+```
+
+### 4. Prepend WAV Header in Dart
+
+```dart
+import 'dart:typed_data';
+
+Uint8List addWavHeader(
+  Uint8List pcmBytes, {
+  int sampleRate = 24000,
+  int channels = 1,
+  int bitDepth = 16,
+}) {
+  final byteRate = sampleRate * channels * bitDepth ~/ 8;
+  final blockAlign = channels * bitDepth ~/ 8;
+
+  final header = ByteData(44)
+    ..setUint32(4, 36 + pcmBytes.length, Endian.little) // ChunkSize
+    ..setUint32(16, 16, Endian.little) // Subchunk1Size for PCM
+    ..setUint16(20, 1, Endian.little) // AudioFormat 1 = PCM
+    ..setUint16(22, channels, Endian.little)
+    ..setUint32(24, sampleRate, Endian.little)
+    ..setUint32(28, byteRate, Endian.little)
+    ..setUint16(32, blockAlign, Endian.little)
+    ..setUint16(34, bitDepth, Endian.little)
+    ..setUint32(40, pcmBytes.length, Endian.little); // Subchunk2Size
+
+  final headerBytes = header.buffer.asUint8List()
+    ..setAll(0, 'RIFF'.codeUnits)
+    ..setAll(8, 'WAVE'.codeUnits)
+    ..setAll(12, 'fmt '.codeUnits)
+    ..setAll(36, 'data'.codeUnits);
+
+  final wavBytes = Uint8List(44 + pcmBytes.length);
+  wavBytes.setRange(0, 44, headerBytes);
+  wavBytes.setRange(44, wavBytes.length, pcmBytes);
+  return wavBytes;
 }
 ```
 
