@@ -32,6 +32,8 @@ To instruct Gemini to synthesize and return audio, configure
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
 - **iOS (Swift)**:
   `GenerationConfig(responseModalities: [.audio], speechConfig: ...)`
+- **Flutter (Dart)**:
+  `GenerationConfig(responseModalities: [ResponseModalities.audio], speechConfig: ...)`
 - **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
 
 ### 2. Single-Speaker `SpeechConfig`
@@ -58,6 +60,13 @@ prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
       responseModalities: [.audio],
       speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
   )
+  ```
+- **Flutter (Dart)**:
+  ```dart
+  final config = GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+  );
   ```
 - **Web**:
   ```javascript
@@ -104,6 +113,20 @@ narrator and character), configure `MultiSpeakerVoiceConfig` with
       ),
       languageCode: "en-US"
   )
+  ```
+
+- **Flutter (Dart)** (use the `SpeechConfig.multiSpeaker` named constructor):
+
+  ```dart
+  final multiSpeechConfig = SpeechConfig.multiSpeaker(
+    multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+      speakerVoiceConfigs: [
+        SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+        SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+      ],
+    ),
+    languageCode: 'en-US',
+  );
   ```
 
 - **Web**:
@@ -647,6 +670,138 @@ private extension Data {
         var val = value
         self = Swift.withUnsafeBytes(of: &val) { Data($0) }
     }
+}
+```
+
+______________________________________________________________________
+
+## Flutter (Dart)
+
+These snippets follow the official
+[Generate speech](https://firebase.google.com/docs/ai-logic/generate-speech.md.txt)
+guide. The model returns raw PCM bytes (24 kHz, 1 channel, 16-bit); playback is
+app-specific, so `playAudio` / `appendAudioChunk` are placeholders for your own
+player code (the
+[`firebase_ai` example app](https://github.com/firebase/flutterfire/blob/main/packages/firebase_ai/firebase_ai/example/lib/pages/tts_page.dart)
+feeds chunks into a `flutter_soloud` PCM buffer stream).
+
+### 1. Single-Speaker Generation (`generateContent`)
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Set `responseModalities` to include `audio`.
+// Configure a `SpeechConfig` with your chosen voice name (and optionally a language code).
+final config = GenerationConfig(
+  responseModalities: [ResponseModalities.audio],
+  speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+);
+
+// Create a `GenerativeModel` instance with a model that supports speech generation.
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: config,
+);
+
+// Provide a text prompt.
+final prompt = 'Say cheerfully: Have a wonderful day!';
+
+// Call `generateContent` to generate the speech output based on your text prompt.
+final response = await model.generateContent([Content.text(prompt)]);
+
+// Extract the audio data and handle it for downstream use. For example:
+final part = response.candidates.first.content.parts.first;
+if (part is InlineDataPart && part.mimeType.startsWith('audio/')) {
+  final Uint8List pcmData = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+
+  // To play back PCM audio data, you'll need to write your own `playAudio` function.
+  await playAudio(pcmData);
+}
+```
+
+### 2. Multi-Speaker Dialogue
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Configure a `SpeechConfig` for multiple speakers, assigning a voice to each speaker.
+final multiSpeechConfig = SpeechConfig.multiSpeaker(
+  multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+    speakerVoiceConfigs: [
+      SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+      SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+    ],
+  ),
+  languageCode: 'en-US',
+);
+
+// Set `responseModalities` to include `audio`.
+final config = GenerationConfig(
+  responseModalities: [ResponseModalities.audio],
+  speechConfig: multiSpeechConfig,
+);
+
+// Create a `GenerativeModel` instance with a model that supports speech generation.
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: config,
+);
+
+// Provide a text prompt that includes the names of the speakers.
+final prompt = '''
+Joe: How's it going today Jane?
+Jane: [excited] Not too bad, how about you?
+''';
+
+// Call `generateContent` to generate the speech output based on your text prompt.
+final response = await model.generateContent([Content.text(prompt)]);
+
+// Extract the audio data and handle it for downstream use. For example:
+final part = response.candidates.first.content.parts.first;
+if (part is InlineDataPart && part.mimeType.startsWith('audio/')) {
+  final Uint8List pcmData = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+
+  // To play back PCM audio data, you'll need to write your own `playAudio` function.
+  await playAudio(pcmData);
+}
+```
+
+### 3. Streaming with `generateContentStream`
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Set `responseModalities` to include `audio`.
+// Configure a `SpeechConfig` with your chosen voice name (and optionally a language code).
+final config = GenerationConfig(
+  responseModalities: [ResponseModalities.audio],
+  speechConfig: SpeechConfig(voiceName: 'Kore'),
+);
+
+// Create a `GenerativeModel` instance with a model that supports speech generation.
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: config,
+);
+
+// Provide a text prompt.
+final prompt = 'Tell me a story about a brave knight.';
+
+// Call `generateContentStream` to generate the speech output stream based on your text prompt.
+final responseStream = model.generateContentStream([Content.text(prompt)]);
+
+// Extract the audio data and handle it for downstream use. For example:
+await for (final chunk in responseStream) {
+  final part = chunk.candidates.first.content.parts.first;
+  if (part is InlineDataPart && part.mimeType.startsWith('audio/')) {
+    final Uint8List pcmChunk = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+
+    // Append the audio chunk to your audio queue/buffer for playback as it arrives.
+    appendAudioChunk(pcmChunk);
+  }
 }
 ```
 

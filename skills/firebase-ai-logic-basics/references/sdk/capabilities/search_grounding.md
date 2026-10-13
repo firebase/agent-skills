@@ -84,3 +84,46 @@ if let candidate = response.candidates.first,
   }
 }
 ```
+
+## Flutter (Dart)
+
+Pass `Tool.googleSearch()` in `tools`. Show `renderedContent` with a WebView
+plugin (for example `webview_flutter`).
+
+```dart
+import 'package:firebase_ai/firebase_ai.dart';
+
+// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+final model = FirebaseAI.googleAI().generativeModel(
+  model: '<latest_supported_model>',
+  // Provide Google Search as a tool that the model can use to generate its response.
+  tools: [
+    Tool.googleSearch(),
+  ],
+);
+
+final response = await model.generateContent([Content.text("Who won the euro 2024?")]);
+
+// Get the model's response
+final text = response.text;
+
+// Get the grounding metadata
+final groundingMetadata = response.candidates.firstOrNull?.groundingMetadata;
+
+// REQUIRED - display Google Search suggestions
+// (renderedContent contains HTML and CSS for the search widget)
+final renderedContent = groundingMetadata?.searchEntryPoint?.renderedContent;
+if (renderedContent != null) {
+  // TODO(developer): Display Google Search suggestions using a WebView
+}
+
+// REQUIRED - display sources
+final groundingChunks = groundingMetadata?.groundingChunks;
+if (groundingChunks != null) {
+  for (var chunk in groundingChunks) {
+    final title = chunk.web?.title;  // for example, "uefa.com"
+    final uri = chunk.web?.uri;  // for example, "https://vertexaisearch.cloud.google.com..."
+    // TODO(developer): show sources in the UI
+  }
+}
+```

@@ -124,3 +124,62 @@ print(finalResponse.text ?? "No text in response.")
 > `let tool = Tool.functionDeclarations([...])` no longer compiles. Pass the
 > array literal `tools: [.functionDeclarations([...])]` as above; it works on
 > both old and new SDK versions.
+
+## Flutter (Dart)
+
+Function arguments arrive as `Map<String, Object?>` on `functionCall.args`, and
+`Content.functionResponses` (or `Content.functionResponse` for a single call)
+wraps your results for the follow-up turn:
+
+```dart
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Step 1: the app-side function the model can ask you to run.
+Future<Map<String, Object?>> getStockPrice(String symbol) async {
+  // TODO(developer): Call a real stock price API. Hardcoded for demo purposes.
+  return {'symbol': symbol, 'price': 189.84};
+}
+
+// Step 2: describe the function to the model.
+final getStockPriceTool = FunctionDeclaration(
+  'getStockPrice',
+  'Get the current stock price for a given symbol.',
+  parameters: {
+    'symbol': Schema.string(description: 'The stock symbol, e.g. AAPL'),
+  },
+);
+
+// Step 3: provide the declaration when creating the model.
+// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+final model = FirebaseAI.googleAI().generativeModel(
+  model: '<latest_supported_model>',
+  tools: [Tool.functionDeclarations([getStockPriceTool])],
+);
+
+Future<String> askStockPrice() async {
+  // Step 4: send the prompt in a chat session and run any requested call(s).
+  final chat = model.startChat();
+  var response = await chat.sendMessage(
+    Content.text('What is the stock price of Apple?'),
+  );
+
+  final functionResponses = <FunctionResponse>[];
+  for (final functionCall in response.functionCalls) {
+    if (functionCall.name == 'getStockPrice') {
+      final symbol = functionCall.args['symbol']! as String;
+      final functionResult = await getStockPrice(symbol);
+      functionResponses.add(
+        FunctionResponse(functionCall.name, functionResult, id: functionCall.id),
+      );
+    }
+  }
+
+  // Step 5: return all function results in a single turn so the model can write its final answer.
+  if (functionResponses.isNotEmpty) {
+    response = await chat.sendMessage(
+      Content.functionResponses(functionResponses),
+    );
+  }
+  return response.text ?? 'No text in response';
+}
+```
