@@ -151,7 +151,8 @@ Maintain history automatically using `startChat`. See the
 
 To improve the user experience by showing partial results as they arrive (like a
 typing effect), use `generateContentStream` instead of `generateContent` for
-faster display of results.
+faster display of results. See the
+[Streaming Responses Guide](references/sdk/capabilities/streaming.md).
 
 ### Text-to-Speech (TTS) Generation
 
@@ -337,4 +338,5 @@ ______________________________________________________________________
 - [Text generation](references/sdk/capabilities/text_generation.md)
 - [Multimodal input (images, audio, video, PDF)](references/sdk/capabilities/multimodal_input.md)
 - [Multi-turn chat](references/sdk/capabilities/chat.md)
+- [Streaming responses](references/sdk/capabilities/streaming.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
