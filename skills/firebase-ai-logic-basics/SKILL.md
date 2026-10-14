@@ -182,6 +182,8 @@ snippets for iOS (Swift), Android (Kotlin), and Web.
 > for the currently supported image generation (Nano Banana) model names.
 
 - Requires an upgraded Blaze pay-as-you-go billing plan.
+- See the
+  [Image Generation Guide](references/sdk/capabilities/image_generation.md).
 
 ### Search Grounding with the built in googleSearch tool
 
@@ -327,4 +329,5 @@ ______________________________________________________________________
 - [Structured output (JSON Schema)](references/sdk/capabilities/structured_output.md)
 - [Function calling (tools)](references/sdk/capabilities/function_calling.md)
 - [Search grounding (googleSearch)](references/sdk/capabilities/search_grounding.md)
+- [Image generation (Nano Banana)](references/sdk/capabilities/image_generation.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
