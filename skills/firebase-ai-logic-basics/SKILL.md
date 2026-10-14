@@ -217,7 +217,8 @@ Hybrid inference runs prompts with an on-device model when one is available and
 falls back to a cloud-hosted model otherwise (or vice versa). Availability and
 setup steps differ by platform, more info in the
 [hybrid and on-device documentation](https://firebase.google.com/docs/ai-logic/hybrid.md.txt),
-which links to each platform's guide.
+which links to each platform's guide, and in the
+[On-Device & Hybrid Inference Guide](references/sdk/capabilities/on_device_hybrid.md).
 
 ______________________________________________________________________
 
@@ -330,4 +331,5 @@ ______________________________________________________________________
 - [Function calling (tools)](references/sdk/capabilities/function_calling.md)
 - [Search grounding (googleSearch)](references/sdk/capabilities/search_grounding.md)
 - [Image generation (Nano Banana)](references/sdk/capabilities/image_generation.md)
+- [On-device & hybrid inference](references/sdk/capabilities/on_device_hybrid.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
