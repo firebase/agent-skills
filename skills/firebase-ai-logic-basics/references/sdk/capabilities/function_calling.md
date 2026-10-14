@@ -1,5 +1,65 @@
 # Function Calling (Tools)
 
+Define functions that the model can request to execute to interact with external
+systems. Function calling (also called *tool use*) lets a Gemini model overcome
+stale training data and its inability to query or modify external data: you
+describe your app's functions to the model, the model replies with structured
+arguments when it wants one called, your app executes the function, and you send
+the result back so the model can write its final answer. *Note: Advanced
+workflows like function calling generally require a multi-turn Chat Session to
+handle the back-and-forth execution.* Use it whenever the answer depends on live
+data (prices, weather, inventory), a database lookup, or an action in your app.
+
+## Configuration
+
+The round trip is the same on every platform:
+
+1. **Write the function** in your app (call an API, query a database, compute a
+   value). It returns a JSON-like map.
+1. **Declare it** with a `FunctionDeclaration` (name, description, parameter
+   schema). Put as much detail as possible in the descriptions; the model uses
+   them to decide which function to call and how to fill the arguments.
+1. **Pass the declaration as a tool** when creating the model. You can provide
+   up to 128 function declarations.
+1. **Send the prompt in a chat session** and inspect the response's
+   `functionCalls`. *The model never calls your function directly* — it returns
+   the function name plus structured arguments, and your app runs it.
+1. **Send a `FunctionResponse` part back** (role `user`) containing your
+   function's output. The model then generates its final natural-language
+   response.
+
+Schema rules for the parameter declaration:
+
+- Schemas follow a subset of OpenAPI. Supported attributes: `type`, `nullable`,
+  `required`, `format`, `description`, `properties`, `items`, `enum`, `minimum`,
+  `maximum`, `minItems`, `maxItems`, `anyOf`, `title`. Not supported: `default`,
+  `optional`, `oneOf`.
+- **All parameters are required by default.** Mark optional ones in the
+  declaration's `optionalParameters` list on Android, iOS, and Flutter, or in
+  `optionalProperties` on
+  `Schema.object({ properties: {...}, optionalProperties: [...] })` on Web
+  (`firebase/ai` does not have `optionalParameters`, and passing
+  `optionalParameters` to `Schema.object()` sends an invalid key to the API).
+- Nested objects are declared with `Schema.obj` (Kotlin), `.object(properties:)`
+  (Swift) or `Schema.object` (Dart, Web); the official guide's `fetchWeather`
+  sample shows a nested `location` object.
+
+Behaviour your app must accommodate:
+
+- The model may ask for **another call** (same or different function) after
+  receiving a result, and may ask for **several calls at once** (parallel
+  function calling). Loop until the response contains no function calls, and
+  return a response part for every call.
+- You can constrain the model with a tool config (**function calling mode**):
+  `AUTO` (default — model chooses between text and a call), `ANY` (forced
+  function calling; optionally restrict to `allowedFunctionNames`), or `NONE`.
+- Function calling is supported by the general-use Gemini models; see
+  https://firebase.google.com/docs/ai-logic/function-calling.md.txt for the
+  current model list and the details of `toolConfig`.
+
+This file uses one `getStockPrice(symbol)` example on every platform so the flow
+is identical across Android, iOS, Flutter and Web.
+
 ## Android (Kotlin)
 
 Function arguments arrive as `Map<String, JsonElement>` and the function result
@@ -244,3 +304,27 @@ async function askStockPrice() {
   return result.response.text();
 }
 ```
+
+## Troubleshooting
+
+- **`response.text` is empty/nil on the first turn.** That is expected when the
+  model chose to call a function: the turn contains `functionCalls` instead of
+  text. Execute the call and send the `FunctionResponse` part back; the text
+  arrives in the follow-up response.
+- **The model never calls the function.** Improve the function and parameter
+  descriptions (along with the function and parameter names and types, they are
+  all the model sees), or force a call by setting the function calling mode to
+  `ANY` in the tool config.
+- **Android: `Unresolved reference: JsonObject` / `jsonPrimitive`.** The
+  `firebase-ai` artifact only pulls `kotlinx-serialization-json` in at runtime.
+  Add `org.jetbrains.kotlinx:kotlinx-serialization-json` as an `implementation`
+  dependency of your app module to compile the samples above.
+- **iOS: `Cannot find 'Tool' in scope`.** You are on Firebase iOS SDK 13+; use
+  `tools: [.functionDeclarations([...])]` or `GenerativeModel.Tool`.
+- **Schema rejected by the API.** Remove unsupported attributes (`default`,
+  `optional`, `oneOf`) and declare optional fields through `optionalParameters`
+  (Android, iOS, Flutter) or `Schema.object({ properties, optionalProperties })`
+  (Web) instead.
+
+See the official function calling guide:
+https://firebase.google.com/docs/ai-logic/function-calling
