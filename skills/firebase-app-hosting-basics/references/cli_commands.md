@@ -33,10 +33,6 @@ using the Firebase Console.
 
 - **Purpose**: Deletes a backend and its associated resources.
 
-### `npx -y firebase-tools@latest apphosting:rollouts:list <backend-id>`
-
-- **Purpose**: Lists the history of rollouts for a backend.
-
 ## Secrets Management
 
 App Hosting uses Cloud Secret Manager to securely handle sensitive environment
@@ -46,20 +42,20 @@ variables (like API keys).
 
 - **Purpose**: Creates or updates a secret in Cloud Secret Manager and makes it
   available to App Hosting.
-- **Behavior**: Prompts for the secret value (hidden input).
+- **Behavior**: Prompts for the secret value interactively, or reads from stdin
+  via `printf '%s' '<value>'` with `--data-file - --force`.
 
 ### `npx -y firebase-tools@latest apphosting:secrets:grantaccess <secret-name>`
 
 - **Purpose**: Grants the App Hosting service account permission to access the
   secret.
-- **Note**: Often handled automatically by `secrets:set`, but useful for
-  debugging permission issues or granting access to existing secrets.
+- **Note**: Pass `--backend <backend-id>` when reusing or updating an existing
+  secret.
 
 ## Automated deployment via GitHub (CI/CD)
 
-**IMPORTANT** Only use these commands if you are setting up automated
-deployments via GitHub. If you are managing deployments using
-`npx -y firebase-tools@latest deploy`, DO NOT use these commands.
+**IMPORTANT** Only use this command for GitHub CI/CD deployments, not with
+`npx -y firebase-tools@latest deploy`.
 
 ### `npx -y firebase-tools@latest apphosting:rollouts:create <backend-id>`
 
@@ -70,10 +66,12 @@ deployments via GitHub. If you are managing deployments using
 - **Use Case**: Useful for redeploying without code changes, or rolling back to
   a specific commit.
 
+## Backend Creation
+
 ### `npx -y firebase-tools@latest apphosting:backends:create`
 
-- **Purpose**: Creates a new App Hosting backend. Use this when setting up
-  automated deployments via GitHub.
+- **Purpose**: Creates a new App Hosting backend (pass `--backend`,
+  `--primary-region`, and `--root-dir` for non-interactive deploys).
 - **Options**:
   - `--app <webAppId>`: The ID of an existing Firebase web app to associate with
     the backend.
