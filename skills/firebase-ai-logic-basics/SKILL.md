@@ -185,6 +185,10 @@ snippets for iOS (Swift), Android (Kotlin), and Web.
 
 ### Search Grounding with the built in googleSearch tool
 
+Ground model responses in live Google Search results (`Tool.googleSearch()`).
+See the
+[Search Grounding Guide](references/sdk/capabilities/search_grounding.md).
+
 ______________________________________________________________________
 
 ## Supported Platforms and Frameworks
@@ -322,4 +326,5 @@ ______________________________________________________________________
 - [Streaming responses](references/sdk/capabilities/streaming.md)
 - [Structured output (JSON Schema)](references/sdk/capabilities/structured_output.md)
 - [Function calling (tools)](references/sdk/capabilities/function_calling.md)
+- [Search grounding (googleSearch)](references/sdk/capabilities/search_grounding.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
