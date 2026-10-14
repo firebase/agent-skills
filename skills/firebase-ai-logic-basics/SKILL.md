@@ -173,7 +173,7 @@ models:
 See the
 [Text-to-Speech (TTS) Generation Guide](references/sdk/capabilities/text_to_speech.md)
 for full implementation details, streaming patterns, and copy-paste code
-snippets for iOS (Swift), Android (Kotlin), and Web.
+snippets for Android (Kotlin), iOS (Swift), Flutter (Dart), and Web.
 
 ### Generate Images with Nano Banana
 

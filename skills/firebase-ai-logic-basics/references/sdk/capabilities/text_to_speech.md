@@ -1,10 +1,14 @@
 # Client-Side Text-to-Speech (TTS) Generation with Gemini
 
+> [!WARNING] **Preview:** Using the Firebase AI Logic SDKs for text-to-speech
+> (TTS) generation is in Preview and may change in backwards-incompatible ways.
+
 Firebase AI Logic enables client-side Text-to-Speech (TTS) generation directly
-from your mobile and web applications without maintaining custom backend speech
-services. Using specialized Gemini TTS models, apps can synthesize natural,
-expressive audio with custom voice personas, multi-speaker dialogues, and
-in-flight audio streaming.
+from your Android, iOS, Flutter, and Web applications without maintaining custom
+backend speech services. Using Gemini TTS models, apps can synthesize
+controllable speech from exact text transcripts with single- or two-speaker
+voices, natural-language style guidance, inline audio tags, and low-latency
+streaming.
 
 ______________________________________________________________________
 
@@ -12,21 +16,43 @@ ______________________________________________________________________
 
 Always specify a dedicated Gemini TTS model when generating audio:
 
-| Model ID                       | Description                                                                        |
-| :----------------------------- | :--------------------------------------------------------------------------------- |
-| `gemini-3.1-flash-tts-preview` | Low-latency speech synthesis (preview); supports single- and multi-speaker output. |
+| Model ID                       | Description                                                                                                   |
+| :----------------------------- | :------------------------------------------------------------------------------------------------------------ |
+| `gemini-3.1-flash-tts-preview` | Low-latency speech synthesis (preview); supports single-speaker, 2-speaker dialogue, streaming, and `[tags]`. |
 
-> [!WARNING] Always verify currently supported model availability in the
-> [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt).
+> [!NOTE] Firebase AI Logic also supports Gemini 2.x TTS models, but streaming
+> (`generateContentStream`), inline audio tags (`[whispers]`, `[laughs]`), and
+> expanded auto-detected languages are only supported on Gemini 3.x TTS models
+> (`gemini-3.1-flash-tts-preview`). Always check the
+> [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
+> for newly released TTS models.
+
+> [!IMPORTANT] **Model-specific API differences
+> (`gemini-3.1-flash-tts-preview`):**
+>
+> - **Raw PCM output on both unary and streaming calls:** Both `generateContent`
+>   and `generateContentStream` return **headerless raw 16-bit linear PCM**
+>   (`audio/pcm`, 24 kHz, mono, little-endian). Do **not** assume unary
+>   `generateContent` responses include a WAV header — always play via a raw PCM
+>   API (`AudioTrack`, `AVAudioEngine`, Web Audio `AudioContext`) or prepend a
+>   44-byte WAV (RIFF) header before passing bytes to `MediaPlayer`,
+>   `AVAudioPlayer`, `<audio>`, or file-based players.
+> - **Prompt-based style & square-bracket tags:** Pass style guidance in the
+>   text prompt (using `[Audio Profile]` / `[Director's Notes]` or a
+>   natural-language prefix like `"Say cheerfully: ..."`), speaker turns as
+>   `SpeakerName: ...` prefixes in the prompt text, and inline vocal tags in
+>   **square brackets** (`[whispers]`, `[laughs]`, `[sighs]`). Do **not** use
+>   `speech_metadata` part fields or angle-bracket tags (`<sigh>`).
+> - **Omit text-sampling parameters:** Do not pass `temperature`, `topP`,
+>   `topK`, `candidateCount`, or `systemInstruction` on TTS requests.
 
 ______________________________________________________________________
 
-## Core Concepts & Configurations
+## Configuration
 
 ### 1. Response Modality
 
-To instruct Gemini to synthesize and return audio, configure
-`responseModalities` in the generation configuration to include audio:
+Configure `responseModalities` in `GenerationConfig` to request `AUDIO` output:
 
 - **Android (Kotlin)**:
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
@@ -39,10 +65,14 @@ To instruct Gemini to synthesize and return audio, configure
 
 ### 2. Single-Speaker `SpeechConfig`
 
-Configure voice persona and optional language code (`languageCode`, e.g.
-`"en-US"`, `"es-ES"`, `"ja-JP"`) using `SpeechConfig`. Voice names map to Google
-prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
-`Aoede`):
+Configure a voice name from the
+[30 supported multilingual HD voices](https://firebase.google.com/docs/ai-logic/generate-speech#response-voices)
+(for example: `Kore`, `Puck`, `Charon`, `Fenrir`, `Aoede`) and an optional
+BCP-47 `languageCode` (such as `"en-US"`, `"es-ES"`, `"ja-JP"`, `"hi-IN"`; see
+[supported language codes](https://firebase.google.com/docs/ai-logic/generate-speech#explicit-language-codes)).
+If you omit `languageCode`, the model
+[automatically detects the language](https://firebase.google.com/docs/ai-logic/generate-speech#languages)
+from the prompt.
 
 - **Android (Kotlin)**:
   ```kotlin
@@ -80,11 +110,17 @@ prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
   };
   ```
 
-### 3. Multi-Speaker `MultiSpeakerVoiceConfig` (2-Speaker Dialogues)
+### 3. Multi-Speaker `MultiSpeakerVoiceConfig` (Exactly 2 Speakers)
 
-For scripts with two distinct characters or roles (e.g., host and guest,
-narrator and character), configure `MultiSpeakerVoiceConfig` with
-`speakerVoiceConfigs` linking speaker names to specific voices:
+For dialogues or conversations, map speaker names (used as `SpeakerName: ...`
+prefixes in your prompt) to voices using `MultiSpeakerVoiceConfig`:
+
+- **Constraint:** Multi-speaker configuration supports **exactly 2 speakers**.
+
+- **Multilingual dialogues:** You can mix languages in a single multi-speaker
+  request (for example, one speaker in Japanese and another in Portuguese). For
+  mixed-language prompts, **do not** set `languageCode` in `SpeechConfig` so the
+  model automatically detects and switches languages on each speaker's turn.
 
 - **Android (Kotlin)**:
 
@@ -154,41 +190,52 @@ narrator and character), configure `MultiSpeakerVoiceConfig` with
 
 ______________________________________________________________________
 
-## Audio Directives and Emotional Tags
+## Control Speech Output with Prompts
 
-Gemini TTS models accept natural-language directives and inline tags in prompts
-to control tone, cadence, pacing, and emotional expression.
+### 1. Prompt Structure
 
-### Directives
+For best results (and to prevent the speech classifier from rejecting vague
+prompts or reading instructions aloud), structure prompts with these components:
 
-Include directives at the start of your prompt to set the overall tone and
-scene:
-
-- `[Audio Profile: Warm, conversational podcast co-host with energetic delivery]`
-- `[Scene: Quiet bedtime story in a calm room]`
-- `[Director's Note: Speak deliberately, pausing for reflection after major questions]`
-
-### Emotional Tags & Delivery Cues
-
-Embed delivery markers inline within dialogue or narration:
-
-- `[whispers]` — Soft, confidential whisper.
-- `[laughs]` / `[chuckles]` — Lighthearted laughter during delivery.
-- `[sighs]` — Expressive exhale.
-- `[slowly]` — Reduced tempo for emphasis or dramatic effect.
-- `[excited]` — Higher energy and faster pacing.
-- `[pause]` — Deliberate silence.
-
-### Multi-Speaker Prompt Example
+- **`Audio Profile`**: Speaker persona, core identity, and archetype (e.g.,
+  `A warm, professional narrator`).
+- **`Scene`**: Environment and emotional vibe (e.g., `In a quiet library` or
+  `A lively sports broadcast`).
+- **`Director's Notes`**: Emotion, pace, style, and accent (e.g.,
+  `Speak fast, with high energy and excitement`).
+- **`Sample Context`**: Starting context for delivery (e.g.,
+  `The game just ended with a last-second touchdown`).
+- **Transcript**: The exact text to be spoken.
 
 ```text
-[Scene: A lively coffee-shop tech discussion]
-[Director's Note: Host is upbeat and curious; Guest is thoughtful and explanatory]
+[Audio Profile: A young, energetic voice]
+[Scene: A lively sports broadcast]
+[Director's Notes: Speak fast, with high energy and excitement]
+[Sample Context: The game just ended with a last-second touchdown]
+Welcome back fans! What an incredible game we're witnessing today!
+```
 
-Host: Welcome back! [excited] Today we are diving into client-side audio.
-Guest: [laughs] It's about time! No servers in between means virtually zero latency.
-Host: [whispers] Tell us the secret... how does it stream?
-Guest: [slowly] Pure linear PCM, chunk by chunk, directly to your device's audio engine.
+### 2. Audio Tags (`gemini-3.1-flash-tts-preview`)
+
+Insert square-bracket formatting tags directly in the text prompt to guide vocal
+performance:
+
+- `[whispers]` — Speak in a whisper
+- `[laughs]` / `[giggles]` — Add laughter or giggles
+- `[sighs]` / `[gasp]` — Add a sigh or gasp
+- `[shouting]` — Shout
+- `[excited]` / `[serious]` — Shift emotional tone
+- `[sighs whispers]` — Combine multiple tags in one bracket
+
+Rules when using audio tags:
+
+- **No fixed list:** Experiment with descriptive expressions such as `[bored]`
+  or `[sarcastically]`.
+- **Always use English tags:** Even when the spoken transcript is in another
+  language, write the bracketed audio tags in English.
+
+```text
+I have a secret to tell you. [whispers] I found the hidden treasure. [laughs] I can't believe it!
 ```
 
 ______________________________________________________________________
@@ -197,47 +244,31 @@ ______________________________________________________________________
 
 ### Format Specifications
 
-Gemini TTS audio format depends on whether the request is unary or streaming:
+`gemini-3.1-flash-tts-preview` returns **raw PCM audio data** for **both** unary
+(`generateContent`) and streaming (`generateContentStream`) calls:
 
-- **Unary Requests (`generateContent`)**: Returns complete **WAV (`audio/wav`)**
-  audio with a standard 44-byte RIFF header included by default (24 kHz, mono,
-  16-bit signed little-endian PCM). These bytes can be passed directly to
-  standard media players (`AVAudioPlayer`, `MediaPlayer`, `<audio>`).
+- **Encoding**: 16-bit signed linear PCM, little-endian (`audio/pcm` or
+  `audio/l16`)
+- **Sample Rate**: 24,000 Hz (24 kHz)
+- **Channels**: 1 channel (mono)
+- **Container Header**: **None** (raw headerless PCM bytes)
 
-- **Streaming Requests (`generateContentStream`)**: Returns headerless raw
-  **Linear PCM (`audio/l16; rate=24000; channels=1`)** chunks (24 kHz, mono,
-  16-bit signed little-endian PCM) so chunks can be streamed or concatenated
-  continuously without per-chunk container headers.
+Because the response bytes have no container header (like WAV or MP3), standard
+media players (`AVAudioPlayer`, `MediaPlayer`, `<audio>`) cannot play the raw
+bytes directly. Choose one of two playback options:
 
-- **Audio Parameters**:
+1. **Option 1 — Low-level raw PCM playback (recommended for streaming):** Pass
+   raw 24 kHz 16-bit mono PCM buffers directly to `AudioTrack` (Android),
+   `AVAudioEngine` + `AVAudioPlayerNode` (iOS), or the Web Audio API
+   `AudioContext` (Web).
+1. **Option 2 — Prepend a 44-byte WAV (RIFF) header (unary or buffered):**
+   Prepend a standard 44-byte WAV header to the raw PCM bytes so standard
+   players (`MediaPlayer`, `AVAudioPlayer`, `<audio>`, or Flutter audio plugins)
+   can play the buffer or temporary `.wav` file directly.
 
-  - **Sample Rate**: 24,000 Hz (24 kHz)
-  - **Channels**: 1 channel (mono)
-  - **Bit Depth**: 16-bit linear PCM (little-endian signed integer)
-  - **MIME Types**: `audio/l16` (streaming chunks) or `audio/wav` /
-    `audio/x-wav` (unary)
+#### Standard 44-Byte WAV (RIFF) Header Layout
 
-### Playback Approaches
-
-1. **Direct Low-Latency PCM Streaming**:
-   - Stream raw PCM chunks directly into low-level audio renderers without
-     waiting for the full response:
-     - **iOS**: `AVAudioEngine` + `AVAudioPlayerNode` scheduling
-       `AVAudioPCMBuffer`.
-     - **Android**: `AudioTrack` configured with `ENCODING_PCM_16BIT` and
-       `CHANNEL_OUT_MONO`.
-     - **Web**: Web Audio API (`AudioContext`) scheduling PCM chunks into
-       `AudioBufferSourceNode`.
-1. **WAV Container Format**:
-   - Standard media players (`AVAudioPlayer` on iOS, `MediaPlayer` on Android,
-     `<audio>` on Web) expect a container header (RIFF/WAV).
-   - For unary responses, the RIFF header is already present. For assembled
-     streaming PCM chunks, prepend a standard **44-byte RIFF header** to make
-     the complete audio immediately playable or saveable as `.wav`.
-
-#### Standard 44-Byte WAV (RIFF) Header Construction
-
-```
+```text
 Offset  Size  Field              Value
 0       4     ChunkID            "RIFF"
 4       4     ChunkSize          36 + Subchunk2Size (file size - 8)
@@ -1019,16 +1050,26 @@ function writeString(view: DataView, offset: number, string: string) {
 
 ______________________________________________________________________
 
-## Best Practices & Troubleshooting
+## Constraints & Troubleshooting (`gemini-3.1-flash-tts-preview`)
 
-- **Audio Session & Permissions**: On iOS and Android, make sure the app's audio
-  session/category is configured to allow playback (e.g.,
-  `AVAudioSessionCategoryPlayback`).
+- **Occasional Text Token Returns (`500` Error)**:
+  `gemini-3.1-flash-tts-preview` occasionally returns text tokens instead of
+  audio tokens on a small percentage of requests, causing the call to fail with
+  a `500` error. Always implement retry logic around TTS generation calls.
+- **Classifier False Rejections (`PROHIBITED_CONTENT` or Spoken Instructions)**:
+  Vague prompts can trigger the speech synthesis safety classifier
+  (`PROHIBITED_CONTENT`) or cause the model to read style instructions aloud.
+  Use a structured prompt preamble (`[Audio Profile: ...]`,
+  `[Director's Notes: ...]`) before the transcript.
+- **Voice Inconsistency**: Output may deviate from the selected speaker voice if
+  the prompt's tone or persona contradicts the voice's profile. Keep prompt
+  directions aligned with the chosen voice.
+- **Longer Outputs Drift**: Speech quality and consistency can degrade on
+  outputs longer than a few minutes. Split long transcripts into smaller chunks.
+- **Audio Session & Permissions**: On iOS and Android, configure the app's audio
+  session/category for playback (e.g., `AVAudioSession.Category.playback`).
 - **Buffering & Jitter Prevention**: When streaming audio chunks via
-  `generateContentStream`, queue buffers sequentially with exact timestamps or
-  frame offsets to avoid audio stutter or gaps.
-- **Model Compatibility**: TTS features require Gemini models with dedicated
-  audio synthesis capabilities (`gemini-3.1-flash-tts-preview`). Do not use
-  standard text-only model IDs.
-- **App Check Protection**: Generating audio consumes quota. Protect your API
-  endpoints by enforcing App Check on every client build.
+  `generateContentStream`, schedule buffers sequentially with exact frame or
+  timestamp offsets to avoid gaps.
+- **App Check Protection**: Generating audio consumes quota; enforce App Check
+  with `useLimitedUseAppCheckTokens` enabled in production.
