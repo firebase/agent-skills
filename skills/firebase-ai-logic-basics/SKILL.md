@@ -144,7 +144,8 @@ See the
 
 ### Chat Session (Multi-turn)
 
-Maintain history automatically using `startChat`.
+Maintain history automatically using `startChat`. See the
+[Multi-Turn Chat Guide](references/sdk/capabilities/chat.md).
 
 ### Streaming Responses
 
@@ -335,4 +336,5 @@ ______________________________________________________________________
 - [Flutter (Dart) SDK setup](references/sdk/setup/flutter_setup.md)
 - [Text generation](references/sdk/capabilities/text_generation.md)
 - [Multimodal input (images, audio, video, PDF)](references/sdk/capabilities/multimodal_input.md)
+- [Multi-turn chat](references/sdk/capabilities/chat.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
