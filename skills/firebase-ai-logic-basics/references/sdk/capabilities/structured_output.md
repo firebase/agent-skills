@@ -1,5 +1,51 @@
 # Structured Output (JSON)
 
+The Gemini API returns unstructured text by default. When your app needs to
+parse the response (render it in a list, store it, hand it to another step),
+define a *response schema* and set the response MIME type to `application/json`
+so the model always returns JSON that conforms to the schema. This is sometimes
+called "JSON mode" or "controlled generation". It works with text-only prompts
+and with multimodal requests (images, audio, video, PDF input), and the same
+mechanism with `text/x.enum` constrains classification tasks to a fixed set of
+labels. Supported by the general-use Gemini models; check
+[the models list](https://firebase.google.com/docs/ai-logic/models.md.txt).
+
+## Configuration
+
+- **Where it goes**: both `responseMimeType` and `responseSchema` are fields of
+  the model's generation config, set when you create the `GenerativeModel`.
+  Setting a `responseSchema` requires a compatible `responseMimeType`.
+- **Supported MIME types**:
+  - `application/json` — output JSON as defined in the response schema.
+  - `text/x.enum` — output a single plain-text enum value from the schema
+    (useful for classification). Do not JSON-parse this response.
+- **Building a schema**: use the SDK's `Schema` helpers rather than raw JSON.
+  Every SDK offers object, array, string, integer, floating-point, boolean and
+  enum builders (`Schema.obj`/`Schema.object`, `Schema.array`, `Schema.string`,
+  `Schema.integer`, `Schema.double`/`Schema.number`, `Schema.boolean`,
+  `Schema.enumeration`/`Schema.enumString`). Each builder accepts an optional
+  `description` — use clear field names and descriptions, because the model uses
+  them together with your prompt to decide what to put in each field.
+- **Optional properties**: with the Firebase AI Logic SDKs **all properties are
+  required by default** unless you list them in the object's
+  `optionalProperties` array (the model may then fill or skip them). This is the
+  opposite of the default when calling the Gemini API directly or via its server
+  SDKs.
+- **Supported schema fields**: `anyOf`, `description`, `enum`, `format`,
+  `items`, `maxItems`, `minItems`, `minimum`, `maximum`, `nullable`,
+  `properties`, `propertyOrdering`, `required`, and `title` (a subset of the
+  OpenAPI 3.0 schema object; for full JSON Schema features like `$ref`/`$defs`,
+  use `responseJsonSchema` or Android's `@Generable` KSP processor).
+- **Limits**: the response schema counts toward the model's input token limit,
+  so keep schemas as small as the task allows.
+- **Parsing**: the model's reply arrives as a JSON string in the response
+  `text`; parse it with the platform's JSON library (`org.json`/`kotlinx`,
+  `JSONDecoder`, `dart:convert`, `JSON.parse`).
+
+The samples below all use the same schema from the official guide: an object
+with a `characters` array, where each character has a `name`, `age`, `species`
+and an optional `accessory` enum.
+
 ## Android (Kotlin)
 
 Build the schema with `Schema.obj` / `Schema.array` / `Schema.enumeration`, then
@@ -192,3 +238,23 @@ const data = await getJsonData(
 );
 console.log(data.characters);
 ```
+
+## Troubleshooting
+
+- **The model omits a field or returns extra ones.** All properties are required
+  unless listed in `optionalProperties`; the model ignores schema fields outside
+  the supported set listed above, so express constraints with `enum`,
+  `nullable`, `maxItems` and descriptions instead of unsupported keywords.
+- **Error when `optionalProperties` references an unknown key.** `Schema.obj`
+  (Android throws `IllegalArgumentException`), `Schema.object` (iOS triggers
+  `fatalError`, Web throws `AIError` `INVALID_SCHEMA`) validate that every name
+  in `optionalProperties` exists in `properties` — put `optionalProperties` on
+  the object that directly owns the field.
+- **Parsing fails on a `text/x.enum` response.** That MIME type returns a bare
+  enum string (for example `comedy`), not JSON; read `response.text` directly.
+- **Request rejected after adding a schema.** `responseSchema` requires a
+  compatible `responseMimeType` (`application/json` or `text/x.enum`) in the
+  same generation config.
+
+See the official structured output guide:
+https://firebase.google.com/docs/ai-logic/generate-structured-output
