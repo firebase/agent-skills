@@ -50,18 +50,20 @@ provider.
 - **Input**: All Gemini Image models accept image input (for editing, and as
   reference images for objects, characters, or style; per-model limits are in
   the official guide); some accept video input; none accept audio. Inline
-  request data is limited to 20 MB.
+  request data is limited to 20 MB per request, with at most 14 input images and
+  7 MB per base64-encoded image (see the
+  [models page](https://firebase.google.com/docs/ai-logic/models.md.txt)).
 - **Editing and iteration**: Pass the source image together with the text
   prompt. For iterative edits, use a chat session (`startChat()` /
   `sendMessage()`) with the same model configuration; follow-up turns do not
   need to resend the image.
 - **Images are not guaranteed**: The model may answer with text only
   (`FinishReason` `NO_IMAGE`), especially for ambiguous prompts, or refuse an
-  unsafe prompt (`FinishReason` `STOP`). On iOS
-  (`GenerateContentError.responseStoppedEarly`) and Web (`AIError` from
-  `inlineDataParts()`), `NO_IMAGE` throws an error rather than returning empty
-  image parts. Ask for images explicitly ("generate an image", "update the
-  image") and handle the no-image case in the UI.
+  unsafe prompt (`FinishReason` `STOP`). On Android (`ResponseStoppedException`
+  from `generateContent`), iOS (`GenerateContentError.responseStoppedEarly`) and
+  Web (`AIError` from `inlineDataParts()`), `NO_IMAGE` throws an error; Flutter
+  returns empty `inlineDataParts`. Ask for images explicitly ("generate an
+  image", "update the image") and handle the no-image case in the UI.
 - Grounding with Google Search and structured output are supported on some image
   models only; check the official guide for the current model matrix.
 
@@ -356,4 +358,4 @@ try {
   an image must contain text, generate the text first, then the image.
 
 See the official image generation guide:
-https://firebase.google.com/docs/ai-logic/generate-images-gemini
+https://firebase.google.com/docs/ai-logic/generate-images-gemini.md.txt
