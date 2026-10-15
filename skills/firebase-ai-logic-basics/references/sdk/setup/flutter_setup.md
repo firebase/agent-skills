@@ -68,10 +68,12 @@ void main() async {
 
 Use `FirebaseAI.googleAI` for the **Gemini Developer API**.
 
-> [!IMPORTANT] **Model Selection:** Refer to
+> [!IMPORTANT] **Model Selection:** Always actively fetch or read
 > [Firebase AI Logic Models](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> to find the latest supported model. Do not use old models like
-> `gemini-2.0-pro` or `gemini-2.0-flash`.
+> to determine the latest supported Gemini model ID before writing code. Do NOT
+> guess model names from memory or use retired/deprecated Gemini 1.x or 2.x
+> models (such as `gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-2.0-pro`, or
+> `gemini-2.5-flash`).
 
 > [!IMPORTANT] **Choose the Right API Provider:** Always use
 > `FirebaseAI.googleAI` (Gemini Developer API) as the default for prototyping
