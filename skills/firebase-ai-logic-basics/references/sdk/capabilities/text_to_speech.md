@@ -42,9 +42,12 @@ Always specify a dedicated Gemini TTS model when generating audio:
 >   natural-language prefix like `"Say cheerfully: ..."`), speaker turns as
 >   `SpeakerName: ...` prefixes in the prompt text, and inline vocal tags in
 >   **square brackets** (`[whispers]`, `[laughs]`, `[sighs]`). Do **not** use
->   `speech_metadata` part fields or angle-bracket tags (`<sigh>`).
+>   `speech_metadata` part fields or angle-bracket tags (`<sigh>`): those are
+>   Gemini Interactions API features (what the ai.google.dev prompting guide
+>   teaches) and are not supported by Firebase AI Logic.
 > - **Omit text-sampling parameters:** Do not pass `temperature`, `topP`,
->   `topK`, `candidateCount`, or `systemInstruction` on TTS requests.
+>   `topK`, or `candidateCount` on TTS requests; they are not applicable to TTS
+>   models. Put style guidance in the prompt text instead (see above).
 
 ______________________________________________________________________
 
@@ -1079,5 +1082,7 @@ ______________________________________________________________________
 - **Buffering & Jitter Prevention**: When streaming audio chunks via
   `generateContentStream`, schedule buffers sequentially with exact frame or
   timestamp offsets to avoid gaps.
-- **App Check Protection**: Generating audio consumes quota; enforce App Check
-  with `useLimitedUseAppCheckTokens` enabled in production.
+- **App Check Protection**: Generating audio consumes quota. Enforce App Check
+  (required for Firebase AI Logic starting November 2, 2026), and consider
+  `useLimitedUseAppCheckTokens` for replay protection (it adds per-request
+  latency; see the App Check guide).
