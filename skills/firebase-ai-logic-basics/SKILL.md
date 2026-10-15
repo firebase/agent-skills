@@ -121,6 +121,10 @@ ______________________________________________________________________
 
 ### Text-Only Generation
 
+See the [Text Generation Guide](references/sdk/capabilities/text_generation.md)
+for single-turn `generateContent`, generation config, and safety settings across
+Android, iOS, Flutter, and Web.
+
 ### Multimodal (Text + Images/Audio/Video/PDF input)
 
 Firebase AI Logic allows Gemini models to analyze image files directly from your
@@ -300,4 +304,5 @@ ______________________________________________________________________
 - [iOS (Swift) SDK setup](references/sdk/setup/ios_setup.md)
 - [Web (JavaScript) SDK setup](references/sdk/setup/web_setup.md)
 - [Flutter (Dart) SDK setup](references/sdk/setup/flutter_setup.md)
+- [Text generation](references/sdk/capabilities/text_generation.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
