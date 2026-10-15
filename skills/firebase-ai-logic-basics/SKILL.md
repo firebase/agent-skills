@@ -107,10 +107,17 @@ ______________________________________________________________________
 
 ## Core Capabilities
 
-> [!WARNING] **CRITICAL: Use current model names:** Always check the
+> [!WARNING] **CRITICAL: Always look up the latest supported model names:**
+> Before writing any `generativeModel` or `getGenerativeModel` call, you MUST
+> actively fetch or read the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> for the currently supported model names. Do NOT use `gemini-2.0-pro` or
-> `gemini-2.0-flash` or other older models that are shutdown.
+> (for example via
+> `curl -sL https://firebase.google.com/docs/ai-logic/models.md.txt` or a web
+> fetch tool) to determine the latest supported Gemini model IDs for your task.
+> Never guess a model name from memory, and do **NOT** use retired or deprecated
+> Gemini 1.x or Gemini 2.x models (such as `gemini-1.5-flash`, `gemini-1.5-pro`,
+> `gemini-2.0-flash`, `gemini-2.0-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`, or
+> `gemini-2.5-flash-lite`).
 
 ### Text-Only Generation
 
@@ -275,10 +282,17 @@ ______________________________________________________________________
   - Gemini API Provider: Gemini Developer API
   - Reference: [flutter_setup.md](references/sdk/setup/flutter_setup.md)
 
-> [!WARNING] **CRITICAL: Use current model names:** Always check the
+> [!WARNING] **CRITICAL: Always look up the latest supported model names:**
+> Before writing any `generativeModel` or `getGenerativeModel` call, you MUST
+> actively fetch or read the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> for the currently supported model names. Do NOT use `gemini-2.0-pro` or
-> `gemini-2.0-flash` or other older models that are shutdown.
+> (for example via
+> `curl -sL https://firebase.google.com/docs/ai-logic/models.md.txt` or a web
+> fetch tool) to determine the latest supported Gemini model IDs for your task.
+> Never guess a model name from memory, and do **NOT** use retired or deprecated
+> Gemini 1.x or Gemini 2.x models (such as `gemini-1.5-flash`, `gemini-1.5-pro`,
+> `gemini-2.0-flash`, `gemini-2.0-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`, or
+> `gemini-2.5-flash-lite`).
 
 ## References
 
