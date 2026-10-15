@@ -51,8 +51,8 @@ text-to-speech) rather than here.
 
 Safety settings adjust the likelihood of getting responses that may be
 considered harmful. The default threshold depends on the model: for current
-models (Gemini 2.5 and later on the Gemini Developer API; `gemini-3.5-flash` and
-later on the Agent Platform Gemini API) the filters are **off** by default, so
+models (Gemini 3.x and later on the Gemini Developer API and Agent Platform
+Gemini API) the filters are **off** by default, so
 set an explicit threshold if you want the model to block content. You configure
 one `SafetySetting` per harm category when creating the `GenerativeModel`; each
 pairs a category with a block threshold. Gemini Live API models do **not**
