@@ -25,8 +25,8 @@ Xcode project.
 ```swift
 import FirebaseAILogic
 
-// To enable replay protection for generative or preview models, pass
-// useLimitedUseAppCheckTokens: true with your backend:
+// Limited-use App Check tokens are recommended (and required if you enforce
+// replay protection in the Firebase console):
 let ai = FirebaseAI.firebaseAI(
     backend: .googleAI(),
     useLimitedUseAppCheckTokens: true
@@ -43,9 +43,11 @@ Platform Gemini API use `backend: .agentPlatform()` (optionally
 
 ### App Check Enforcement and Replay Protection
 
-Firebase AI Logic requires Firebase App Check for commonly abused models. If App
-Check is not configured in your app and enforced in the Firebase console,
-requests to those models fail with:
+Firebase AI Logic requires Firebase App Check for commonly abused models, and
+starting November 2, 2026, App Check is automatically enforced for all of
+Firebase AI Logic (it can't be unenforced, so app versions without App Check are
+blocked). If App Check is not configured in your app and enforced in the
+Firebase console, requests to commonly abused models fail with:
 
 ```text
 HTTP 403: "To access this model, you must enforce Firebase App Check"
@@ -158,9 +160,11 @@ FirebaseApp.configure()
 > [!IMPORTANT] `AppAttestProviderFactory` requires the **App Attest** capability
 > on the app target (Xcode -> Signing & Capabilities -> + Capability -> App
 > Attest), which adds the
-> `com.apple.developer.devicecheck.appattest-environment` entitlement. Without
-> it, App Attest token requests fail at runtime. Use
-> `DeviceCheckProviderFactory()` if App Attest is unavailable for the target.
+> `com.apple.developer.devicecheck.appattest-environment` entitlement; set its
+> value to `production` in the `.entitlements` file, as the Firebase App Attest
+> setup guide requires. Without the capability, App Attest token requests fail
+> at runtime. Use `DeviceCheckProviderFactory()` if App Attest is unavailable
+> for the target.
 
 For CI/CD, add an `AppCheckDebugToken` environment variable to the Xcode test
 scheme with a value like `$(APP_CHECK_DEBUG_TOKEN)`, then pass the token from

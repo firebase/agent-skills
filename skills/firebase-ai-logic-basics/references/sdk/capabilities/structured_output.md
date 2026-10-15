@@ -83,7 +83,7 @@ let ai = FirebaseAI.firebaseAI(backend: .googleAI())
 // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
 let model = ai.generativeModel(
   modelName: "<latest_supported_model>",
-  // In the generation config, set the `responseMimeType` to `application/json`
+  // In the generation config, set the `responseMIMEType` to `application/json`
   // and pass the JSON schema object into `responseSchema`.
   generationConfig: GenerationConfig(
     responseMIMEType: "application/json",
