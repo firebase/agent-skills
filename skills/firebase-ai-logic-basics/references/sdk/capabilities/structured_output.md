@@ -31,11 +31,13 @@ labels. Supported by the general-use Gemini models; check
   `optionalProperties` array (the model may then fill or skip them). This is the
   opposite of the default when calling the Gemini API directly or via its server
   SDKs.
-- **Supported schema fields**: `anyOf`, `description`, `enum`, `format`,
-  `items`, `maxItems`, `minItems`, `minimum`, `maximum`, `nullable`,
-  `properties`, `propertyOrdering`, `required`, and `title` (a subset of the
-  OpenAPI 3.0 schema object; for full JSON Schema features like `$ref`/`$defs`,
-  use `responseJsonSchema` or Android's `@Generable` KSP processor).
+- **Supported schema fields**: the Firebase guide lists `enum`, `items`,
+  `maxItems`, `nullable`, `properties`, and `required` (a subset of the OpenAPI
+  3.0 schema object). The model silently ignores fields it doesn't support, so
+  validate the parsed JSON in code instead of relying on extra constraints. Web,
+  Android, and Flutter also accept a JSON Schema via `responseJsonSchema`
+  (Android can generate one with `@Generable` and the KSP processor); iOS
+  doesn't.
 - **Limits**: the response schema counts toward the model's input token limit,
   so keep schemas as small as the task allows.
 - **Parsing**: the model's reply arrives as a JSON string in the response
@@ -254,7 +256,9 @@ console.log(data.characters);
   enum string (for example `comedy`), not JSON; read `response.text` directly.
 - **Request rejected after adding a schema.** `responseSchema` requires a
   compatible `responseMimeType` (`application/json` or `text/x.enum`) in the
-  same generation config.
+  same generation config. On Web this fails on the client:
+  `getGenerativeModel()` throws `AIError` (`UNSUPPORTED`) when you create the
+  model, before any request is sent.
 
 See the official structured output guide:
-https://firebase.google.com/docs/ai-logic/generate-structured-output
+https://firebase.google.com/docs/ai-logic/generate-structured-output.md.txt
