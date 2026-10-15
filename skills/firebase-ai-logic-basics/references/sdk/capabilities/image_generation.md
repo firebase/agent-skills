@@ -334,10 +334,11 @@ try {
 ## Troubleshooting
 
 - **Response contains text but no image, or throws `NO_IMAGE`** (`FinishReason`
-  is `NO_IMAGE`; throws `GenerateContentError.responseStoppedEarly` on iOS and
-  `AIError` from `inlineDataParts()` on Web): the prompt was ambiguous. Ask for
-  image output explicitly ("generate an image", "provide images as you go
-  along", "update the image") or retry.
+  is `NO_IMAGE`; throws `ResponseStoppedException` on Android,
+  `GenerateContentError.responseStoppedEarly` on iOS, and `AIError` from
+  `inlineDataParts()` on Web; Flutter returns empty `inlineDataParts`): the
+  prompt was ambiguous. Ask for image output explicitly ("generate an image",
+  "provide images as you go along", "update the image") or retry.
 - **Model refuses and returns only text** (`FinishReason` is `STOP`): the prompt
   was judged potentially unsafe; the model will not create the image.
 - **No image parts and the model is a general-use Gemini model**: image
