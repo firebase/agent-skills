@@ -115,8 +115,9 @@ async function streamResponse(prompt) {
   Swift and Dart; use `chunk.text ?: ""` / `if let text = chunk.text` / `?? ''`
   before concatenating.
 - **Request fails after adding `candidateCount`.** `candidateCount` is not
-  applicable to `generateContentStream`, and `gemini-3.7-flash` and later reject
-  it with HTTP 400 regardless; remove it from the `GenerationConfig`.
+  applicable to `generateContentStream` and is unsupported on Gemini 3.x and
+  later models (some reject it with HTTP 400); remove it from the
+  `GenerationConfig`.
 
 See the official text generation guide (section "Stream the response"):
-https://firebase.google.com/docs/ai-logic/generate-text
+https://firebase.google.com/docs/ai-logic/generate-text.md.txt
