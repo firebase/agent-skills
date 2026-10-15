@@ -31,9 +31,8 @@ The round trip is the same on every platform:
 Schema rules for the parameter declaration:
 
 - Schemas follow a subset of OpenAPI. Supported attributes: `type`, `nullable`,
-  `required`, `format`, `description`, `properties`, `items`, `enum`, `minimum`,
-  `maximum`, `minItems`, `maxItems`, `anyOf`, `title`. Not supported: `default`,
-  `optional`, `oneOf`.
+  `required`, `format`, `description`, `properties`, `items`, `enum`. Not
+  supported: `default`, `optional`, `maximum`, `oneOf`.
 - **All parameters are required by default.** Mark optional ones in the
   declaration's `optionalParameters` list on Android, iOS, and Flutter, or in
   `optionalProperties` on
@@ -44,7 +43,7 @@ Schema rules for the parameter declaration:
   (Swift) or `Schema.object` (Dart, Web); the official guide's `fetchWeather`
   sample shows a nested `location` object.
 
-Behaviour your app must accommodate:
+Behavior your app must accommodate:
 
 - The model may ask for **another call** (same or different function) after
   receiving a result, and may ask for **several calls at once** (parallel
@@ -319,12 +318,15 @@ async function askStockPrice() {
   `firebase-ai` artifact only pulls `kotlinx-serialization-json` in at runtime.
   Add `org.jetbrains.kotlinx:kotlinx-serialization-json` as an `implementation`
   dependency of your app module to compile the samples above.
-- **iOS: `Cannot find 'Tool' in scope`.** You are on Firebase iOS SDK 13+; use
-  `tools: [.functionDeclarations([...])]` or `GenerativeModel.Tool`.
+- **iOS: `Tool` errors after upgrading to Firebase iOS SDK 13+.** `Tool` was
+  renamed to `GenerativeModel.Tool` (to avoid clashing with Foundation Models'
+  `Tool`), so you'll see `Cannot find 'Tool' in scope` (or a type error if
+  `FoundationModels` is imported). Use `tools: [.functionDeclarations([...])]`
+  or `GenerativeModel.Tool`.
 - **Schema rejected by the API.** Remove unsupported attributes (`default`,
   `optional`, `oneOf`) and declare optional fields through `optionalParameters`
   (Android, iOS, Flutter) or `Schema.object({ properties, optionalProperties })`
   (Web) instead.
 
 See the official function calling guide:
-https://firebase.google.com/docs/ai-logic/function-calling
+https://firebase.google.com/docs/ai-logic/function-calling.md.txt
