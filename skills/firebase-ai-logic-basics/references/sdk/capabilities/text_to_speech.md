@@ -30,7 +30,8 @@ To instruct Gemini to synthesize and return audio, configure
 
 - **Android (Kotlin)**:
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
-- **Swift**: `generationConfig = GenerationConfig(responseModalities: [.audio])`
+- **iOS (Swift)**:
+  `GenerationConfig(responseModalities: [.audio], speechConfig: ...)`
 - **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
 
 ### 2. Single-Speaker `SpeechConfig`
@@ -51,13 +52,11 @@ prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
       )
   }
   ```
-- **Swift**:
+- **iOS (Swift)**:
   ```swift
-  let speechConfig = SpeechConfig(
-      voiceConfig: VoiceConfig(
-          prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-      ),
-      languageCode: "en-US"
+  let config = GenerationConfig(
+      responseModalities: [.audio],
+      speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
   )
   ```
 - **Web**:
@@ -93,26 +92,17 @@ narrator and character), configure `MultiSpeakerVoiceConfig` with
   )
   ```
 
-- **Swift**:
+- **iOS (Swift)**:
 
   ```swift
-  let multiSpeakerConfig = SpeechConfig(
+  let multiSpeechConfig = SpeechConfig(
       multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
           speakerVoiceConfigs: [
-              SpeakerVoiceConfig(
-                  speaker: "Host",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-                  )
-              ),
-              SpeakerVoiceConfig(
-                  speaker: "Guest",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Aoede")
-                  )
-              )
+              SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+              SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
           ]
-      )
+      ),
+      languageCode: "en-US"
   )
   ```
 
@@ -453,9 +443,69 @@ fun playWavAudio(context: Context, pcmBytes: ByteArray) {
 
 ______________________________________________________________________
 
-### Swift (iOS)
+## iOS (Swift)
 
-#### 1. Streaming Playback with `AVAudioEngine`
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```swift
+import FirebaseAILogic
+
+// @MainActor so these can call the @MainActor playRawPcm(data:) helper below.
+@MainActor
+func generateSingleSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let config = GenerationConfig(
+        responseModalities: [.audio],
+        speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: config
+    )
+
+    let response = try await model.generateContent("Say cheerfully: Have a wonderful day!")
+    // Join all audio parts before playing; playing per-part would replace the
+    // player on each pass so only the last part is heard.
+    let pcmData = response.inlineDataParts.reduce(Data()) { $0 + $1.data }
+    playRawPcm(data: pcmData) // Raw PCM audio bytes (24kHz, 1 channel, 16-bit)
+}
+
+@MainActor
+func generateMultiSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let multiSpeechConfig = SpeechConfig(
+        multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+            speakerVoiceConfigs: [
+                SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+                SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
+            ]
+        ),
+        languageCode: "en-US"
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: GenerationConfig(
+            responseModalities: [.audio],
+            speechConfig: multiSpeechConfig
+        )
+    )
+
+    let prompt = """
+    Joe: How's it going today Jane?
+    Jane: [excited] Not too bad, how about you?
+    """
+
+    let response = try await model.generateContent(prompt)
+    let pcmData = response.inlineDataParts.reduce(Data()) { $0 + $1.data }
+    playRawPcm(data: pcmData)
+}
+```
+
+### 2. Streaming Playback with `AVAudioEngine` (`generateContentStream`)
 
 ```swift
 import AVFoundation
@@ -465,10 +515,11 @@ import FirebaseAILogic
 final class SpeechStreamingManager {
     private let audioEngine = AVAudioEngine()
     private let playerNode = AVAudioPlayerNode()
-    
-    // 24 kHz, 16-bit Mono PCM
+
+    // AVAudioEngine requires 32-bit float non-interleaved PCM for node connections;
+    // convert incoming 24 kHz 16-bit signed integer PCM samples to Float32 [-1.0, 1.0].
     private let audioFormat = AVAudioFormat(
-        commonFormat: .pcmFormatInt16,
+        commonFormat: .pcmFormatFloat32,
         sampleRate: 24000,
         channels: 1,
         interleaved: false
@@ -480,55 +531,57 @@ final class SpeechStreamingManager {
     }
 
     func streamSpeech(prompt: String) async throws {
-        let ai = FirebaseAI.firebaseAI()
-        
-        let speechConfig = SpeechConfig(
-            voiceConfig: VoiceConfig(
-                prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-            )
-        )
-        
-        let genConfig = GenerationConfig(
+        let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+        let config = GenerationConfig(
             responseModalities: [.audio],
-            speechConfig: speechConfig
+            speechConfig: SpeechConfig(voiceName: "Kore")
         )
-        
+
         let model = ai.generativeModel(
             modelName: "gemini-3.1-flash-tts-preview",
-            generationConfig: genConfig
+            generationConfig: config
         )
-        
+
+        #if os(iOS)
+        // Without the .playback category, audio is muted when the silent switch is on.
+        try AVAudioSession.sharedInstance().setCategory(.playback)
+        try AVAudioSession.sharedInstance().setActive(true)
+        #endif
         if !audioEngine.isRunning {
             try audioEngine.start()
         }
         playerNode.play()
 
-        let stream = model.generateContentStream(prompt)
-        for try await chunk in stream {
-            for part in chunk.candidates.first?.content.parts ?? [] {
-                if let inlineData = part as? InlineDataPart,
-                   inlineData.mimeType.contains("audio/pcm") || inlineData.mimeType.contains("audio/l16") {
-                    schedulePCMBuffer(data: inlineData.data)
-                }
+        let responseStream = try model.generateContentStream(prompt)
+        for try await chunk in responseStream {
+            for part in chunk.inlineDataParts {
+                // Raw PCM audio bytes (24kHz, 1 channel, 16-bit signed little-endian)
+                schedulePCMBuffer(data: part.data)
             }
         }
     }
 
     private func schedulePCMBuffer(data: Data) {
-        let frameCount = UInt32(data.count) / audioFormat.streamDescription.pointee.mBytesPerFrame
+        let sampleCount = data.count / MemoryLayout<Int16>.size
+        let frameCount = AVAudioFrameCount(sampleCount)
         guard frameCount > 0,
-              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount) else {
+              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount),
+              let floatChannel = buffer.floatChannelData?[0] else {
             return
         }
         buffer.frameLength = frameCount
-        
+
         data.withUnsafeBytes { rawBufferPointer in
-            guard let src = rawBufferPointer.baseAddress else { return }
-            if let dest = buffer.int16ChannelData?[0] {
-                UnsafeMutableRawPointer(dest).copyMemory(from: src, byteCount: data.count)
+            // loadUnaligned reads Int16 samples without re-binding Data's memory
+            // and works even if the chunk's bytes aren't 2-byte aligned in memory.
+            // (If a chunk ever has an odd byte count, carry the last byte over.)
+            for i in 0..<sampleCount {
+                let sample = rawBufferPointer.loadUnaligned(fromByteOffset: i * 2, as: Int16.self)
+                floatChannel[i] = Float(Int16(littleEndian: sample)) / 32768.0
             }
         }
-        
+
         playerNode.scheduleBuffer(buffer)
     }
 
@@ -539,9 +592,32 @@ final class SpeechStreamingManager {
 }
 ```
 
-#### 2. WAV Converter for `AVAudioPlayer`
+### 3. Prepend WAV Header for `AVAudioPlayer`
 
 ```swift
+import AVFoundation
+
+// @MainActor: a global mutable var is an error under Swift 6 strict concurrency
+// unless it is isolated to an actor.
+@MainActor var audioPlayer: AVAudioPlayer?
+
+@MainActor
+func playRawPcm(data: Data) {
+    let wavData = addWavHeader(to: data)
+    do {
+        #if os(iOS)
+        // Without the .playback category, audio is muted when the silent switch is on.
+        try AVAudioSession.sharedInstance().setCategory(.playback)
+        try AVAudioSession.sharedInstance().setActive(true)
+        #endif
+        audioPlayer = try AVAudioPlayer(data: wavData)
+        audioPlayer?.prepareToPlay()
+        audioPlayer?.play()
+    } catch {
+        print("Error playing audio: \(error)")
+    }
+}
+
 func addWavHeader(to pcmData: Data, sampleRate: Int = 24000, channels: Int = 1, bitDepth: Int = 16) -> Data {
     var header = Data()
     let byteRate = sampleRate * channels * bitDepth / 8

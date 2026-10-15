@@ -57,3 +57,60 @@ val generatedImageAsBitmap = model.generateContent(prompt)
     // Handle the generated image
     .candidates.firstOrNull()?.content?.parts?.filterIsInstance<ImagePart>()?.firstOrNull()?.image
 ```
+
+## iOS (Swift)
+
+Create the model with the `.image` response modality and read the first
+`InlineDataPart` from the response. Replace the `fatalError` calls with real
+error handling in production code:
+
+```swift
+import FirebaseAILogic
+import UIKit
+
+// Create a `GenerativeModel` instance with a Gemini model that supports image output.
+// [AGENT] Replace "<latest_supported_image_model>" with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
+let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
+  modelName: "<latest_supported_image_model>",
+  // Configure the model to respond with images only.
+  generationConfig: GenerationConfig(responseModalities: [.image])
+)
+
+// Provide a text prompt instructing the model to generate an image
+let prompt = "Generate an image of the Eiffel tower with fireworks in the background."
+
+// To generate an image, call `generateContent` with the text input
+let response = try await model.generateContent(prompt)
+
+// Handle the generated image
+guard let inlineDataPart = response.inlineDataParts.first else {
+  fatalError("No image data in response.")
+}
+guard let uiImage = UIImage(data: inlineDataPart.data) else {
+  fatalError("Failed to convert data to UIImage.")
+}
+```
+
+### Edit an image
+
+Pass a `UIImage` together with the text prompt to the same image-capable
+`model`:
+
+```swift
+// Provide an image for the model to edit
+guard let image = UIImage(named: "scones") else { fatalError("Image file not found.") }
+
+// Provide a text prompt instructing the model to edit the image
+let prompt = "Edit this image to make it look like a cartoon"
+
+// To edit the image, call `generateContent` with the image and text input
+let response = try await model.generateContent(image, prompt)
+
+// Handle the generated image
+guard let inlineDataPart = response.inlineDataParts.first else {
+  fatalError("No image data in response.")
+}
+guard let uiImage = UIImage(data: inlineDataPart.data) else {
+  fatalError("Failed to convert data to UIImage.")
+}
+```
