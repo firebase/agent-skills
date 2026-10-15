@@ -7,16 +7,16 @@ verifiable sources beyond its knowledge cutoff. Reach for it when a response
 must be current or must show its sources (news, prices, schedules, "who won",
 region-specific facts). You enable it by adding the built-in Google Search tool
 to the model; the model then decides per request whether to search, runs the
-queries, and returns a "grounded result" whose `groundingMetadata` you are
-**required** to display in your UI.
+queries, and returns a "grounded result" whose Search Suggestions and sources
+(from `groundingMetadata`) you are **required** to display in your UI.
 
 ## Configuration
 
 - **Provider and models**: available with the Gemini Developer API (and the
   Agent Platform Gemini API, formerly branded Vertex AI) on the current
-  general-use Gemini models (Flash, Flash-Lite and Pro), on the Nano Banana
-  image models, and on the Live API models. Check the "Supported models" list on
-  the
+  general-use Gemini models (Flash, Flash-Lite and Pro), on the Pro and Flash
+  Gemini Image models (not Flash-Lite Image), and on the Live API models. Check
+  the "Supported models" list on the
   [official grounding page](https://firebase.google.com/docs/ai-logic/grounding-google-search.md.txt)
   and pick the model from
   [the models list](https://firebase.google.com/docs/ai-logic/models.md.txt).
@@ -38,9 +38,10 @@ queries, and returns a "grounded result" whose `groundingMetadata` you are
   - `groundingSupports` — links text `segment`s (`startIndex`/`endIndex`) to
     `groundingChunkIndices`, for building inline citations.
 - **Pricing and limits**: Grounding with Google Search has its own pricing,
-  model availability and limits — review the
-  [Gemini Developer API pricing page](https://ai.google.dev/gemini-api/docs/pricing)
-  before enabling it.
+  model availability and limits — review the pricing page for your provider
+  before enabling it:
+  [Gemini Developer API](https://ai.google.dev/gemini-api/docs/pricing) or
+  [Agent Platform Gemini API](https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing).
 
 > [!WARNING] **Display requirements** If a response contains Google Search
 > Suggestions (`searchEntryPoint` is present) it is a grounded result and you
@@ -274,4 +275,4 @@ if (groundingChunks) {
   tapped.
 
 See the official Grounding with Google Search guide:
-https://firebase.google.com/docs/ai-logic/grounding-google-search
+https://firebase.google.com/docs/ai-logic/grounding-google-search.md.txt

@@ -185,8 +185,8 @@ snippets for iOS (Swift), Android (Kotlin), and Web.
 
 ### Search Grounding with the built in googleSearch tool
 
-Ground model responses in live Google Search results (`Tool.googleSearch()`).
-See the
+Ground model responses in live Google Search results with the built-in
+`googleSearch` tool. See the
 [Search Grounding Guide](references/sdk/capabilities/search_grounding.md).
 
 ______________________________________________________________________
