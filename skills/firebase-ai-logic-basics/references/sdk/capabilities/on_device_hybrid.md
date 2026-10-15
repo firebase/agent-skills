@@ -8,12 +8,14 @@ to a cloud-hosted Gemini model (or the reverse) depending on availability:
   Prompt (Gemini Nano) on supported Android devices.
 - **Web (`firebase/ai`)**: uses Chrome's built-in `LanguageModel` Prompt API
   (Gemini Nano) on Chrome on Desktop (v139+).
-- **iOS (`FirebaseAILogic` via Swift Package Manager)**: in `firebase-ios-sdk`
-  v13.0.0+ (iOS 27+ / macOS 27+), `ai.geminiLanguageModel(name:)` conforms to
-  Apple's `FoundationModels.LanguageModel` protocol so apps can route between
-  Apple's on-device `SystemLanguageModel.default` and cloud Gemini models with
-  `LanguageModelSession` (replacing the experimental `HybridModel` /
-  `GenerativeModelSession` wrapper from v12.13.0–12.x).
+- **iOS (`FirebaseAILogic` via Swift Package Manager)**:
+  `ai.geminiLanguageModel(name:)` (Public Preview since `firebase-ios-sdk`
+  v12.19.0; iOS 27+ / macOS 27+, Xcode 27) conforms to Apple's
+  `FoundationModels.LanguageModel` protocol so apps can route between Apple's
+  on-device `SystemLanguageModel.default` and cloud Gemini models with
+  `LanguageModelSession`. Use v13.0.0+, which removed the interim
+  `GenerativeModelSession` / `HybridModel` APIs (v12.11.0–12.x); ignore docs or
+  samples that still use them.
 - **Flutter (`firebase_ai`)**: not available via Firebase AI Logic (always calls
   the cloud-hosted Gemini API).
 
@@ -23,10 +25,12 @@ reaching every user through the cloud fallback.
 
 ## Configuration
 
-> [!WARNING] **Preview feature.** On-device and hybrid inference on Android
-> (`@PublicPreviewAPI` in `firebase-ai` + `firebase-ai-ondevice`) and Web
-> (Chrome Desktop v139+) are in Preview and may change in backwards-incompatible
-> ways.
+> [!WARNING] **Pre-GA on Android and iOS.** Hybrid inference on Android is
+> Experimental (`@PublicPreviewAPI` in `firebase-ai` + `firebase-ai-ondevice`;
+> the ML Kit Prompt API is in beta) and the iOS Foundation Models integration is
+> in Public Preview; both may change in backwards-incompatible ways. Web hybrid
+> inference is GA in the SDK (`@firebase/ai` 2.13.0+) and needs Chrome on
+> Desktop v139+.
 
 ### Inference modes
 
@@ -39,6 +43,11 @@ model. Both platforms share the same four `InferenceMode` constants:
 | `ONLY_ON_DEVICE`   | Use the on-device model if it's available; otherwise throw an exception.            |
 | `PREFER_IN_CLOUD`  | Use the cloud-hosted model if it's available; otherwise fall back to the on-device. |
 | `ONLY_IN_CLOUD`    | Use the cloud-hosted model if it's available; otherwise throw an exception.         |
+
+On Android, `PREFER_IN_CLOUD` falls back to on-device only when the device is
+offline; other cloud errors throw. On Web, if the browser doesn't expose the
+`LanguageModel` API, requests currently run in the cloud in every mode
+(including `ONLY_ON_DEVICE`), so check `inferenceSource`.
 
 - **Inspecting which path ran**: read `response.inferenceSource` (Android) or
   `result.response.inferenceSource` (Web) and compare it with
@@ -54,13 +63,17 @@ model. Both platforms share the same four `InferenceMode` constants:
     not been called and the model is still `"downloadable"`, `PREFER_ON_DEVICE`
     falls back to the cloud without starting a download.
 - **Cloud fallback configuration**:
-  - **Android**: pass `modelName`, `generationConfig`, `safetySettings`, and
-    `systemInstruction` directly to
-    `generativeModel(..., onDeviceConfig = OnDeviceConfig(...))`.
+  - **Android**: pass `modelName`, `generationConfig`, and `safetySettings`
+    directly to `generativeModel(..., onDeviceConfig = OnDeviceConfig(...))`.
+    (`systemInstruction` for on-device and hybrid modes is in the `firebase-ai`
+    changelog but not yet in a released SDK.)
   - **Web**: pass cloud settings in `inCloudParams` (`model`,
-    `generationConfig`, etc.; default cloud model is `gemini-3.5-flash-lite` in
-    `firebase@13.0.0+`, or `gemini-2.5-flash-lite` in `firebase@12.x`) and
-    Chrome Prompt API options in `onDeviceParams` (`createOptions`,
+    `generationConfig`, etc.). If you omit `inCloudParams` entirely, the SDK
+    defaults the cloud model to `gemini-3.5-flash-lite` (`@firebase/ai@3.0.0` /
+    `firebase@13.0.0+`; `gemini-2.5-flash-lite` from `@firebase/ai@2.7.0` /
+    `firebase@12.8.0`). If you pass `inCloudParams` you must include `model`,
+    otherwise `getGenerativeModel()` throws `NO_MODEL`. Chrome Prompt API
+    options go in `onDeviceParams` (`createOptions`,
     `promptOptions.responseConstraint`). Note that `createOptions.temperature`
     and `topK` were removed in `firebase@13.0.0` (`@firebase/ai@3.0.0`).
 
@@ -70,8 +83,7 @@ Supported for on-device inference:
 
 - Single-turn content generation, streaming (`generateContentStream`) and
   non-streaming (`generateContent`)
-- Text from text-only input (plus text `systemInstruction` on Android; up to
-  4096 tokens on iOS)
+- Text from text-only input (up to 4096 tokens on iOS)
 - Text from text-and-image input (single `Bitmap` + text on Android with a
   4000-token request limit; JPEG/PNG on Web with a 9216-token limit)
 - Structured output (via `generateObject` / `@Generable` KSP on Android, or
@@ -81,13 +93,17 @@ Supported for on-device inference:
   `countTokens` to decide hybrid fallback thresholds because token counts differ
   between cloud-hosted and on-device models.
 
-Not supported on-device (with `PREFER_ON_DEVICE` the SDK falls back to the cloud
-automatically; with `ONLY_ON_DEVICE` the request throws):
+Not supported on-device. What happens when a request uses one of these differs
+by platform and feature: the SDK may fall back to the cloud, silently drop the
+field (for example `tools` on Android and Web), or fail. If a feature needs any
+of these, use `ONLY_IN_CLOUD` (as the Android docs recommend) and check
+`inferenceSource`:
 
 - Audio, video, and document (PDF) inputs, or file URLs (`gs://`)
-- Image generation with Gemini or Imagen models
+- Image generation
 - Multi-turn chat (`startChat`) and bidirectional Live API streaming
-- Tools (function calling, Google Search grounding)
+- Tools (function calling, Google Search grounding); exception: iOS supports
+  function calling and structured output on-device
 - AI monitoring in the Firebase console for on-device requests
 
 ## Android (Kotlin)
@@ -292,9 +308,9 @@ For enum output use `Schema.enumString({ enum: [...] })` with
   Chrome DevTools) — `generateContent` does not trigger a new model download on
   its own.
 - **Android: `OnDeviceModelStatus.UNAVAILABLE`**: the device does not support
-  AICore / Gemini Nano, or `com.google.firebase:firebase-ai-ondevice` is missing
-  from `dependencies`. With `PREFER_ON_DEVICE`, requests automatically fall back
-  to the cloud model.
+  AICore / Gemini Nano; with `PREFER_ON_DEVICE`, requests automatically fall
+  back to the cloud model. If `model.onDeviceExtension` is `null` instead,
+  `com.google.firebase:firebase-ai-ondevice` is missing from `dependencies`.
 - **`ONLY_ON_DEVICE` throws**: the on-device model is unavailable or not yet
   downloaded, or the request uses a feature that is not supported on-device
   (chat, tools, audio/video/PDF, file URLs). Use `PREFER_ON_DEVICE` if a cloud
@@ -307,8 +323,10 @@ For enum output use `Schema.enumString({ enum: [...] })` with
   `PREFER_ON_DEVICE` / `PREFER_IN_CLOUD`). Even on Android (where on-device
   `countTokens` is supported), token counts differ between cloud-hosted and
   on-device models, so do not rely on `countTokens` for fallback decisions.
-- **Web: works on localhost but not for end users**: the Chrome Origin Trial
-  token is missing, expired, or not served on that page.
+- **Web: works locally but not for some end users**: on-device inference needs
+  Chrome on Desktop v139+ with Gemini Nano available; before the Prompt API
+  shipped for web pages (Chrome 148), pages also needed a Chrome Origin Trial
+  token. Check `inferenceSource` to see where requests ran.
 
 See the official hybrid on-device inference guide:
 https://firebase.google.com/docs/ai-logic/hybrid.md.txt
