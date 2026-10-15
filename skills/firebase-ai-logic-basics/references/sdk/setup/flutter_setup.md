@@ -90,8 +90,10 @@ Use `FirebaseAI.googleAI` for the **Gemini Developer API**.
 import 'package:firebase_ai/firebase_ai.dart';
 
 Future<String> generateText(String prompt) async {
-  // Always pass useLimitedUseAppCheckTokens: true on the first FirebaseAI.googleAI()
-  // call for a FirebaseApp (the SDK caches the instance per app and backend).
+  // Limited-use App Check tokens are recommended (and required if you enforce
+  // replay protection). Pass the flag on the first FirebaseAI.googleAI() call
+  // for a FirebaseApp: the SDK caches the instance per app and backend, so the
+  // flag is ignored on later calls.
   final googleAI = FirebaseAI.googleAI(
     useLimitedUseAppCheckTokens: true,
   );
