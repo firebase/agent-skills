@@ -52,11 +52,10 @@ text-to-speech) rather than here.
 Safety settings adjust the likelihood of getting responses that may be
 considered harmful. The default threshold depends on the model: for current
 models (Gemini 3.x and later on the Gemini Developer API and Agent Platform
-Gemini API) the filters are **off** by default, so
-set an explicit threshold if you want the model to block content. You configure
-one `SafetySetting` per harm category when creating the `GenerativeModel`; each
-pairs a category with a block threshold. Gemini Live API models do **not**
-support safety settings. Details:
+Gemini API) the filters are **off** by default, so set an explicit threshold if
+you want the model to block content. You configure one `SafetySetting` per harm
+category when creating the `GenerativeModel`; each pairs a category with a block
+threshold. Gemini Live API models do **not** support safety settings. Details:
 https://firebase.google.com/docs/ai-logic/safety-settings.md.txt
 
 Harm categories, with the enum name used by each SDK:
@@ -206,8 +205,13 @@ Future<String> generateText(String prompt) async {
     model: '<latest_supported_model>',
   );
 
-  final response = await model.generateContent([Content.text(prompt)]);
-  return response.text ?? 'No response';
+  try {
+    final response = await model.generateContent([Content.text(prompt)]);
+    return response.text ?? '';
+  } on FirebaseAIException catch (e) {
+    // Blocked or stopped responses throw FirebaseAIException when reading .text
+    rethrow;
+  }
 }
 ```
 
@@ -244,8 +248,12 @@ Future<String> generateConfiguredText(String prompt) async {
     safetySettings: safetySettings,
   );
 
-  final response = await configuredModel.generateContent([Content.text(prompt)]);
-  return response.text ?? 'No response';
+  try {
+    final response = await configuredModel.generateContent([Content.text(prompt)]);
+    return response.text ?? '';
+  } on FirebaseAIException catch (e) {
+    rethrow;
+  }
 }
 ```
 
@@ -264,9 +272,13 @@ const ai = getAI(app, { backend: new GoogleAIBackend() });
 const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
 
 async function generateText(prompt) {
-  const result = await model.generateContent(prompt);
-  const response = result.response;
-  return response.text();
+  try {
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (err) {
+    // Blocked responses throw AIError when calling .text()
+    throw err;
+  }
 }
 ```
 
