@@ -17,12 +17,12 @@ is allowed to generate). Both are optional.
 
 ### Generation config
 
-A `GenerationConfig` is passed when creating the `GenerativeModel` and is kept
-for the lifetime of that instance; to use different values, create a new model
-instance. Full parameter descriptions:
+A `GenerationConfig` is passed when creating the `GenerativeModel` and applies
+to every request from that instance (Web and Flutter also accept per-request
+`generationConfig` / `safetySettings` overrides). Full parameter descriptions:
 https://firebase.google.com/docs/ai-logic/model-parameters.md.txt
 
-| Parameter          | What it controls                                                                                                                                | Status on general-use Gemini 3.x models                          |
+| Parameter          | What it controls                                                                                                                                | Status on general-use Gemini 3.x and later models                |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | `maxOutputTokens`  | Maximum number of tokens that can be generated in the response.                                                                                 | Supported                                                        |
 | `stopSequences`    | Strings that make the model stop generating when one of them appears in the response.                                                           | Supported (not applicable to image or TTS models)                |
@@ -33,10 +33,11 @@ https://firebase.google.com/docs/ai-logic/model-parameters.md.txt
 | `presencePenalty`  | Penalizes new tokens based on whether they have already appeared in the text so far.                                                            | Request **fails with HTTP 400** starting with `gemini-3.7-flash` |
 | `frequencyPenalty` | Penalizes new tokens based on their existing frequency in the text so far.                                                                      | Request **fails with HTTP 400** starting with `gemini-3.7-flash` |
 
-> [!WARNING] **Gemini 3.x drops the sampling parameters.** For the latest
-> general-use Gemini 3.x models `temperature`, `topK` and `topP` are ignored,
-> and `candidateCount`, `frequencyPenalty` and `presencePenalty` make the
-> request fail with a 400 error starting with `gemini-3.7-flash`. Prefer
+> [!WARNING] **Gemini 3.x and later drop the sampling parameters.** For the
+> latest general-use Gemini 4.x and 3.x models, `temperature`, `topK` and `topP`
+> are ignored, and `candidateCount`, `frequencyPenalty` and `presencePenalty`
+> are unsupported; newer models (currently `gemini-3.7-flash`,
+> `gemini-3.8-flash` and `gemini-4-argon`) reject them with HTTP 400. Prefer
 > `maxOutputTokens` and `stopSequences` in new code, and remove the other
 > parameters when upgrading an existing app.
 
@@ -49,9 +50,11 @@ text-to-speech) rather than here.
 ### Safety settings
 
 Safety settings adjust the likelihood of getting responses that may be
-considered harmful. By default the model blocks content with a medium or high
-probability of being unsafe across all categories. You configure one
-`SafetySetting` per harm category when creating the `GenerativeModel`; each
+considered harmful. The default threshold depends on the model: for current
+models (Gemini 2.5 and later on the Gemini Developer API; `gemini-3.5-flash` and
+later on the Agent Platform Gemini API) the filters are **off** by default, so
+set an explicit threshold if you want the model to block content. You configure
+one `SafetySetting` per harm category when creating the `GenerativeModel`; each
 pairs a category with a block threshold. Gemini Live API models do **not**
 support safety settings. Details:
 https://firebase.google.com/docs/ai-logic/safety-settings.md.txt
@@ -67,13 +70,13 @@ Harm categories, with the enum name used by each SDK:
 
 Block thresholds, from strictest to most permissive:
 
-| Threshold                        | Kotlin             | Swift                  | Dart     | Web                      |
-| -------------------------------- | ------------------ | ---------------------- | -------- | ------------------------ |
-| Block low probability and above  | `LOW_AND_ABOVE`    | `.blockLowAndAbove`    | `low`    | `BLOCK_LOW_AND_ABOVE`    |
-| Block medium and above (default) | `MEDIUM_AND_ABOVE` | `.blockMediumAndAbove` | `medium` | `BLOCK_MEDIUM_AND_ABOVE` |
-| Block only high probability      | `ONLY_HIGH`        | `.blockOnlyHigh`       | `high`   | `BLOCK_ONLY_HIGH`        |
-| Block none (always show)         | `NONE`             | `.blockNone`           | `none`   | `BLOCK_NONE`             |
-| Off (safety filter turned off)   | `OFF`              | `.off`                 | `off`    | `OFF`                    |
+| Threshold                       | Kotlin             | Swift                  | Dart     | Web                      |
+| ------------------------------- | ------------------ | ---------------------- | -------- | ------------------------ |
+| Block low probability and above | `LOW_AND_ABOVE`    | `.blockLowAndAbove`    | `low`    | `BLOCK_LOW_AND_ABOVE`    |
+| Block medium and above          | `MEDIUM_AND_ABOVE` | `.blockMediumAndAbove` | `medium` | `BLOCK_MEDIUM_AND_ABOVE` |
+| Block only high probability     | `ONLY_HIGH`        | `.blockOnlyHigh`       | `high`   | `BLOCK_ONLY_HIGH`        |
+| Block none (always show)        | `NONE`             | `.blockNone`           | `none`   | `BLOCK_NONE`             |
+| Off (safety filter turned off)  | `OFF`              | `.off`                 | `off`    | `OFF`                    |
 
 ## Android (Kotlin)
 
@@ -312,26 +315,28 @@ const configuredModel = getGenerativeModel(ai, {
 
 ## Troubleshooting
 
-- **HTTP 400 after a model upgrade.** `frequencyPenalty`, `presencePenalty`, or
-  `candidateCount` on Gemini 3.x models (`gemini-3.7-flash` and later) can cause
-  requests to be rejected or ignored. Remove them from the `GenerationConfig`;
-  `temperature`, `topP`, and `topK` are also ignored by general-use Gemini 3.x
-  models.
-- **Blocked response (`null` `text` or thrown exception).** When a prompt or
-  candidate is blocked by safety or recitation filters, Android returns `null`
-  from `response.text`, whereas iOS (`GenerateContentError`), Flutter
-  (`FirebaseAIException`), and Web (`AIError`) throw an exception when reading
-  `.text` / `.text()` (or from `generateContent` on iOS). Because of this,
-  null-coalescing (`??`) in Flutter or iOS will not prevent an unhandled
-  exception; wrap the call in `try` / `catch`. Inspect
-  `promptFeedback.blockReason` on the response and `finishReason` on the first
-  candidate, then relax the threshold for that category or rewrite the prompt.
-- **Deprecation warnings on `GenerationConfig`.** All four SDKs (Android
-  `firebase-ai:18.0.0+`, iOS `13.0.0+`, Flutter `firebase_ai:4.0.0+`, and Web
-  `@firebase/ai@3.0.0+`) mark `temperature`, `topP`, `topK`, `candidateCount`,
-  `presencePenalty`, and `frequencyPenalty` as deprecated on `GenerationConfig`;
-  use only `maxOutputTokens` and `stopSequences` (plus capability-specific
-  configs) as shown above.
+- **HTTP 400 after a model upgrade.** `frequencyPenalty`, `presencePenalty`, and
+  `candidateCount` are unsupported on general-use Gemini 3.x and later models,
+  and newer models (`gemini-3.7-flash`, `gemini-3.8-flash`, `gemini-4-argon`)
+  reject them with HTTP 400. Remove them from the `GenerationConfig`;
+  `temperature`, `topP`, and `topK` are also ignored by these models.
+- **Blocked or truncated response (thrown exception).** Android
+  (`PromptBlockedException` / `ResponseStoppedException`) and iOS
+  (`GenerateContentError.promptBlocked` / `.responseStoppedEarly`) throw from
+  `generateContent` itself, for any finish reason other than `STOP` (including
+  `MAX_TOKENS`). Flutter (`FirebaseAIException`) and Web (`AIError`) throw when
+  you read `.text` / `.text()` on a blocked response. A `??` / `?:` fallback on
+  `text` therefore never handles a block; wrap the call in `try` / `catch` (`do`
+  / `catch` in Swift). Inspect `promptFeedback.blockReason` on the response and
+  `finishReason` on the first candidate, then relax the threshold for that
+  category or rewrite the prompt.
+- **Deprecation warnings on `GenerationConfig`.** iOS `13.0.0+`, Web
+  `@firebase/ai@3.0.0+`, and the Android `firebase-ai:18.0.0+` builder setters
+  mark `temperature`, `topP`, `topK`, `candidateCount`, `presencePenalty`, and
+  `frequencyPenalty` as deprecated. The Kotlin `generationConfig { }` DSL and
+  Flutter `firebase_ai` 4.0.0 don't warn yet, so don't rely on the compiler: use
+  only `maxOutputTokens` and `stopSequences` (plus capability-specific configs)
+  as shown above.
 
 See the official text generation guide:
-https://firebase.google.com/docs/ai-logic/generate-text
+https://firebase.google.com/docs/ai-logic/generate-text.md.txt
