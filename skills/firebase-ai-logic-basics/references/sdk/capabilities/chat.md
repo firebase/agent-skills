@@ -25,10 +25,10 @@ function calling, which need a back-and-forth between the model and your app.
 - **Do not end a request with a `model` turn.** On `gemini-4-argon`, the
   `gemini-3.x-flash` models (except `gemini-3.5-flash`), and
   `gemini-3.5-flash-lite`, prefilling model turns is not supported: if the last
-  non-empty turn in the request is a `model` turn, the request fails with HTTP
-  400\. Seeded `startChat()` history is fine because `sendMessage()` appends the
-  `user` turn after it; the trap is hand-built `contents` arrays passed to
-  `generateContent()`.
+  non-empty turn in the request is a `model` turn, the request fails with an
+  HTTP 400 error. Seeded `startChat()` history is fine because `sendMessage()`
+  appends the `user` turn after it; the trap is hand-built `contents` arrays
+  passed to `generateContent()`.
 - **Streaming replies.** Call `sendMessageStream()` on the chat instead of
   `sendMessage()` to receive the reply chunk by chunk; see the
   [Streaming capability](streaming.md) for full examples.
