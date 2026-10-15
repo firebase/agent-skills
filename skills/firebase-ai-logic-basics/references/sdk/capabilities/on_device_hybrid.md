@@ -311,10 +311,13 @@ For enum output use `Schema.enumString({ enum: [...] })` with
   AICore / Gemini Nano; with `PREFER_ON_DEVICE`, requests automatically fall
   back to the cloud model. If `model.onDeviceExtension` is `null` instead,
   `com.google.firebase:firebase-ai-ondevice` is missing from `dependencies`.
-- **`ONLY_ON_DEVICE` throws**: the on-device model is unavailable or not yet
-  downloaded, or the request uses a feature that is not supported on-device
-  (chat, tools, audio/video/PDF, file URLs). Use `PREFER_ON_DEVICE` if a cloud
-  fallback is acceptable.
+- **`ONLY_ON_DEVICE` throws**: the on-device model is unavailable, or the
+  request includes input the on-device model can't take (for example audio,
+  video, PDF, or `gs://` file URLs). It is not a reliable check for other
+  unsupported features: `tools` and some config fields are dropped silently,
+  multi-turn chat may run on-device, and on Web without the `LanguageModel` API
+  requests run in the cloud. Use `ONLY_IN_CLOUD` for features that need the
+  cloud, or `PREFER_ON_DEVICE` if a cloud fallback is acceptable.
 - **Requests unexpectedly run in the cloud**: `PREFER_ON_DEVICE` silently falls
   back for unsupported features or when Gemini Nano is unavailable. Check
   `response.inferenceSource` / `result.response.inferenceSource`.
