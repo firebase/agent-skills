@@ -114,3 +114,72 @@ guard let uiImage = UIImage(data: inlineDataPart.data) else {
   fatalError("Failed to convert data to UIImage.")
 }
 ```
+
+## Flutter (Dart)
+
+Create the model with `ResponseModalities.image` and read the bytes from
+`response.inlineDataParts` (for example to show them with `Image.memory`):
+
+```dart
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Create a `GenerativeModel` instance with a Gemini model that supports image output.
+// [AGENT] Replace '<latest_supported_image_model>' with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
+final model = FirebaseAI.googleAI().generativeModel(
+  model: '<latest_supported_image_model>',
+  generationConfig: GenerationConfig(
+    // Configure the model to respond with images only.
+    responseModalities: [ResponseModalities.image],
+    // Specify aspect ratio and image size (both optional) in an image config.
+    // The default is a square (1:1) image at 1024x1024.
+    imageConfig: ImageConfig(
+      aspectRatio: ImageAspectRatio.landscape16x9,
+      imageSize: ImageSize.size2K,
+    ),
+  ),
+);
+
+// Provide a text prompt instructing the model to generate an image
+final prompt = [Content.text('Generate an image of the Eiffel Tower with fireworks in the background.')];
+
+// To generate an image, call `generateContent` with the text input
+final response = await model.generateContent(prompt);
+if (response.inlineDataParts.isNotEmpty) {
+  final imageBytes = response.inlineDataParts.first.bytes;
+  // Process the image
+} else {
+  // Handle the case where no images were generated
+  print('Error: No images were generated.');
+}
+```
+
+### Edit an image
+
+Wrap the image bytes in an `InlineDataPart` with their MIME type and send them
+with a `TextPart` in a single `Content.multi` to the same image-capable `model`:
+
+```dart
+import 'dart:io';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Prepare an image for the model to edit
+final image = await File('scones.jpg').readAsBytes();
+final imagePart = InlineDataPart('image/jpeg', image);
+
+// Provide a text prompt instructing the model to edit the image
+final prompt = TextPart('Edit this image to make it look like a cartoon');
+
+// To edit the image, call `generateContent` with the image and text input
+final response = await model.generateContent([
+  Content.multi([imagePart, prompt]),
+]);
+
+// Handle the generated image
+if (response.inlineDataParts.isNotEmpty) {
+  final imageBytes = response.inlineDataParts.first.bytes;
+  // Process the image
+} else {
+  // Handle the case where no images were generated
+  print('Error: No images were generated.');
+}
+```

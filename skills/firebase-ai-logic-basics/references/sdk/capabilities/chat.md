@@ -63,3 +63,23 @@ let history = [
 ]
 let chat = model.startChat(history: history)
 ```
+
+## Flutter (Dart)
+
+Seed the session with `Content.text` (user role) and `Content.model` entries,
+then send new user messages:
+
+```dart
+import 'package:firebase_ai/firebase_ai.dart';
+
+// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+final model = FirebaseAI.googleAI().generativeModel(model: '<latest_supported_model>');
+
+final chat = model.startChat(history: [
+  Content.text('Hello, I am a user.'),
+  Content.model([TextPart('Hello! How can I help you today?')]),
+]);
+
+final response = await chat.sendMessage(Content.text('What is CBT?'));
+print(response.text);
+```
