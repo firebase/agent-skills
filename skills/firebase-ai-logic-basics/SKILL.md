@@ -1,7 +1,7 @@
 ---
 name: firebase-ai-logic-basics
 description: >-
-  Integrates Firebase AI Logic (formerly Vertex AI for Firebase) into mobile and web apps (Android, iOS, Web, and Flutter) to call Gemini models from client code. Use when provisioning or initializing Firebase AI Logic, or adding Gemini features to an app: text generation, multimodal input, chat, streaming, structured output, hybrid on-device inference, App Check protection, or switching models with Remote Config.
+  Integrates Firebase AI Logic (formerly Vertex AI for Firebase) into mobile and web apps (Android, iOS, Web, and Flutter) to call Gemini models from client code. Use when provisioning or initializing Firebase AI Logic, or adding Gemini features to an app: text generation, multimodal input, chat, streaming, structured output, function calling, Google Search grounding, image generation (Nano Banana), text-to-speech, hybrid on-device inference, App Check protection, or switching models with Remote Config.
 version: 1.1.0
 metadata:
   author: Google LLC
@@ -282,9 +282,8 @@ ______________________________________________________________________
 
 ## References
 
-[Android (Kotlin) SDK usage patterns](references/sdk/setup/android_setup.md)
-[iOS SDK code examples and usage patterns](references/sdk/setup/ios_setup.md)
-[Web SDK setup, code examples, and usage patterns](references/sdk/setup/web_setup.md)
-
-[Flutter SDK code examples and usage patterns](references/sdk/setup/flutter_setup.md)
-[Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
+- [Android (Kotlin) SDK setup](references/sdk/setup/android_setup.md)
+- [iOS (Swift) SDK setup](references/sdk/setup/ios_setup.md)
+- [Web (JavaScript) SDK setup](references/sdk/setup/web_setup.md)
+- [Flutter (Dart) SDK setup](references/sdk/setup/flutter_setup.md)
+- [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
