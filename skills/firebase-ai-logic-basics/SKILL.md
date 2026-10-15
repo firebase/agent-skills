@@ -1,8 +1,8 @@
 ---
 name: firebase-ai-logic-basics
 description: >-
-  Integrates Firebase AI Logic (formerly Vertex AI for Firebase) into mobile and web apps (Android, iOS, Web, and Flutter) to call Gemini models from client code. Use when provisioning or initializing Firebase AI Logic, or adding Gemini features to an app: text generation, multimodal input, chat, streaming, structured output, hybrid on-device inference, App Check protection, or switching models with Remote Config.
-version: 1.0.1
+  Integrates Firebase AI Logic (formerly Vertex AI for Firebase) into mobile and web apps (Android, iOS, Web, and Flutter) to call Gemini models from client code. Use when provisioning or initializing Firebase AI Logic, or adding Gemini features to an app: text generation, multimodal input, chat, streaming, structured output, function calling, Google Search grounding, image generation (Nano Banana), text-to-speech, hybrid on-device inference, App Check protection, or switching models with Remote Config.
+version: 1.1.0
 metadata:
   author: Google LLC
   category: AiAndMachineLearning
@@ -107,10 +107,17 @@ ______________________________________________________________________
 
 ## Core Capabilities
 
-> [!WARNING] **CRITICAL: Use current model names:** Always check the
+> [!WARNING] **CRITICAL: Always look up the latest supported model names:**
+> Before writing any `generativeModel` or `getGenerativeModel` call, you MUST
+> actively fetch or read the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> for the currently supported model names. Do NOT use `gemini-2.0-pro` or
-> `gemini-2.0-flash` or other older models that are shutdown.
+> (for example via
+> `curl -sL https://firebase.google.com/docs/ai-logic/models.md.txt` or a web
+> fetch tool) to determine the latest supported Gemini model IDs for your task.
+> Never guess a model name from memory, and do **NOT** use retired or deprecated
+> Gemini 1.x or Gemini 2.x models (such as `gemini-1.5-flash`, `gemini-1.5-pro`,
+> `gemini-2.0-flash`, `gemini-2.0-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`, or
+> `gemini-2.5-flash-lite`).
 
 ### Text-Only Generation
 
@@ -154,7 +161,8 @@ models:
   - Client-side decoding and playback of 24 kHz 16-bit linear PCM (`audio/l16`)
     or WAV container format (`audio/x-wav`)
 
-See the [Text-to-Speech (TTS) Generation Guide](references/tts_generation.md)
+See the
+[Text-to-Speech (TTS) Generation Guide](references/sdk/capabilities/text_to_speech.md)
 for full implementation details, streaming patterns, and copy-paste code
 snippets for iOS (Swift), Android (Kotlin), and Web.
 
@@ -257,33 +265,39 @@ ______________________________________________________________________
 - **Android (Kotlin)**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [usage_patterns_android.md](references/usage_patterns_android.md)
+  - Reference: [android_setup.md](references/sdk/setup/android_setup.md)
 
 - **iOS (Swift)**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [ios_setup.md](references/ios_setup.md)
+  - Reference: [ios_setup.md](references/sdk/setup/ios_setup.md)
 
 - **Web Modular API**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [usage_patterns_web.md](references/usage_patterns_web.md)
+  - Reference: [web_setup.md](references/sdk/setup/web_setup.md)
 
 - **Flutter (Dart)**
 
   - Gemini API Provider: Gemini Developer API
-  - Reference: [flutter_setup.md](references/flutter_setup.md)
+  - Reference: [flutter_setup.md](references/sdk/setup/flutter_setup.md)
 
-> [!WARNING] **CRITICAL: Use current model names:** Always check the
+> [!WARNING] **CRITICAL: Always look up the latest supported model names:**
+> Before writing any `generativeModel` or `getGenerativeModel` call, you MUST
+> actively fetch or read the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> for the currently supported model names. Do NOT use `gemini-2.0-pro` or
-> `gemini-2.0-flash` or other older models that are shutdown.
+> (for example via
+> `curl -sL https://firebase.google.com/docs/ai-logic/models.md.txt` or a web
+> fetch tool) to determine the latest supported Gemini model IDs for your task.
+> Never guess a model name from memory, and do **NOT** use retired or deprecated
+> Gemini 1.x or Gemini 2.x models (such as `gemini-1.5-flash`, `gemini-1.5-pro`,
+> `gemini-2.0-flash`, `gemini-2.0-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`, or
+> `gemini-2.5-flash-lite`).
 
 ## References
 
-[Android (Kotlin) SDK usage patterns](references/usage_patterns_android.md)
-[iOS SDK code examples and usage patterns](references/ios_setup.md)
-[Web SDK setup, code examples, and usage patterns](references/usage_patterns_web.md)
-
-[Flutter SDK code examples and usage patterns](references/flutter_setup.md)
-[Client-side Text-to-Speech (TTS) generation](references/tts_generation.md)
+- [Android (Kotlin) SDK setup](references/sdk/setup/android_setup.md)
+- [iOS (Swift) SDK setup](references/sdk/setup/ios_setup.md)
+- [Web (JavaScript) SDK setup](references/sdk/setup/web_setup.md)
+- [Flutter (Dart) SDK setup](references/sdk/setup/flutter_setup.md)
+- [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
