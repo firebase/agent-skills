@@ -535,6 +535,11 @@ final class SpeechStreamingManager {
             generationConfig: config
         )
 
+        #if os(iOS)
+        // Without the .playback category, audio is muted when the silent switch is on.
+        try AVAudioSession.sharedInstance().setCategory(.playback)
+        try AVAudioSession.sharedInstance().setActive(true)
+        #endif
         if !audioEngine.isRunning {
             try audioEngine.start()
         }
@@ -561,7 +566,8 @@ final class SpeechStreamingManager {
 
         data.withUnsafeBytes { rawBufferPointer in
             // loadUnaligned reads Int16 samples without re-binding Data's memory
-            // and tolerates chunks that are not 2-byte aligned.
+            // and works even if the chunk's bytes aren't 2-byte aligned in memory.
+            // (If a chunk ever has an odd byte count, carry the last byte over.)
             for i in 0..<sampleCount {
                 let sample = rawBufferPointer.loadUnaligned(fromByteOffset: i * 2, as: Int16.self)
                 floatChannel[i] = Float(Int16(littleEndian: sample)) / 32768.0
