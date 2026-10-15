@@ -28,9 +28,9 @@ ______________________________________________________________________
 To instruct Gemini to synthesize and return audio, configure
 `responseModalities` in the generation configuration to include audio:
 
-- **Swift**: `generationConfig = GenerationConfig(responseModalities: [.audio])`
-- **Kotlin**:
+- **Android (Kotlin)**:
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
+- **Swift**: `generationConfig = GenerationConfig(responseModalities: [.audio])`
 - **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
 
 ### 2. Single-Speaker `SpeechConfig`
@@ -40,6 +40,17 @@ Configure voice persona and optional language code (`languageCode`, e.g.
 prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
 `Aoede`):
 
+- **Android (Kotlin)**:
+  ```kotlin
+  @OptIn(PublicPreviewAPI::class)
+  val config = generationConfig {
+      responseModalities = listOf(ResponseModality.AUDIO)
+      speechConfig = SpeechConfig(
+          voice = Voice("Kore"),
+          languageCode = "en-US"
+      )
+  }
+  ```
 - **Swift**:
   ```swift
   let speechConfig = SpeechConfig(
@@ -48,17 +59,6 @@ prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
       ),
       languageCode: "en-US"
   )
-  ```
-- **Kotlin**:
-  ```kotlin
-  val speechConfig = speechConfig {
-      voiceConfig = voiceConfig {
-          prebuiltVoiceConfig = prebuiltVoiceConfig {
-              voiceName = "Puck"
-          }
-      }
-      languageCode = "en-US"
-  }
   ```
 - **Web**:
   ```javascript
@@ -78,7 +78,23 @@ For scripts with two distinct characters or roles (e.g., host and guest,
 narrator and character), configure `MultiSpeakerVoiceConfig` with
 `speakerVoiceConfigs` linking speaker names to specific voices:
 
+- **Android (Kotlin)**:
+
+  ```kotlin
+  @OptIn(PublicPreviewAPI::class)
+  val multiSpeechConfig = SpeechConfig(
+      multiSpeakerVoiceConfig = MultiSpeakerVoiceConfig(
+          speakerVoiceConfigs = listOf(
+              SpeakerVoiceConfig(speaker = "Joe", voice = Voice("Puck")),
+              SpeakerVoiceConfig(speaker = "Jane", voice = Voice("Kore"))
+          )
+      ),
+      languageCode = "en-US"
+  )
+  ```
+
 - **Swift**:
+
   ```swift
   let multiSpeakerConfig = SpeechConfig(
       multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
@@ -99,28 +115,9 @@ narrator and character), configure `MultiSpeakerVoiceConfig` with
       )
   )
   ```
-- **Kotlin**:
-  ```kotlin
-  val multiSpeakerConfig = speechConfig {
-      multiSpeakerVoiceConfig = multiSpeakerVoiceConfig {
-          speakerVoiceConfigs = listOf(
-              speakerVoiceConfig {
-                  speaker = "Host"
-                  voiceConfig = voiceConfig {
-                      prebuiltVoiceConfig = prebuiltVoiceConfig { voiceName = "Puck" }
-                  }
-              },
-              speakerVoiceConfig {
-                  speaker = "Guest"
-                  voiceConfig = voiceConfig {
-                      prebuiltVoiceConfig = prebuiltVoiceConfig { voiceName = "Aoede" }
-                  }
-              }
-          )
-      }
-  }
-  ```
+
 - **Web**:
+
   ```javascript
   speechConfig: {
     multiSpeakerVoiceConfig: {
@@ -243,7 +240,218 @@ Offset  Size  Field              Value
 
 ______________________________________________________________________
 
-## Platform Code Snippets
+## Android (Kotlin)
+
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```kotlin
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.InlineDataPart
+import com.google.firebase.ai.type.MultiSpeakerVoiceConfig
+import com.google.firebase.ai.type.PublicPreviewAPI
+import com.google.firebase.ai.type.ResponseModality
+import com.google.firebase.ai.type.SpeakerVoiceConfig
+import com.google.firebase.ai.type.SpeechConfig
+import com.google.firebase.ai.type.Voice
+import com.google.firebase.ai.type.generationConfig
+
+@OptIn(PublicPreviewAPI::class)
+suspend fun generateSingleSpeakerSpeech(): ByteArray? {
+    val config = generationConfig {
+        responseModalities = listOf(ResponseModality.AUDIO)
+        speechConfig = SpeechConfig(
+            voice = Voice("Kore"),
+            languageCode = "en-US"
+        )
+    }
+
+    val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.1-flash-tts-preview",
+        generationConfig = config
+    )
+
+    val response = model.generateContent("Say cheerfully: Have a wonderful day!")
+    val part = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()
+    if (part is InlineDataPart) {
+        return part.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+    }
+    return null
+}
+
+@OptIn(PublicPreviewAPI::class)
+suspend fun generateMultiSpeakerSpeech(): ByteArray? {
+    val multiSpeechConfig = SpeechConfig(
+        multiSpeakerVoiceConfig = MultiSpeakerVoiceConfig(
+            speakerVoiceConfigs = listOf(
+                SpeakerVoiceConfig(speaker = "Joe", voice = Voice("Puck")),
+                SpeakerVoiceConfig(speaker = "Jane", voice = Voice("Kore"))
+            )
+        ),
+        languageCode = "en-US"
+    )
+
+    val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.1-flash-tts-preview",
+        generationConfig = generationConfig {
+            responseModalities = listOf(ResponseModality.AUDIO)
+            speechConfig = multiSpeechConfig
+        }
+    )
+
+    val prompt = """
+        Joe: How's it going today Jane?
+        Jane: [excited] Not too bad, how about you?
+    """.trimIndent()
+
+    val response = model.generateContent(prompt)
+    val part = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()
+    return (part as? InlineDataPart)?.inlineData
+}
+```
+
+### 2. Streaming Playback with `AudioTrack` (`generateContentStream`)
+
+```kotlin
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioTrack
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.InlineDataPart
+import com.google.firebase.ai.type.PublicPreviewAPI
+import com.google.firebase.ai.type.ResponseModality
+import com.google.firebase.ai.type.SpeechConfig
+import com.google.firebase.ai.type.Voice
+import com.google.firebase.ai.type.generationConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+@OptIn(PublicPreviewAPI::class)
+class SpeechStreamingManager {
+    private val sampleRate = 24000
+    private val minBufferSize = AudioTrack.getMinBufferSize(
+        sampleRate,
+        AudioFormat.CHANNEL_OUT_MONO,
+        AudioFormat.ENCODING_PCM_16BIT
+    )
+
+    private val audioTrack = AudioTrack.Builder()
+        .setAudioAttributes(
+            AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .build()
+        )
+        .setAudioFormat(
+            AudioFormat.Builder()
+                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                .setSampleRate(sampleRate)
+                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                .build()
+        )
+        .setBufferSizeInBytes(minBufferSize * 2)
+        .setTransferMode(AudioTrack.MODE_STREAM)
+        .build()
+
+    suspend fun streamSpeech(prompt: String) = withContext(Dispatchers.IO) {
+        val config = generationConfig {
+            responseModalities = listOf(ResponseModality.AUDIO)
+            speechConfig = SpeechConfig(voice = Voice("Kore"))
+        }
+
+        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+            modelName = "gemini-3.1-flash-tts-preview",
+            generationConfig = config
+        )
+
+        audioTrack.play()
+        try {
+            model.generateContentStream(prompt).collect { chunk ->
+                val part = chunk.candidates.firstOrNull()?.content?.parts?.firstOrNull()
+                if (part is InlineDataPart) {
+                    val pcmChunk = part.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+                    audioTrack.write(pcmChunk, 0, pcmChunk.size)
+                }
+            }
+        } finally {
+            audioTrack.stop()
+        }
+    }
+
+    fun release() {
+        audioTrack.release()
+    }
+}
+```
+
+### 3. Convert Raw PCM to WAV for `MediaPlayer`
+
+```kotlin
+import android.content.Context
+import android.media.MediaPlayer
+import java.io.File
+import java.io.FileOutputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+
+fun addWavHeader(
+    pcmBytes: ByteArray,
+    sampleRate: Int = 24000,
+    channels: Short = 1,
+    bitDepth: Short = 16
+): ByteArray {
+    val totalDataLen = pcmBytes.size
+    val totalLength = totalDataLen + 36
+    val byteRate = sampleRate * channels * bitDepth / 8
+    val blockAlign = (channels * bitDepth / 8).toShort()
+
+    val header = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN).apply {
+        put("RIFF".toByteArray())
+        putInt(totalLength)
+        put("WAVE".toByteArray())
+        put("fmt ".toByteArray())
+        putInt(16) // Subchunk1Size
+        putShort(1) // AudioFormat 1 = PCM
+        putShort(channels)
+        putInt(sampleRate)
+        putInt(byteRate)
+        putShort(blockAlign)
+        putShort(bitDepth)
+        put("data".toByteArray())
+        putInt(totalDataLen)
+    }.array()
+
+    return header + pcmBytes
+}
+
+fun playWavAudio(context: Context, pcmBytes: ByteArray) {
+    val wavBytes = addWavHeader(pcmBytes)
+    val tempFile = File.createTempFile("tts_", ".wav", context.cacheDir).apply {
+        deleteOnExit()
+        FileOutputStream(this).use { it.write(wavBytes) }
+    }
+
+    val mediaPlayer = MediaPlayer()
+    try {
+        mediaPlayer.setDataSource(tempFile.absolutePath)
+        mediaPlayer.prepare()
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener {
+            it.release()
+            tempFile.delete()
+        }
+    } catch (e: Exception) {
+        mediaPlayer.release()
+        tempFile.delete()
+        throw e
+    }
+}
+```
+
+______________________________________________________________________
 
 ### Swift (iOS)
 
@@ -362,153 +570,6 @@ private extension Data {
     init<T>(from value: T) {
         var val = value
         self = Swift.withUnsafeBytes(of: &val) { Data($0) }
-    }
-}
-```
-
-______________________________________________________________________
-
-### Kotlin (Android)
-
-#### Streaming Playback with `AudioTrack`
-
-```kotlin
-import android.media.AudioAttributes
-import android.media.AudioFormat
-import android.media.AudioTrack
-import com.google.firebase.ai.FirebaseAI
-import com.google.firebase.ai.type.ResponseModality
-import com.google.firebase.ai.type.generationConfig
-import com.google.firebase.ai.type.prebuiltVoiceConfig
-import com.google.firebase.ai.type.speechConfig
-import com.google.firebase.ai.type.voiceConfig
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
-class SpeechStreamingManager {
-    private val sampleRate = 24000
-    private val minBufferSize = AudioTrack.getMinBufferSize(
-        sampleRate,
-        AudioFormat.CHANNEL_OUT_MONO,
-        AudioFormat.ENCODING_PCM_16BIT
-    )
-
-    private val audioTrack = AudioTrack.Builder()
-        .setAudioAttributes(
-            AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .build()
-        )
-        .setAudioFormat(
-            AudioFormat.Builder()
-                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                .setSampleRate(sampleRate)
-                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                .build()
-        )
-        .setBufferSizeInBytes(minBufferSize * 2)
-        .setTransferMode(AudioTrack.MODE_STREAM)
-        .build()
-
-    suspend fun streamSpeech(prompt: String) = withContext(Dispatchers.IO) {
-        val config = generationConfig {
-            responseModalities = listOf(ResponseModality.AUDIO)
-            speechConfig = speechConfig {
-                voiceConfig = voiceConfig {
-                    prebuiltVoiceConfig = prebuiltVoiceConfig {
-                        voiceName = "Puck"
-                    }
-                }
-            }
-        }
-
-        val generativeModel = FirebaseAI.getInstance().getGenerativeModel(
-            modelName = "gemini-3.1-flash-tts-preview",
-            generationConfig = config
-        )
-
-        audioTrack.play()
-        try {
-            val responseStream = generativeModel.generateContentStream(prompt)
-            responseStream.collect { chunk ->
-                chunk.candidates.firstOrNull()?.content?.parts?.forEach { part ->
-                    if (part is com.google.firebase.ai.type.InlineDataPart) {
-                        val audioBytes = part.data
-                        audioTrack.write(audioBytes, 0, audioBytes.size)
-                    }
-                }
-            }
-        } finally {
-            audioTrack.stop()
-        }
-    }
-
-    fun release() {
-        audioTrack.release()
-    }
-}
-```
-
-#### 2. Convert PCM to WAV for `MediaPlayer`
-
-```kotlin
-import android.content.Context
-import android.media.MediaPlayer
-import java.io.File
-import java.io.FileOutputStream
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-
-fun addWavHeader(
-    pcmBytes: ByteArray,
-    sampleRate: Int = 24000,
-    channels: Short = 1,
-    bitDepth: Short = 16
-): ByteArray {
-    val totalDataLen = pcmBytes.size
-    val totalLength = totalDataLen + 36
-    val byteRate = sampleRate * channels * bitDepth / 8
-    val blockAlign = (channels * bitDepth / 8).toShort()
-
-    val header = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN).apply {
-        put("RIFF".toByteArray())
-        putInt(totalLength)
-        put("WAVE".toByteArray())
-        put("fmt ".toByteArray())
-        putInt(16) // Subchunk1Size
-        putShort(1) // AudioFormat 1 = PCM
-        putShort(channels)
-        putInt(sampleRate)
-        putInt(byteRate)
-        putShort(blockAlign)
-        putShort(bitDepth)
-        put("data".toByteArray())
-        putInt(totalDataLen)
-    }.array()
-
-    return header + pcmBytes
-}
-
-fun playWavAudio(context: Context, wavBytes: ByteArray) {
-    val tempFile = File.createTempFile("tts_", ".wav", context.cacheDir).apply {
-        deleteOnExit()
-        FileOutputStream(this).use { it.write(wavBytes) }
-    }
-
-    val mediaPlayer = MediaPlayer()
-    try {
-        mediaPlayer.setDataSource(tempFile.absolutePath)
-        mediaPlayer.prepare()
-        mediaPlayer.start()
-        mediaPlayer.setOnCompletionListener {
-            it.release()
-            tempFile.delete()
-        }
-    } catch (e: Exception) {
-        mediaPlayer.release()
-        tempFile.delete()
-        throw e
     }
 }
 ```
