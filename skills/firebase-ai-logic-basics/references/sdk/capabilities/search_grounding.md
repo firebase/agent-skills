@@ -127,3 +127,44 @@ if (groundingChunks != null) {
   }
 }
 ```
+
+## Web (JavaScript)
+
+Pass `{ googleSearch: {} }` in `tools`. `ai` is the instance returned by
+`getAI(app, { backend: new GoogleAIBackend() })` during setup. Insert
+`renderedContent` into the DOM as-is (it already includes its CSS).
+
+```javascript
+import { getGenerativeModel } from "firebase/ai";
+
+const model = getGenerativeModel(ai, {
+  model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  // Provide Google Search as a tool that the model can use to generate its response
+  tools: [{ googleSearch: {} }]
+});
+
+const result = await model.generateContent("Who won the euro 2024?");
+
+// Get the model's text response
+const text = result.response.text();
+
+// Get the grounding metadata
+const groundingMetadata = result.response.candidates?.[0]?.groundingMetadata;
+
+// REQUIRED - display Google Search suggestions
+// (renderedContent contains HTML and CSS for the search widget)
+const renderedContent = groundingMetadata?.searchEntryPoint?.renderedContent;
+if (renderedContent) {
+  // TODO(developer): render this HTML and CSS in the UI
+}
+
+// REQUIRED - display sources
+const groundingChunks = groundingMetadata?.groundingChunks;
+if (groundingChunks) {
+  for (const chunk of groundingChunks) {
+    const title = chunk.web?.title;  // for example, "uefa.com"
+    const uri = chunk.web?.uri;  // for example, "https://vertexaisearch.cloud.google.com..."
+    // TODO(developer): show sources in the UI
+  }
+}
+```

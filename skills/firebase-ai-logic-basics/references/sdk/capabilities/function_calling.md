@@ -183,3 +183,64 @@ Future<String> askStockPrice() async {
   return response.text ?? 'No text in response';
 }
 ```
+
+## Web (JavaScript)
+
+Declare the tool as a plain object with a `functionDeclarations` array (use the
+`Schema` helpers for the parameters), read `functionCalls()` from the response,
+and send the `functionResponse` part(s) back in a single turn:
+
+```javascript
+import { getAI, getGenerativeModel, GoogleAIBackend, Schema } from "firebase/ai";
+
+// Step 1: the app-side function the model can ask you to run.
+async function getStockPrice({ symbol }) {
+  // TODO(developer): Call a real stock price API. Hardcoded for demo purposes.
+  return { symbol, price: 189.84 };
+}
+
+// Step 2: describe the function to the model.
+const getStockPriceTool = {
+  functionDeclarations: [
+    {
+      name: "getStockPrice",
+      description: "Get the current stock price for a given symbol.",
+      parameters: Schema.object({
+        properties: {
+          symbol: Schema.string({ description: "The stock symbol, e.g. AAPL" }),
+        },
+      }),
+    },
+  ],
+};
+
+// Step 3: provide the declaration when creating the model.
+const ai = getAI(app, { backend: new GoogleAIBackend() });
+const model = getGenerativeModel(ai, {
+  model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  tools: [getStockPriceTool],
+});
+
+async function askStockPrice() {
+  // Step 4: send the prompt in a chat session and run any requested call(s).
+  const chat = model.startChat();
+  let result = await chat.sendMessage("What is the stock price of Apple?");
+
+  const functionResponses = [];
+  for (const call of result.response.functionCalls() ?? []) {
+    if (call.name === "getStockPrice") {
+      const functionResult = await getStockPrice(call.args);
+      functionResponses.push({
+        type: "functionResponse",
+        functionResponse: { id: call.id, name: call.name, response: functionResult },
+      });
+    }
+  }
+
+  // Step 5: return all function results in a single turn so the model can write its final answer.
+  if (functionResponses.length > 0) {
+    result = await chat.sendMessage(functionResponses);
+  }
+  return result.response.text();
+}
+```

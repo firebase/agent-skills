@@ -144,3 +144,51 @@ final response = await model.generateContent([Content.text(prompt)]);
 final json = jsonDecode(response.text ?? '{}') as Map<String, dynamic>;
 final characters = json['characters'] as List<dynamic>;
 ```
+
+## Web (JavaScript)
+
+Enforce a specific JSON schema for the response. `ai` is the instance returned
+by `getAI(app, { backend: new GoogleAIBackend() })` during setup. The schema is
+optional: with only `responseMimeType: "application/json"` the model still
+returns JSON, but chooses the shape itself.
+
+```javascript
+import { getGenerativeModel, Schema } from "firebase/ai";
+
+// Provide a JSON schema object using a standard format.
+// Later, pass this schema object into `responseSchema` in the generation config.
+const jsonSchema = Schema.object({
+  properties: {
+    characters: Schema.array({
+      items: Schema.object({
+        properties: {
+          name: Schema.string(),
+          age: Schema.integer(),
+          species: Schema.string(),
+          accessory: Schema.enumString({ enum: ["hat", "belt", "shoes"] }),
+        },
+        optionalProperties: ["accessory"],
+      }),
+    }),
+  },
+});
+
+const jsonModel = getGenerativeModel(ai, {
+  model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  generationConfig: {
+    responseMimeType: "application/json",
+    // Optional: Define a schema
+    responseSchema: jsonSchema
+  }
+});
+
+async function getJsonData(prompt) {
+  const result = await jsonModel.generateContent(prompt);
+  return JSON.parse(result.response.text());
+}
+
+const data = await getJsonData(
+  "For use in a children's card game, generate 10 animal-based characters."
+);
+console.log(data.characters);
+```

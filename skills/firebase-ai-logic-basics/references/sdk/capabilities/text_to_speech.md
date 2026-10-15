@@ -34,7 +34,8 @@ To instruct Gemini to synthesize and return audio, configure
   `GenerationConfig(responseModalities: [.audio], speechConfig: ...)`
 - **Flutter (Dart)**:
   `GenerationConfig(responseModalities: [ResponseModalities.audio], speechConfig: ...)`
-- **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
+- **Web (JS/TS)**:
+  `generationConfig: { responseModalities: [ResponseModality.AUDIO], speechConfig: ... }`
 
 ### 2. Single-Speaker `SpeechConfig`
 
@@ -68,16 +69,15 @@ prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
     speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
   );
   ```
-- **Web**:
+- **Web (JavaScript)**:
   ```javascript
-  speechConfig: {
-    voiceConfig: {
-      prebuiltVoiceConfig: {
-        voiceName: "Puck"
-      }
+  const generationConfig = {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+      languageCode: "en-US",
     },
-    languageCode: "en-US"
-  }
+  };
   ```
 
 ### 3. Multi-Speaker `MultiSpeakerVoiceConfig` (2-Speaker Dialogues)
@@ -129,23 +129,27 @@ narrator and character), configure `MultiSpeakerVoiceConfig` with
   );
   ```
 
-- **Web**:
+- **Web (JavaScript)**:
 
   ```javascript
-  speechConfig: {
-    multiSpeakerVoiceConfig: {
-      speakerVoiceConfigs: [
-        {
-          speaker: "Host",
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } }
-        },
-        {
-          speaker: "Guest",
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } }
-        }
-      ]
-    }
-  }
+  const generationConfig = {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      multiSpeakerVoiceConfig: {
+        speakerVoiceConfigs: [
+          {
+            speaker: "Joe",
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } },
+          },
+          {
+            speaker: "Jane",
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+          },
+        ],
+      },
+      languageCode: "en-US",
+    },
+  };
   ```
 
 ______________________________________________________________________
@@ -807,17 +811,87 @@ await for (final chunk in responseStream) {
 
 ______________________________________________________________________
 
-### Web (JavaScript/TypeScript)
+## Web (JavaScript)
 
-#### 1. Streaming Playback with Web Audio API
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```javascript
+import { initializeApp } from "firebase/app";
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  ResponseModality,
+} from "firebase/ai";
+
+const firebaseApp = initializeApp(firebaseConfig);
+const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
+
+const model = getGenerativeModel(ai, {
+  model: "gemini-3.1-flash-tts-preview",
+  generationConfig: {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+      languageCode: "en-US",
+    },
+  },
+});
+
+const result = await model.generateContent(
+  "Say cheerfully: Have a wonderful day!"
+);
+const inlineDataParts = result.response.inlineDataParts();
+if (inlineDataParts?.[0]) {
+  const pcmBase64 = inlineDataParts[0].inlineData.data; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+  const pcmBytes = Uint8Array.from(atob(pcmBase64), (c) => c.charCodeAt(0));
+  // Raw PCM has no container header, so standard players can't decode it directly.
+  // Wrap it in a WAV Blob with `pcmToWavBlob` (section 3 below) and play it:
+  const audio = new Audio(URL.createObjectURL(pcmToWavBlob(pcmBytes)));
+  await audio.play();
+}
+```
+
+For **multi-speaker** dialogue, replace `speechConfig` with a
+`multiSpeakerVoiceConfig` that assigns a voice to each speaker name, and name
+the speakers in the prompt:
+
+```javascript
+const model = getGenerativeModel(ai, {
+  model: "gemini-3.1-flash-tts-preview",
+  generationConfig: {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      multiSpeakerVoiceConfig: {
+        speakerVoiceConfigs: [
+          { speaker: "Joe", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } },
+          { speaker: "Jane", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } },
+        ],
+      },
+      languageCode: "en-US",
+    },
+  },
+});
+
+const prompt = `
+Joe: How's it going today Jane?
+Jane: [excited] Not too bad, how about you?
+`;
+
+const result = await model.generateContent(prompt);
+// Decode and play `result.response.inlineDataParts()` exactly as in the single-speaker example.
+```
+
+### 2. Streaming Playback with Web Audio API (`generateContentStream`)
 
 ```typescript
 import { initializeApp } from "firebase/app";
-import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
-
-const firebaseConfig = {
-  // your firebase configuration
-};
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  ResponseModality,
+} from "firebase/ai";
 
 const app = initializeApp(firebaseConfig);
 const ai = getAI(app, { backend: new GoogleAIBackend() });
@@ -825,11 +899,11 @@ const ai = getAI(app, { backend: new GoogleAIBackend() });
 const model = getGenerativeModel(ai, {
   model: "gemini-3.1-flash-tts-preview",
   generationConfig: {
-    responseModalities: ["AUDIO"],
+    responseModalities: [ResponseModality.AUDIO],
     speechConfig: {
       voiceConfig: {
         prebuiltVoiceConfig: {
-          voiceName: "Puck",
+          voiceName: "Kore",
         },
       },
     },
@@ -843,7 +917,9 @@ export class WebSpeechPlayer {
   private getAudioContext(): AudioContext {
     if (!this.audioCtx) {
       if (typeof window === "undefined") {
-        throw new Error("AudioContext is only available in browser environments.");
+        throw new Error(
+          "AudioContext is only available in browser environments."
+        );
       }
       const AudioContextClass =
         window.AudioContext ||
@@ -864,14 +940,12 @@ export class WebSpeechPlayer {
     const responseStream = await model.generateContentStream(prompt);
 
     for await (const chunk of responseStream.stream) {
-      const candidates = chunk.candidates || [];
-      for (const candidate of candidates) {
-        for (const part of candidate.content?.parts || []) {
-          if ("inlineData" in part && part.inlineData?.data) {
-            const rawPcm = this.base64ToArrayBuffer(part.inlineData.data);
-            this.queuePcmChunk(rawPcm, ctx);
-          }
-        }
+      const inlineDataParts = chunk.inlineDataParts();
+      if (inlineDataParts?.[0]) {
+        const rawPcm = this.base64ToArrayBuffer(
+          inlineDataParts[0].inlineData.data
+        );
+        this.queuePcmChunk(rawPcm, ctx);
       }
     }
   }
@@ -909,7 +983,7 @@ export class WebSpeechPlayer {
 }
 ```
 
-#### 2. Convert PCM Base64 to Playable WAV Blob for `<audio>` Elements
+### 3. Convert Raw PCM to Playable WAV `Blob` for `<audio>` Elements
 
 ```typescript
 export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
@@ -929,8 +1003,8 @@ export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
 
   // fmt subchunk
   writeString(view, 12, "fmt ");
-  view.setUint32(16, 16, true);             // Subchunk1Size
-  view.setUint16(20, 1, true);              // AudioFormat (PCM = 1)
+  view.setUint32(16, 16, true); // Subchunk1Size
+  view.setUint16(20, 1, true); // AudioFormat (PCM = 1)
   view.setUint16(22, numChannels, true);
   view.setUint32(24, sampleRate, true);
   view.setUint32(28, byteRate, true);
@@ -941,7 +1015,7 @@ export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
   writeString(view, 36, "data");
   view.setUint32(40, dataSize, true);
 
-  return new Blob([header, pcmBytes], { type: "audio/wav" });
+  return new Blob([header, new Uint8Array(pcmBytes)], { type: "audio/wav" });
 }
 
 function writeString(view: DataView, offset: number, string: string) {
