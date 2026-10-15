@@ -15,9 +15,10 @@ Every non-text part of a request is passed as **inline data** (the raw file
 bytes, which the SDK base64-encodes in transit) **together with its MIME type**.
 The Android and Apple SDKs additionally accept platform-native image types
 (`Bitmap`; `UIImage`, `NSImage`, `CIImage`, `CGImage`) without a MIME type;
-those are converted client-side to JPEG at 80% quality. Pass an explicit
-inline-data part with a MIME type instead when you need PNG transparency or
-exact control over the encoding.
+those are converted client-side to JPEG at 80% quality (except `CIImage` on
+Apple platforms, which is encoded via `jpegRepresentation` with default
+quality). Pass an explicit inline-data part with a MIME type instead when you
+need PNG transparency or exact control over the encoding.
 
 > [!WARNING] **The total request size limit is 20 MB.** Inline data is
 > base64-encoded in transit (which grows it by about a third), and an oversized
@@ -42,7 +43,11 @@ tokenization, and best practices):
 | Video    | `video/mp4`, `video/quicktime`, `video/webm`, and more        | 10 video files                                      | [Analyze video](https://firebase.google.com/docs/ai-logic/analyze-video.md.txt)         |
 | Document | `application/pdf`, `text/plain`                               | 1,000 pages and 50 MB per file; each page = 1 image | [Analyze documents](https://firebase.google.com/docs/ai-logic/analyze-documents.md.txt) |
 
-Prompting tips from the official guides: place the file(s) *before* the text
+These are general maximums; current models can have lower per-model limits (see
+"Specifications and limitations" on the
+[models page](https://firebase.google.com/docs/ai-logic/models.md.txt)).
+
+Prompting tips from the official guides: place a single file *before* the text
 prompt, and when sending several images give each an index in the prompt
 (`image 1`, `image 2`, ...) so you and the model can refer to them.
 
