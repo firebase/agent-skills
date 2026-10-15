@@ -11,9 +11,9 @@ function calling, which need a back-and-forth between the model and your app.
 ## Configuration
 
 - **Roles.** Content in a conversation has one of two roles. `user` provides the
-  prompts and is the default for `sendMessage()`; the call throws if a different
-  role is passed. `model` provides the responses and is only used when you seed
-  `startChat()` with existing `history`.
+  prompts and is the role `sendMessage()` should always send (Android throws for
+  other roles; Web assigns the role for you). `model` provides the responses and
+  is only used when you seed `startChat()` with existing `history`.
 - **History is automatic.** After `startChat()`, each `sendMessage()` adds the
   user message and the model response to the session, so a follow-up such as
   "How many paws are in my house?" can refer back to an earlier "I have two
@@ -22,6 +22,13 @@ function calling, which need a back-and-forth between the model and your app.
   `startChat()` to resume a stored conversation or to give the model examples.
   To steer overall behavior instead, prefer system instructions; see
   https://firebase.google.com/docs/ai-logic/system-instructions.md.txt.
+- **Do not end a request with a `model` turn.** On `gemini-4-argon`, the
+  `gemini-3.x-flash` models (except `gemini-3.5-flash`), and
+  `gemini-3.5-flash-lite`, prefilling model turns is not supported: if the last
+  non-empty turn in the request is a `model` turn, the request fails with HTTP
+  400\. Seeded `startChat()` history is fine because `sendMessage()` appends the
+  `user` turn after it; the trap is hand-built `contents` arrays passed to
+  `generateContent()`.
 - **Streaming replies.** Call `sendMessageStream()` on the chat instead of
   `sendMessage()` to receive the reply chunk by chunk; see the
   [Streaming capability](streaming.md) for full examples.
@@ -159,4 +166,5 @@ async function sendMessage(msg) {
   object for the lifetime of the conversation and reuse it for every
   `sendMessage()`; do not create one per message.
 
-See the official chat guide: https://firebase.google.com/docs/ai-logic/chat
+See the official chat guide:
+https://firebase.google.com/docs/ai-logic/chat.md.txt
