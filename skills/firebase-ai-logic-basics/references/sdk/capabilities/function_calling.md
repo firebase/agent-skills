@@ -324,9 +324,9 @@ async function askStockPrice() {
   `FoundationModels` is imported). Use `tools: [.functionDeclarations([...])]`
   or `GenerativeModel.Tool`.
 - **Schema rejected by the API.** Remove unsupported attributes (`default`,
-  `optional`, `oneOf`) and declare optional fields through `optionalParameters`
-  (Android, iOS, Flutter) or `Schema.object({ properties, optionalProperties })`
-  (Web) instead.
+  `optional`, `maximum`, `oneOf`) and declare optional fields through
+  `optionalParameters` (Android, iOS, Flutter) or
+  `Schema.object({ properties, optionalProperties })` (Web) instead.
 
 See the official function calling guide:
 https://firebase.google.com/docs/ai-logic/function-calling.md.txt
