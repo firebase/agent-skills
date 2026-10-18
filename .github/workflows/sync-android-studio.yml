@@ -1,0 +1,101 @@
+name: Sync Android Studio Skills
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'skills/**'
+  workflow_dispatch:
+    inputs:
+      full_resync:
+        description: 'Force LLM adaptation of all surviving SKILL.md files (not just those changed in the last commit)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-android-studio:
+    name: Sync main to platform/android-studio
+    environment: genkit skills automerger cron
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: main
+          fetch-depth: 2
+          path: main-branch
+
+      - name: Checkout platform/android-studio
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: platform/android-studio
+          path: android-studio-branch
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Gemini SDK dependency
+        run: npm ci --prefix main-branch/scripts/skill-token-counter
+
+      - name: Detect modified SKILL.md files and run sync
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FULL_RESYNC: ${{ inputs.full_resync || 'false' }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          CHANGED_FILES=""
+          if [ "$FULL_RESYNC" != "true" ] && [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            CHANGED_FILES=$(git -C main-branch diff --name-only "$BEFORE_SHA" HEAD -- skills/ | paste -sd "," -)
+            echo "Changed files since $BEFORE_SHA: $CHANGED_FILES"
+            # If the push touched skills/ but did not modify any SKILL.md file, pass a sentinel so Category 3 is skipped
+            if [ -z "$CHANGED_FILES" ]; then
+              CHANGED_FILES="__NONE__"
+            fi
+          fi
+
+          if [ "$FULL_RESYNC" = "true" ]; then
+            node main-branch/scripts/sync-android-studio.mjs \
+              --source-dir main-branch/skills \
+              --target-dir android-studio-branch/skills \
+              --full
+          else
+            node main-branch/scripts/sync-android-studio.mjs \
+              --source-dir main-branch/skills \
+              --target-dir android-studio-branch/skills \
+              --changed-files "$CHANGED_FILES" \
+              --before-sha "$BEFORE_SHA"
+          fi
+
+      - name: Set up Python & format Markdown
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run mdformat on synced skills
+        run: bash main-branch/scripts/format.sh android-studio-branch/skills
+
+      - name: Create Pull Request against platform/android-studio
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
+        with:
+          path: android-studio-branch
+          base: platform/android-studio
+          branch: sync/main-to-android-studio
+          commit-message: "chore: sync Android Studio skills from main"
+          title: "chore: 🤖 Sync Android Studio skills with main"
+          body: |
+            Automated sync of Android-applicable skills from `main` to `platform/android-studio`.
+
+            - **Category 1 (Deterministic Exclusion):** Removes non-Android skills (`xcode-project-setup`, `firebase-hosting-basics`, `firebase-app-hosting-basics`, `extension-to-functions-codebase`) and non-Android reference files (`*ios*`, `*web*`, `*flutter*`).
+            - **Category 2 (Deterministic Copy & Frontmatter Sync):** Copies surviving `references/**` files 1:1 from `main` and deterministically syncs YAML frontmatter metadata.
+            - **Category 3 (Targeted LLM Pass):** Adapts `SKILL.md` prose via Gemini only when a surviving `SKILL.md` changed on `main`.
+          committer: Google Open Source Bot <firebase-oss-bot@google.com>
+          reviewers: joehan, christhompsongoogle
+          token: ${{ secrets.OSS_BOT_AUTOMERGER_PAT || secrets.GITHUB_TOKEN }}
