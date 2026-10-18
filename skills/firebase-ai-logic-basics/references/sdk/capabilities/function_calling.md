@@ -48,8 +48,8 @@ lifecycleScope.launch {
     val functionCalls = result.functionCalls.filter { it.name == "getStockPrice" }
     if (functionCalls.isNotEmpty()) {
         val responseParts = functionCalls.map { call ->
-            val symbol = call.args["symbol"]!!.jsonPrimitive.content
-            FunctionResponsePart(call.name, getStockPrice(symbol))
+            val symbol = call.args["symbol"]?.jsonPrimitive?.content ?: ""
+            FunctionResponsePart(call.name, getStockPrice(symbol), call.id)
         }
 
         // Step 5: return all function response parts in a single turn.
