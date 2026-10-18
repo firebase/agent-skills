@@ -248,7 +248,6 @@ ______________________________________________________________________
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
-import com.google.firebase.ai.type.InlineDataPart
 import com.google.firebase.ai.type.MultiSpeakerVoiceConfig
 import com.google.firebase.ai.type.PublicPreviewAPI
 import com.google.firebase.ai.type.ResponseModality
@@ -273,11 +272,7 @@ suspend fun generateSingleSpeakerSpeech(): ByteArray? {
     )
 
     val response = model.generateContent("Say cheerfully: Have a wonderful day!")
-    val part = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()
-    if (part is InlineDataPart) {
-        return part.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
-    }
-    return null
+    return response.inlineDataParts.firstOrNull()?.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
 }
 
 @OptIn(PublicPreviewAPI::class)
@@ -306,8 +301,7 @@ suspend fun generateMultiSpeakerSpeech(): ByteArray? {
     """.trimIndent()
 
     val response = model.generateContent(prompt)
-    val part = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()
-    return (part as? InlineDataPart)?.inlineData
+    return response.inlineDataParts.firstOrNull()?.inlineData
 }
 ```
 
@@ -320,7 +314,6 @@ import android.media.AudioTrack
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
-import com.google.firebase.ai.type.InlineDataPart
 import com.google.firebase.ai.type.PublicPreviewAPI
 import com.google.firebase.ai.type.ResponseModality
 import com.google.firebase.ai.type.SpeechConfig
@@ -370,9 +363,8 @@ class SpeechStreamingManager {
         audioTrack.play()
         try {
             model.generateContentStream(prompt).collect { chunk ->
-                val part = chunk.candidates.firstOrNull()?.content?.parts?.firstOrNull()
-                if (part is InlineDataPart) {
-                    val pcmChunk = part.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+                chunk.inlineDataParts.firstOrNull()?.inlineData?.let { pcmChunk ->
+                    // Raw PCM bytes (24kHz, 1 channel, 16-bit)
                     audioTrack.write(pcmChunk, 0, pcmChunk.size)
                 }
             }

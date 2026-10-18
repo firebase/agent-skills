@@ -216,17 +216,22 @@ fresh installs without hardcoding secrets:
    }
    ```
 
-1. In your instrumentation test, wrap calls in `DebugAppCheckTestHelper`:
+1. In your instrumentation test, wrap calls in `DebugAppCheckTestHelper` (and
+   `runTest` from `kotlinx-coroutines-test` since AI Logic APIs are `suspend`
+   functions):
 
    ```kotlin
    import com.google.firebase.appcheck.debug.testing.DebugAppCheckTestHelper
+   import kotlinx.coroutines.test.runTest
 
    private val debugAppCheckTestHelper = DebugAppCheckTestHelper.fromInstrumentationArgs()
 
    @Test
    fun generatesContent() {
        debugAppCheckTestHelper.withDebugProvider<Exception> {
-           // Test code that calls AI Logic with the pre-provisioned debug token
+           runTest {
+               // Test suspend AI Logic calls with the pre-provisioned debug token
+           }
        }
    }
    ```
