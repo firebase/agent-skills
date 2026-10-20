@@ -1,5 +1,44 @@
 # Chat (Multi-turn Conversations)
 
+Use a chat session when the user and the model exchange more than one message
+and later turns depend on earlier ones. The SDK manages the conversation state
+for you: `startChat()` creates a session (optionally seeded with prior history)
+and every `sendMessage()` call appends both the user message and the model's
+reply to that history, so unlike `generateContent()` you never store or resend
+the transcript yourself. Chat is also the recommended way to run tools such as
+function calling, which need a back-and-forth between the model and your app.
+
+## Configuration
+
+- **Roles.** Content in a conversation has one of two roles. `user` provides the
+  prompts and is the role `sendMessage()` should always send (Android throws for
+  other roles; Web assigns the role for you). `model` provides the responses and
+  is only used when you seed `startChat()` with existing `history`.
+- **History is automatic.** After `startChat()`, each `sendMessage()` adds the
+  user message and the model response to the session, so a follow-up such as
+  "How many paws are in my house?" can refer back to an earlier "I have two
+  dogs". Keep one chat object per conversation.
+- **Seeding history.** Pass alternating `user` / `model` content to
+  `startChat()` to resume a stored conversation or to give the model examples.
+  To steer overall behavior instead, prefer system instructions; see
+  https://firebase.google.com/docs/ai-logic/system-instructions.md.txt.
+- **Do not end a request with a `model` turn.** On `gemini-4-argon`, the
+  `gemini-3.x-flash` models (except `gemini-3.5-flash`), and
+  `gemini-3.5-flash-lite`, prefilling model turns is not supported: if the last
+  non-empty turn in the request is a `model` turn, the request fails with an
+  HTTP 400 error. Seeded `startChat()` history is fine because `sendMessage()`
+  appends the `user` turn after it; the trap is hand-built `contents` arrays
+  passed to `generateContent()`.
+- **Streaming replies.** Call `sendMessageStream()` on the chat instead of
+  `sendMessage()` to receive the reply chunk by chunk; see the
+  [Streaming capability](streaming.md) for full examples.
+- **Multimodal turns.** `sendMessage()` accepts the same parts as
+  `generateContent()` (text, images, audio, PDF; see
+  [multimodal_input.md](multimodal_input.md)). With a Gemini image model and
+  `IMAGE` in `responseModalities`, chat lets you iteratively edit a generated
+  image across turns; see the "Iterate and edit images" section of
+  https://firebase.google.com/docs/ai-logic/chat.md.txt.
+
 ## Android (Kotlin)
 
 Maintain chat history automatically. The SDK methods are `suspend` functions, so
@@ -113,3 +152,19 @@ async function sendMessage(msg) {
   return result.response.text();
 }
 ```
+
+## Troubleshooting
+
+- **Error when sending a message with a custom role.** `sendMessage()` only
+  accepts user turns (send a plain string on Android, iOS, and Web, or
+  `content { text(...) }` on Android, or `Content.text(...)` /
+  `Content.multi(...)` on Flutter, which all set the `user` role automatically).
+  Passing the `model` role to `sendMessage()` throws on Android or fails with
+  HTTP 400; `model` is valid only inside the `history` passed to `startChat()`.
+- **The model "forgets" earlier turns.** Each `startChat()` call creates a new
+  session that contains only the `history` you pass in. Keep a single chat
+  object for the lifetime of the conversation and reuse it for every
+  `sendMessage()`; do not create one per message.
+
+See the official chat guide:
+https://firebase.google.com/docs/ai-logic/chat.md.txt
