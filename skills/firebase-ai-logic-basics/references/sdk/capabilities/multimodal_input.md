@@ -121,3 +121,56 @@ final response = await model.generateContent([
 Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): use
 `FileData('image/jpeg', 'gs://bucket-name/path/image.jpg')` in place of the
 `InlineDataPart` inside `Content.multi`.
+
+## Web (JavaScript)
+
+Firebase AI Logic accepts Base64 encoded data or specific file references.
+
+```javascript
+import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
+
+const ai = getAI(app, { backend: new GoogleAIBackend() });
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
+
+// Helper to convert file to base64 generic object
+async function fileToGenerativePart(file) {
+  const base64EncodedDataPromise = new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  return {
+    type: "inlineData",
+    inlineData: {
+      data: await base64EncodedDataPromise,
+      mimeType: file.type,
+    },
+  };
+}
+
+async function analyzeImage(prompt, imageFile) {
+  const imagePart = await fileToGenerativePart(imageFile);
+  const result = await model.generateContent([imagePart, prompt]);
+  return result.response.text();
+}
+```
+
+The same helper handles audio, video, and PDF `File` objects because it reads
+the MIME type from `file.type`. If you already hold base64 data, build the part
+directly with an explicit MIME type:
+
+```javascript
+const pdfPart = { type: "inlineData", inlineData: { data: base64Pdf, mimeType: "application/pdf" } };
+const result = await model.generateContent([
+  pdfPart,
+  "Summarize the important results in this report.",
+]);
+console.log(result.response.text());
+```
+
+Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): pass
+`{ type: "fileData", fileData: { mimeType: "image/jpeg", fileUri: "gs://bucket-name/path/image.jpg" } }`
+in place of the `inlineData` part.
