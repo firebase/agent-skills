@@ -47,3 +47,39 @@ Log.d(TAG, response.text ?: "")
 Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): use
 `fileData(uri = "gs://bucket-name/path/image.jpg", mimeType = "image/jpeg")` in
 place of `inlineData(...)` inside the same `content { }` block.
+
+## iOS (Swift)
+
+`generateContent` is variadic and accepts `UIImage` (and other platform image
+types) directly alongside the prompt string, so no MIME type is needed for
+images:
+
+```swift
+import FirebaseAILogic
+import UIKit
+
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(modelName: "<latest_supported_model>")
+
+guard let image = UIImage(named: "scones") else { fatalError("Image file not found.") }
+// Provide a text prompt to include with the image
+let prompt = "What's in this picture?"
+// To generate text output, call generateContent and pass in the prompt
+let response = try await model.generateContent(image, prompt)
+print(response.text ?? "No text in response.")
+```
+
+For PDFs, audio, video, or images with an explicit encoding, wrap the bytes in
+an `InlineDataPart` with the matching MIME type and pass it the same way:
+
+```swift
+// Provide the PDF as `Data` with the appropriate MIME type
+let pdf = try InlineDataPart(data: Data(contentsOf: pdfURL), mimeType: "application/pdf")
+// e.g. audio instead: InlineDataPart(data: audioData, mimeType: "audio/mpeg")
+let response = try await model.generateContent(pdf, "Summarize the important results in this report.")
+print(response.text ?? "No text in response.")
+```
+
+Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): pass
+`FileDataPart(uri: "gs://bucket-name/path/image.jpg", mimeType: "image/jpeg")`
+in place of the `InlineDataPart`.
