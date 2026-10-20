@@ -83,10 +83,12 @@ This is the recommended flow for most users.
 ### Automated deployment via GitHub (CI/CD)
 
 Alternatively, set up a backend connected to a GitHub repository for automated
-deployments "git push" deployments. This is only recommended for more advanced
-users, and is not required to use App Hosting. See
-[CLI Commands](references/cli_commands.md) for more information on how to set
-this up using CLI commands.
+"git push" deployments. For GitHub-connected backends, trigger rollouts with
+`npx -y firebase-tools@latest apphosting:rollouts:create <backend-id> --git-branch <branch>`
+(do not use `rollouts:create` when deploying from local source with `deploy`).
+
+For other backend or secret flags (`backends:get`, `backends:delete`, etc.), run
+`npx -y firebase-tools@latest <command> --help`.
 
 ## Emulation
 
