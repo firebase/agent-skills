@@ -133,7 +133,10 @@ images, detecting objects, and categorizing images. Beyond images, Gemini can
 analyze other media types like audio, video, and PDFs by passing them as inline
 data with their MIME type. For files larger than 20 megabytes (which can cause
 HTTP 413 errors as inline data), store them in Cloud Storage for Firebase and
-pass their URLs to the Gemini Developer API.
+pass their `gs://` URLs via file data parts
+(`FileDataPart`/`FileData`/`fileData`) using the Agent Platform Gemini API
+(formerly branded Vertex AI, which requires the Blaze plan). See the
+[Multimodal Input Guide](references/sdk/capabilities/multimodal_input.md).
 
 ### Chat Session (Multi-turn)
 
@@ -305,4 +308,5 @@ ______________________________________________________________________
 - [Web (JavaScript) SDK setup](references/sdk/setup/web_setup.md)
 - [Flutter (Dart) SDK setup](references/sdk/setup/flutter_setup.md)
 - [Text generation](references/sdk/capabilities/text_generation.md)
+- [Multimodal input (images, audio, video, PDF)](references/sdk/capabilities/multimodal_input.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
