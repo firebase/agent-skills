@@ -1,7 +1,7 @@
 ---
 name: firebase-firestore
 description: >-
-  Sets up, manages, queries, and configures Cloud Firestore databases (Standard/Enterprise edition), including data modeling, security rules, indexes, and SDK integrations (Web, Python, iOS, Android, Flutter). Use when creating/listing Firestore databases, defining data models/indexes, writing SDK queries, or integrating Firestore SDKs. For authoring or modifying Firestore Security Rules (firestore.rules), delegate to the firestore-rules-author subagent if subagent delegation is available, or use firestore-rules-creation otherwise. Don't use for Firebase Hosting, Data Connect, Auth, Storage/GCS, Crashlytics, Functions, or BigQuery.
+  Sets up, manages, queries, configures, and upgrades Cloud Firestore databases (Standard/Enterprise edition) and SDKs, including data modeling, security rules, indexes, and SDK integrations/migrations (Web, Node.js, Python, Go, Java, Android, iOS, .NET, PHP, Ruby, Flutter). Use when creating/listing Firestore databases, defining data models/indexes, writing SDK queries, or integrating and auto-upgrading Firestore SDKs. For authoring or modifying Firestore Security Rules (firestore.rules), delegate to the firestore-rules-author subagent if subagent delegation is available, or use firestore-rules-creation otherwise. Don't use for Firebase Hosting, Data Connect, Auth, Storage/GCS, Crashlytics, Functions, or BigQuery.
 compatibility: This skill is best used with the Firebase CLI, but does not require it. Firebase CLI can be accessed through `npx -y firebase-tools@latest`.
 metadata:
   author: Google LLC
@@ -67,7 +67,28 @@ Proceed with using the guides under `references/enterprise/`.
 
 ______________________________________________________________________
 
-## 2. Specialized Guides
+## 2. SDK Version Resolution & Upgrade Workflow
+
+Skip this section for read-only/Q&A/snippet prompts, CLI-only questions, or
+tasks that only touch `firestore.rules`, `firestore.indexes.json`, or
+`firebase.json`.
+
+- **Adding Firestore, scaffolding a project, or fulfilling an upgrade request**:
+  Never guess or hardcode memorized SDK versions. Read and follow
+  [sdk_versions.md](references/sdk_versions.md) to query the live registry
+  version via `curl`, update the manifest/lockfile, and migrate deprecated APIs
+  across Web, Node.js, Python, Go, Java, Android, iOS, .NET, PHP, Ruby, and
+  Flutter.
+- **Modifying application code in an existing repo with a pinned SDK**: Do
+  **not** silently mutate the manifest or lockfile during unrelated code edits.
+  If the manifest pins an outdated SDK or uses deprecated patterns (e.g., Web
+  v8 `firebase.firestore()`, Python positional `.where()`, Android `-ktx`, iOS
+  `FirebaseFirestoreSwift`), complete the user's task and append a 1-line offer
+  to upgrade using [sdk_versions.md](references/sdk_versions.md).
+
+______________________________________________________________________
+
+## 3. Specialized Guides
 
 Based on the identified or created instance edition, open and read the
 corresponding reference guides:
