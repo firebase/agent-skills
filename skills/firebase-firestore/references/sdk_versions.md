@@ -2,7 +2,23 @@
 
 Never guess or hardcode memorized SDK versions from training weights.
 
-## 1. Adding Firestore, Project Setup, or Explicit Upgrade Requests
+## 1. Modifying Code in an Existing Repo with a Pinned SDK
+
+When editing application code in a repository that already has an older
+Firestore SDK pinned:
+
+1. Do **not** silently mutate the dependency manifest or lockfile during an
+   unrelated feature or bugfix edit (unless the requested feature requires a
+   newer SDK, such as Enterprise Pipelines or Vector Search).
+1. Inspect the manifest file locally. If the pinned Firestore SDK is outdated or
+   the codebase uses deprecated patterns (e.g., Web v8 `firebase.firestore()`,
+   `enableIndexedDbPersistence`, Python positional `.where("a", "==", "b")`,
+   Android `firebase-firestore-ktx`, iOS `FirebaseFirestoreSwift`), complete the
+   user's task and append a 1-line offer at the end of your response:
+   > *"Note: `<package>` is pinned to `<current_version>`. Reply **upgrade
+   > firestore** if you want me to bump it to the latest stable version."*
+
+## 2. Adding Firestore, Project Setup, or Explicit Upgrade Requests
 
 Whenever adding Firestore dependencies, scaffolding a project, or fulfilling an
 upgrade request:
@@ -23,29 +39,16 @@ upgrade request:
    `bundle lock --update google-cloud-firestore`, `flutter pub get`). If a
    lockfile exists but the CLI is not in `PATH`, remind the user to refresh
    their lockfile before running `npm ci` or CI builds.
-1. **Deprecation migration**: Search the repository for deprecated Firestore
-   imports/calls (e.g., Web v8 `firebase.firestore()` -> modular
-   `firebase/firestore`, `enableIndexedDbPersistence` -> `persistentLocalCache`,
-   Python positional `.where("a", "==", "b")` ->
-   `.where(filter=FieldFilter("a", "==", "b"))`, Android
-   `firebase-firestore-ktx` -> `firebase-firestore`, iOS
-   `FirebaseFirestoreSwift` -> `FirebaseFirestore`) and migrate all affected
-   files across the project.
-
-## 2. Modifying Code in an Existing Repo with a Pinned SDK
-
-When editing application code in a repository that already has an older
-Firestore SDK pinned:
-
-1. Do **not** silently mutate the dependency manifest or lockfile during an
-   unrelated feature or bugfix edit (unless the requested feature requires a
-   newer SDK, such as Enterprise Pipelines or Vector Search).
-1. Inspect the manifest file locally. If the pinned Firestore SDK is outdated or
-   the codebase uses deprecated patterns listed in **Section 1**, complete the
-   user's task and append a 1-line offer at the end of your response:
-   > *"Note: `<package>` is pinned to `<current_version>`. Reply **upgrade
-   > firestore** if you want me to bump it to the latest stable version and
-   > migrate deprecated call sites."*
+1. **Deprecation migration**: Check whether the repository uses any newly
+   deprecated Firestore APIs associated with the version upgrade (e.g., Web v8
+   `firebase.firestore()` -> modular `firebase/firestore`,
+   `enableIndexedDbPersistence` -> `persistentLocalCache`, Python positional
+   `.where("a", "==", "b")` -> `.where(filter=FieldFilter("a", "==", "b"))`,
+   Android `firebase-firestore-ktx` -> `firebase-firestore`, iOS
+   `FirebaseFirestoreSwift` -> `FirebaseFirestore`). Ask the user if they want
+   to migrate from those deprecated APIs rather than refactoring their call
+   sites automatically (unless the user explicitly requested a deprecation or
+   code migration).
 
 ## 3. Deterministic Latest Version Queries
 
