@@ -74,11 +74,13 @@ tasks that only touch `firestore.rules`, `firestore.indexes.json`, or
 `firebase.json`.
 
 - **Modifying application code in an existing repo with a pinned SDK**: Do
-  **not** silently mutate the manifest or lockfile during unrelated code edits.
-  If the manifest pins an outdated SDK or uses deprecated patterns (e.g., Web v8
-  `firebase.firestore()`, Python positional `.where()`, Android `-ktx`, iOS
-  `FirebaseFirestoreSwift`), complete the user's task and append a 1-line offer
-  to upgrade using [sdk_versions.md](references/sdk_versions.md).
+  **not** silently mutate the manifest or lockfile during unrelated code edits
+  (unless the requested feature requires a newer SDK, such as Enterprise
+  Pipelines or Vector Search). If the manifest pins an outdated SDK or uses
+  deprecated patterns (e.g., Web v8 `firebase.firestore()`, Python positional
+  `.where()`, Android `-ktx`, iOS `FirebaseFirestoreSwift`), complete the user's
+  task and append a 1-line offer to upgrade using
+  [sdk_versions.md](references/sdk_versions.md).
 - **Adding Firestore, scaffolding a project, or fulfilling an upgrade request**:
   Never guess or hardcode memorized SDK versions. Read and follow
   [sdk_versions.md](references/sdk_versions.md) to query the live registry
