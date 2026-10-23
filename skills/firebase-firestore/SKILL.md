@@ -71,16 +71,35 @@ ______________________________________________________________________
 
 Skip this section for read-only/Q&A/snippet prompts, CLI-only questions, or
 tasks that only touch `firestore.rules`, `firestore.indexes.json`, or
-`firebase.json`.
+`firebase.json`. Whenever adding or modifying application code, **always inspect
+the repository's dependency manifest** (`package.json`, `requirements.txt`,
+`pyproject.toml`, `go.mod`, `pom.xml`, `build.gradle(.kts)`,
+`gradle/libs.versions.toml`, `Podfile`, `Package.swift`, `*.csproj`,
+`Directory.Packages.props`, `composer.json`, `Gemfile`, `*.gemspec`, or
+`pubspec.yaml`; if listing project files via shell, use `ls -R <project_dir>`
+rather than `find`, `grep -r`, or `python3 -c`):
 
 - **Modifying application code in an existing repo with a pinned SDK**: Do
-  **not** silently mutate the manifest or lockfile during unrelated code edits
-  (unless the requested feature requires a newer SDK, such as Enterprise
-  Pipelines or Vector Search). If the manifest pins an outdated SDK or uses
-  deprecated patterns (e.g., Web v8 `firebase.firestore()`, Python positional
+  **not** silently mutate the manifest, lockfile, or existing SDK imports during
+  unrelated code edits (e.g., do not emit modular v9+ imports in a repo still
+  pinned to Web v8, or remove `FirebaseFirestoreSwift` / `-ktx` while the
+  manifest is still pinned to iOS `< 11.0.0` / Android `firebase-bom < 34.0.0`).
+  If the manifest pins an outdated SDK or uses deprecated patterns (e.g., Web v8
+  `firebase.firestore()`, `enableIndexedDbPersistence`, Python positional
   `.where()`, Android `-ktx`, iOS `FirebaseFirestoreSwift`), complete the user's
-  task and append a 1-line offer to upgrade using
-  [sdk_versions.md](references/sdk_versions.md).
+  task and append this 1-line offer at the end of your response (check
+  [sdk_versions.md](references/sdk_versions.md) if unsure whether the pinned
+  version is already current; do **not** append this note if already on the
+  latest version):
+  > *"Note: `<package>` is pinned to `<current_version>`. Reply **upgrade
+  > firestore** if you want me to bump it to the latest stable version."*
+- **Feature requires a newer SDK (e.g., Enterprise Pipelines or Vector
+  Search)**: If the user asks to implement a feature that is unavailable in the
+  pinned SDK version (such as Enterprise Pipelines `.pipeline()` or Vector
+  Search `findNearest` / `find_nearest` / `FindNearest` on an older SDK), read
+  and follow [sdk_versions.md](references/sdk_versions.md) to upgrade the
+  manifest (and lockfile if the CLI is in `PATH`) to the latest stable version
+  in the same turn so the new code compiles.
 - **Adding Firestore, scaffolding a project, or fulfilling an upgrade request**:
   Never guess or hardcode memorized SDK versions. Read and follow
   [sdk_versions.md](references/sdk_versions.md) to query the live registry
