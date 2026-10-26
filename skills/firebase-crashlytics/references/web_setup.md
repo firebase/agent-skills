@@ -64,6 +64,8 @@ firebase crashlytics:sourcemap:upload \
 > [!CAUTION]
 > Ensure `.map` files are deleted or are not publicly accessible in your hosted app to avoid leaking source code.
 
+Pass `--clean` flag to remove local source maps after uploading.
+
 ---
 
 ## 5. Force a Test Crash & Verify
@@ -95,7 +97,7 @@ AI coding agents can assist with investigating web crashes:
 Consult the following guides in the SDK repository for advanced configurations:
 
 - **[Advanced Usage Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md)**:
-  - **[App Versioning](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#app-versioning)**: Automate telemetry version tagging using the `setconstants.js` build script helper.
+  - **[App Versioning](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#app-versioning)**: Automate telemetry version tagging using the `crashlytics-setconstants` build script helper.
   - **[Programmatic Error Capturing](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#programmatic-error-capturing)**: Manually record handled errors with custom key/value metadata using `recordError()`.
   - **[Force Flushing](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#force-flushing-telemetry-records-flush)**: Flush in-memory buffered records immediately before page unload using `flush()`.
   - **[Best Practices & Gotchas](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#best-practices--gotchas)**: Import guidelines and framework integration tips.
