@@ -10,8 +10,8 @@ metadata:
 # Crashlytics
 
 This skill provides a complete guide for getting started with Crashlytics on
-Android, iOS, or Web. Crash data collected from client applications can be read using
-the MCP server in the Firebase CLI.
+Android, iOS, or Web. Crash data collected from client applications can be read
+using the MCP server in the Firebase CLI.
 
 ## Prerequisites
 
