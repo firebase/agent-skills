@@ -39,10 +39,10 @@ ______________________________________________________________________
 
 ## 2. Install Packages & Initialize SDK
 
-Install the packages:
+Install the Firebase package:
 
 ```bash
-npm install firebase/app firebase/crashlytics
+npm install firebase
 ```
 
 - **Initialize Firebase**: Set up your `FirebaseApp` singleton following
