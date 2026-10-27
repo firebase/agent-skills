@@ -8,8 +8,8 @@
     "email": "firebase-support@google.com",
     "url": "https://firebase.google.com"
   },
-  "homepage": "https://github.com/firebase/skills",
-  "repository": "https://github.com/firebase/skills",
+  "homepage": "https://github.com/firebase/agent-skills",
+  "repository": "https://github.com/firebase/agent-skills",
   "license": "Apache-2.0",
   "keywords": [
     "firebase",
