@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "firebase",
+  "version": "1.1.0",
+  "description": "Build full-stack applications with Firebase's suite of backend services including Authentication, Firestore, App Hosting, Cloud Functions, Storage, Crashlytics, and Cloud Messaging.",
+  "author": {
+    "name": "Firebase",
+    "email": "firebase-support@google.com",
+    "url": "https://firebase.google.com"
+  },
+  "homepage": "https://github.com/firebase/agent-skills",
+  "repository": "https://github.com/firebase/agent-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "firebase",
+    "firestore",
+    "auth",
+    "database",
+    "cloud functions",
+    "storage",
+    "hosting",
+    "app hosting",
+    "backend",
+    "crashlytics",
+    "mcp",
+    "skills"
+  ]
+}
