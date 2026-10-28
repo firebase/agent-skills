@@ -15,7 +15,7 @@ Important references:
 
 - Ensure the Firebase project and web app are set up (see
   `skills/firebase-basics/references/web_setup.md`).
-- **Firebase CLI**: Requires version **v15.19.1+**, authenticated
+- **Firebase CLI**: Requires version **v15.19.1** or later, authenticated
   (`firebase login`), and project set (`firebase use <PROJECT_ID>`).
 - **Permissions & Billing**: Cloud project **Owner** or **Editor** role and
   **Blaze (pay-as-you-go)** billing enabled.
@@ -28,7 +28,7 @@ Web Crashlytics leverages Cloud Logging and Cloud Storage under the hood. Use
 the Firebase CLI to onboard your project and web app:
 
 ```bash
-firebase crashlytics:onboard:web <YOUR_FIREBASE_APP_ID> --project <YOUR_FIREBASE_PROJECT_ID>
+npx -y firebase-tools@latest crashlytics:onboard:web <YOUR_FIREBASE_APP_ID> --project <YOUR_FIREBASE_PROJECT_ID>
 ```
 
 This automated command enables the required Telemetry APIs, provisions the
@@ -79,7 +79,7 @@ To display de-minified stack traces in the Crashlytics console, upload
 production source maps using the Firebase CLI:
 
 ```bash
-firebase crashlytics:sourcemap:upload \
+npx -y firebase-tools@latest crashlytics:sourcemap:upload \
   --project <YOUR_FIREBASE_PROJECT_ID> \
   --app <YOUR_FIREBASE_APP_ID> \
   --debug <BUILD_OUTPUT_DIRECTORY>
