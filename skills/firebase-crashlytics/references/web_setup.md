@@ -8,8 +8,8 @@ Important references:
 - Refer to `skills/firebase-basics/references/web_setup.md` for project
   creation, registering a web app, and initializing the core Firebase app.
 - Refer to the
-  [Firebase Crashlytics JS SDK README](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/README.md)
-  for detailed configuration, architecture, and framework documentation.
+  [Get started with Firebase Crashlytics for Web](https://firebase.google.com/docs/crashlytics/web/get-started)
+  guide for detailed configuration, architecture, and framework documentation.
 
 ## Prerequisites
 
@@ -46,7 +46,7 @@ npm install firebase
 ```
 
 - **Initialize Firebase**: Set up your `FirebaseApp` singleton following
-  [Step 2: Core SDK Installation & Initialization](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/README.md#step-2-core-sdk-installation--initialization)
+  [Step 2: Add and initialize the SDK in your app](https://firebase.google.com/docs/crashlytics/web/get-started#add-sdk)
   and `skills/firebase-basics/references/web_setup.md`.
 
 ______________________________________________________________________
@@ -55,19 +55,19 @@ ______________________________________________________________________
 
 Refer to the framework-specific guide corresponding to your app:
 
-- **[Next.js Setup Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/src/next/README.md)**:
+- **[Next.js Setup Guide](https://firebase.google.com/docs/crashlytics/web/get-started#configure-automatic-error-capturing)**:
   Wrap `<CrashlyticsRoutes>` from `firebase/crashlytics/next-navigation` inside
   a Client Component (`"use client"`), then wrap your root App Router layout.
-- **[React Setup Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/src/react/README.md)**:
+- **[React Setup Guide](https://firebase.google.com/docs/crashlytics/web/get-started#configure-automatic-error-capturing)**:
   Wrap root application components with `<FirebaseCrashlytics>` from
   `firebase/crashlytics/react`.
-- **[React Router Setup Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/src/react-router/README.md)**:
+- **[React Router Setup Guide](https://firebase.google.com/docs/crashlytics/web/get-started#configure-automatic-error-capturing)**:
   Replace React Router's `<Routes>` container with `<CrashlyticsRoutes>` from
   `firebase/crashlytics/react-router` for parameterized path tracking.
-- **[TanStack Router Setup Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/src/tanstack/README.md)**:
+- **[TanStack Router Setup Guide](https://firebase.google.com/docs/crashlytics/web/get-started#configure-automatic-error-capturing)**:
   Initialize with `getCrashlytics(app)` and bind error logging in
   `defaultOnCatch` using `recordError()`.
-- **[Angular Setup Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/src/angular/README.md)**:
+- **[Angular Setup Guide](https://firebase.google.com/docs/crashlytics/web/get-started#configure-automatic-error-capturing)**:
   Add `provideCrashlytics(() => app)` from `firebase/crashlytics/angular` to
   application providers in `app.config.ts`.
 
@@ -90,6 +90,9 @@ firebase crashlytics:sourcemap:upload \
 
 Pass `--clean` flag to remove local source maps after uploading.
 
+Reference:
+[Get readable crash reports (Web)](https://firebase.google.com/docs/crashlytics/web/get-deobfuscated-reports).
+
 ______________________________________________________________________
 
 ## 5. Force a Test Crash & Verify
@@ -108,7 +111,7 @@ ______________________________________________________________________
 1. Remove the test crash code once verified.
 
 Reference:
-[Step 4: Force an Initial Crash](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/README.md#step-4-force-an-initial-crash).
+[Test your implementation (Web)](https://firebase.google.com/docs/crashlytics/web/test-implementation#force-test-crash).
 
 ______________________________________________________________________
 
@@ -122,39 +125,39 @@ AI coding agents can assist with investigating web crashes:
 - **REST API & Telemetry Metadata**: Programmatically query issues via the
   [Firebase Crashlytics REST API](https://firebase.google.com/docs/reference/crashlytics/rest)
   using web dimensions (`browser.platform`, `user_agent.*`). See
-  [Debugging with AI Agents](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/README.md#debugging-with-ai-agents).
+  [Web browser metadata](https://firebase.google.com/docs/crashlytics/cloud-logging-schema#browser-metadata).
 
 ______________________________________________________________________
 
 ## 7. Additional Configuration & References
 
-Consult the following guides in the SDK repository for advanced configurations:
+Consult the official Crashlytics documentation for advanced configurations:
 
-- **[Advanced Usage Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md)**:
-  - **[App Versioning](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#app-versioning)**:
+- **[Customize Crash Reports (Web)](https://firebase.google.com/docs/crashlytics/web/customize-crash-reports)**:
+  - **[App Versioning](https://firebase.google.com/docs/crashlytics/web/get-started#set-app-version)**:
     Automate telemetry version tagging using the `crashlytics-setconstants`
     build script helper.
-  - **[Programmatic Error Capturing](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#programmatic-error-capturing)**:
+  - **[Programmatic Error Capturing](https://firebase.google.com/docs/crashlytics/web/customize-crash-reports#log-excepts)**:
     Manually record handled errors with custom key/value metadata using
     `recordError()`.
-  - **[Force Flushing](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#force-flushing-telemetry-records-flush)**:
+  - **[Force Flushing](https://firebase.google.com/docs/crashlytics/web/customize-crash-reports#flush-telemetry-records)**:
     Flush in-memory buffered records immediately before page unload using
     `flush()`.
-  - **[Best Practices & Gotchas](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/ADVANCED_USAGE.md#best-practices--gotchas)**:
+  - **[Best Practices & Gotchas](https://firebase.google.com/docs/crashlytics/troubleshooting#platform-support-web)**:
     Import guidelines and framework integration tips.
-- **[Configuration Guide](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/CONFIGURATION.md)**:
-  - **[Alerting](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/CONFIGURATION.md#alerting)**:
+- **[Configuration Guide](https://firebase.google.com/docs/crashlytics/web/customize-crash-reports)**:
+  - **[Alerting](https://firebase.google.com/docs/crashlytics/alerts-default)**:
     Configure email alerts for new and regressed issues via Firebase Console,
     CLI (`crashlyticsWebAlerts`), or Cloud Monitoring.
-  - **[Sampling](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/CONFIGURATION.md#sampling)**:
+  - **[Sampling](https://firebase.google.com/docs/crashlytics/web/customize-crash-reports#sampling)**:
     Control Cloud Logging volume and costs via Console sampling slider, Firebase
     Telemetry Admin API (`PATCH`), or Cloud Logging exclusion filters.
-  - **[Force 100% Sampling for Debugging](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/CONFIGURATION.md#force-100-sampling-for-debugging-overrides)**:
+  - **[Force 100% Sampling for Debugging](https://firebase.google.com/docs/crashlytics/web/customize-crash-reports#sampling)**:
     Override sampling locally during development via
     `self.FIREBASE_TELEMETRY_DEBUG = true`.
-  - **[Enable/Disable Telemetry Collection](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/CONFIGURATION.md#enabledisable-telemetry-collection)**:
+  - **[Enable/Disable Telemetry Collection](https://firebase.google.com/docs/crashlytics/web/customize-crash-reports#disable-or-enable-telemetry)**:
     Programmatically toggle collection with Telemetry Admin API `:enable` and
     `:disable` methods.
-  - **[Log Schema](https://github.com/firebase/firebase-js-sdk/blob/crashlytics2/packages/crashlytics/docs/CONFIGURATION.md#log-schema)**:
+  - **[Log Schema](https://firebase.google.com/docs/crashlytics/cloud-logging-schema#log-schema)**:
     Field definitions and payload structures for Cloud Logging telemetry
     records.
