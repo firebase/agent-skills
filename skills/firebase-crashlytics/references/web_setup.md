@@ -15,7 +15,7 @@ Important references:
 
 - Ensure the Firebase project and web app are set up (see
   `skills/firebase-basics/references/web_setup.md`).
-- **Firebase CLI**: Requires version **v15.19.1** or later, authenticated
+- **Firebase CLI**: Requires version **v15.34.2** or later, authenticated
   (`firebase login`), and project set (`firebase use <PROJECT_ID>`).
 - **Permissions & Billing**: Cloud project **Owner** or **Editor** role and
   **Blaze (pay-as-you-go)** billing enabled.
