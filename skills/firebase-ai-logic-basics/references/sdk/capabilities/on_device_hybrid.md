@@ -64,3 +64,54 @@ suspend fun runHybridGeneration() {
     Log.d(TAG, "Source: ${response.inferenceSource} (onDevice=$usedOnDevice): ${response.text}")
 }
 ```
+
+## iOS (Swift)
+
+Apple platforms do not ship Gemini Nano; instead, local inference uses Apple's
+on-device `FoundationModels` framework on Apple Intelligence–enabled devices.
+
+- **`firebase-ios-sdk` v13.0.0+ (iOS 27+ / macOS 27+, Preview)**: use
+  `ai.geminiLanguageModel(name:)`, which conforms to Apple's
+  `FoundationModels.LanguageModel` protocol so you can route between Apple's
+  on-device `SystemLanguageModel.default` and a cloud Gemini model with the same
+  `LanguageModelSession` API (see
+  https://firebase.google.com/docs/ai-logic/apple-foundation-models-framework/get-started.md.txt).
+  **Requires Xcode 27** (the API is only compiled under
+  `#if compiler(>=6.4) && canImport(FoundationModels)`) and is marked
+  `@available(iOS 27.0, macOS 27.0, *)`, so apps with an earlier deployment
+  target must wrap the call site in `if #available(...)`:
+
+```swift
+import FirebaseAILogic
+import FoundationModels
+
+let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+if #available(iOS 27.0, macOS 27.0, *) {
+    // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+    let cloudModel = ai.geminiLanguageModel(name: "<latest_supported_model>")
+
+    // Route to Apple's on-device model when available, or fall back to cloud Gemini:
+    let session: LanguageModelSession
+    if SystemLanguageModel.default.isAvailable {
+        session = LanguageModelSession(model: SystemLanguageModel.default)
+    } else {
+        session = LanguageModelSession(model: cloudModel)
+    }
+    let response = try await session.respond(to: "Write a haiku about offline-first apps.")
+    print(response.content)
+} else {
+    // Earlier OS versions: use the standard cloud model directly.
+    let model = ai.generativeModel(modelName: "<latest_supported_model>")
+    let response = try await model.generateContent("Write a haiku about offline-first apps.")
+    print(response.text ?? "No text in response.")
+}
+```
+
+- **Earlier SDK versions (`firebase-ios-sdk` v12.13.0–12.x)**: the experimental
+  `HybridModel` / `GenerativeModelSession` / `FirebaseAI.SystemLanguageModel`
+  wrapper documented at
+  https://firebase.google.com/docs/ai-logic/hybrid/ios/get-started.md.txt was
+  removed in `firebase-ios-sdk` v13.0.0 in favor of `GeminiLanguageModel` above
+  (or standard cloud `ai.generativeModel(modelName:)` on earlier OS versions).
+  See https://firebase.google.com/docs/ai-logic/hybrid.md.txt.

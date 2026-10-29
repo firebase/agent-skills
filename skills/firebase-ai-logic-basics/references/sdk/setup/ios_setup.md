@@ -1,16 +1,32 @@
 # Firebase AI Logic iOS Setup Guide
 
+First, ensure you have initialized the Firebase App and added
+`GoogleService-Info.plist` (see `firebase-basics` skill).
+
 ## 1. Import and Initialize
 
 Ensure you have installed the `FirebaseAILogic` SDK via Swift Package Manager.
 Use the `xcode-project-setup` skill to automate adding the SPM dependency to the
 Xcode project.
 
+**Requires Firebase iOS SDK ≥ 13.0.0** (minimum 12.17.0, which introduced
+`Backend.agentPlatform`). All snippets in this skill target 13.0.0+.
+
+> [!NOTE] **Renamed SDK.** Firebase AI Logic was formerly "Vertex AI in
+> Firebase". The current library is the `FirebaseAILogic` product of the
+> Firebase package (introduced in v12.5.0; in v13.0.0+ the interim `FirebaseAI`
+> product/module and `Backend.vertexAI()` were removed), imported with
+> `import FirebaseAILogic`, with the `FirebaseAI.firebaseAI(backend:)` entry
+> point. If the app still links `FirebaseVertexAI` or `FirebaseAI`, or calls
+> `VertexAI.vertexAI()`, migrate it; do not generate new code against the old
+> library. See the
+> [migration guide](https://firebase.google.com/docs/ai-logic/migrate-to-latest-sdk.md.txt).
+
 ```swift
 import FirebaseAILogic
 
-// To enable replay protection for generative or preview models, pass
-// useLimitedUseAppCheckTokens: true with your backend:
+// Limited-use App Check tokens are recommended (and required if you enforce
+// replay protection in the Firebase console):
 let ai = FirebaseAI.firebaseAI(
     backend: .googleAI(),
     useLimitedUseAppCheckTokens: true
@@ -20,18 +36,25 @@ let ai = FirebaseAI.firebaseAI(
 let model = ai.generativeModel(modelName: "<latest_supported_model>")
 ```
 
-### App Check Replay Protection
+`.googleAI()` selects the Gemini Developer API (the default). For the Agent
+Platform Gemini API use `backend: .agentPlatform()` (optionally
+`.agentPlatform(location: "global")`; `"global"` is the default location, and
+`.vertexAI()` was removed in v13.0.0).
 
-Generative and preview models enforce replay protection with 5-minute
-limited-use App Check tokens. If you call a protected model without enabling
-limited-use tokens, the request fails with:
+### App Check Enforcement and Replay Protection
+
+Firebase AI Logic requires Firebase App Check for commonly abused models, and
+starting November 2, 2026, App Check is automatically enforced for all of
+Firebase AI Logic (it can't be unenforced, so app versions without App Check are
+blocked). If App Check is not configured in your app and enforced in the
+Firebase console, requests to commonly abused models fail with:
 
 ```text
 HTTP 403: "To access this model, you must enforce Firebase App Check"
 ```
 
-To resolve this error, initialize `FirebaseAI` with
-`useLimitedUseAppCheckTokens: true`:
+In addition, when **replay protection** is enabled in App Check, initialize
+`FirebaseAI` with `useLimitedUseAppCheckTokens: true`:
 
 ```swift
 let ai = FirebaseAI.firebaseAI(
@@ -40,8 +63,8 @@ let ai = FirebaseAI.firebaseAI(
 )
 ```
 
-This ensures the SDK fetches a fresh, short-lived limited-use token for each
-request rather than reusing a standard cached App Check token.
+This ensures the SDK fetches a fresh, single-use (5-minute TTL) App Check token
+for each request rather than reusing a standard cached App Check token.
 
 ## 2. SwiftUI Integration (Best Practices)
 
@@ -62,6 +85,7 @@ import FirebaseAILogic
 @Observable
 final class AIViewModel {
     // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+    @ObservationIgnored
     private lazy var model = FirebaseAI.firebaseAI(
         backend: .googleAI(),
         useLimitedUseAppCheckTokens: true
@@ -113,24 +137,7 @@ struct AIView: View {
 }
 ```
 
-## 3. Safety Settings
-
-You can configure safety thresholds to prevent the model from generating harmful
-content.
-
-```swift
-let safetySettings = [
-  SafetySetting(harmCategory: .harassment, threshold: .blockLowAndAbove),
-  SafetySetting(harmCategory: .hateSpeech, threshold: .blockMediumAndAbove)
-]
-
-let model = FirebaseAI.firebaseAI().generativeModel(
-  modelName: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-  safetySettings: safetySettings
-)
-```
-
-## 4. App Check Debug Provider
+## 3. App Check Debug Provider
 
 For App Check debug tokens during local development and CI/CD, add the
 `FirebaseAppCheck` product to the app target (with the `xcode-project-setup`
@@ -144,9 +151,20 @@ import FirebaseCore
 // In your app's init(), before configuring Firebase:
 #if DEBUG
 AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+#else
+AppCheck.setAppCheckProviderFactory(AppAttestProviderFactory()) // or DeviceCheckProviderFactory() fallback
 #endif
 FirebaseApp.configure()
 ```
+
+> [!IMPORTANT] `AppAttestProviderFactory` requires the **App Attest** capability
+> on the app target (Xcode -> Signing & Capabilities -> + Capability -> App
+> Attest), which adds the
+> `com.apple.developer.devicecheck.appattest-environment` entitlement; set its
+> value to `production` in the `.entitlements` file, as the Firebase App Attest
+> setup guide requires. Without the capability, App Attest token requests fail
+> at runtime. Use `DeviceCheckProviderFactory()` if App Attest is unavailable
+> for the target.
 
 For CI/CD, add an `AppCheckDebugToken` environment variable to the Xcode test
 scheme with a value like `$(APP_CHECK_DEBUG_TOKEN)`, then pass the token from
@@ -164,7 +182,7 @@ a new debug token UUID whenever `NSUserDefaults` is cleared (e.g., simulator
 reset or fresh install). To avoid invalidating tokens registered in the Firebase
 Console and prevent token churn, persist a stable token by setting the
 `AppCheckDebugToken` environment variable, which the SDK reads automatically at
-runtime:
+runtime (the legacy `FIRAAppCheckDebugToken` alias is also supported):
 
 > [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Debug tokens
 > grant access to backend resources without device attestation. Never commit
@@ -183,67 +201,14 @@ runtime:
 // ✅ SAFE: Load from gitignored local file or process environment
 // Note: loadGitIgnoredDebugToken() is a placeholder for your custom helper (e.g., reading from a gitignored plist)
 if let debugToken = loadGitIgnoredDebugToken() {
-  setenv("AppCheckDebugToken", debugToken, 0)
+  // overwrite = 0 so a token set in the Xcode scheme (recommended) takes precedence
+  _ = setenv("AppCheckDebugToken", debugToken, 0)
 }
 let providerFactory = AppCheckDebugProviderFactory()
-AppCheck.setAppCheckProviderFactory(providerFactory)
+#else
+let providerFactory = AppAttestProviderFactory() // Requires the App Attest capability (see above)
 #endif
+AppCheck.setAppCheckProviderFactory(providerFactory)
 
 FirebaseApp.configure() // Configure Firebase AFTER setting the App Check provider factory
-```
-
-# Advanced Features
-
-### Chat Session (Multi-turn)
-
-Chat sessions persist state across multiple interactions, which is essential for
-ongoing conversations or when using tools like function calling.
-
-```swift
-let chat = model.startChat()
-
-Task {
-    do {
-        let response1 = try await chat.sendMessage("Hello! I have two dogs in my house.")
-        print(response1.text ?? "")
-
-        let response2 = try await chat.sendMessage("How many paws are in my house?")
-        print(response2.text ?? "")
-    } catch {
-        print("Error in chat: \(error)")
-    }
-}
-```
-
-### Function Calling (Tools)
-
-Define functions that the model can request to execute to interact with external
-systems. *Note: Advanced workflows like function calling generally require a
-multi-turn Chat Session to handle the back-and-forth execution.*
-
-```swift
-let getStockPriceTool = Tool.functionDeclarations([
-  FunctionDeclaration(
-    name: "getStockPrice",
-    description: "Get the current stock price for a given symbol.",
-    parameters: [
-      "symbol": .string(
-        description: "The stock symbol, e.g. AAPL"
-      )
-    ]
-  )
-])
-
-let model = FirebaseAI.firebaseAI().generativeModel(
-  modelName: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-  tools: [getStockPriceTool]
-)
-
-// In your task (using a chat session):
-let chat = model.startChat()
-let response = try await chat.sendMessage("What is the stock price of Apple?")
-if let functionCall = response.functionCalls.first {
-    // Handle the function call (e.g. call a local API and send the result back)
-    print("Model requested function: \(functionCall.name) with args: \(functionCall.args)")
-}
 ```
