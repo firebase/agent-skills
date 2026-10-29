@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
             useLimitedUseAppCheckTokens = true
         )
 
-        // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+        // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt (do NOT use Gemini 1.x or 2.x models)
         val model = ai.generativeModel("<latest_supported_model>")
 
         // Generate content

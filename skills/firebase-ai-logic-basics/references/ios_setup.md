@@ -16,7 +16,7 @@ let ai = FirebaseAI.firebaseAI(
     useLimitedUseAppCheckTokens: true
 )
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt (do NOT use Gemini 1.x or 2.x models)
 let model = ai.generativeModel(modelName: "<latest_supported_model>")
 ```
 

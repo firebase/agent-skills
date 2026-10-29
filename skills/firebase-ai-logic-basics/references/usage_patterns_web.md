@@ -43,7 +43,7 @@ const generationConfig = {
 };
 
 // Specify the config as part of creating the `GenerativeModel` instance
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt (do NOT use Gemini 1.x or 2.x models like gemini-1.5-flash, gemini-2.0-flash, or gemini-2.5-flash)
 const model = getGenerativeModel(ai, { model: "<latest_supported_model>",  generationConfig });
 ```
 
