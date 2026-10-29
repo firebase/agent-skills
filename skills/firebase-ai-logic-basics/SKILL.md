@@ -109,8 +109,12 @@ ______________________________________________________________________
 
 > [!WARNING] **CRITICAL: Use current model names:** Always check the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> for the currently supported model names. Do NOT use `gemini-2.0-pro` or
-> `gemini-2.0-flash` or other older models that are shutdown.
+> for the currently supported model names. Do NOT use any Gemini 1.x or Gemini
+> 2.x models (such as `gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-2.0-flash`,
+> `gemini-2.0-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`, or
+> `gemini-2.5-pro`), as older models are deprecated or shut down. Always use a
+> currently supported Gemini 3+ model; if URL access is blocked in your
+> environment, proceed directly without searching local files.
 
 ### Text-Only Generation
 
@@ -276,8 +280,10 @@ ______________________________________________________________________
 
 > [!WARNING] **CRITICAL: Use current model names:** Always check the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> for the currently supported model names. Do NOT use `gemini-2.0-pro` or
-> `gemini-2.0-flash` or other older models that are shutdown.
+> for the currently supported model names. Do NOT use any Gemini 1.x or Gemini
+> 2.x models (such as `gemini-1.5-flash`, `gemini-2.0-flash`,
+> `gemini-2.5-flash`, or `gemini-2.5-flash-lite`), as older models are
+> deprecated or shut down.
 
 ## References
 
