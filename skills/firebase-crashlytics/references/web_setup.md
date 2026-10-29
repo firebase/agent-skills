@@ -28,7 +28,7 @@ Web Crashlytics leverages Cloud Logging and Cloud Storage under the hood. Use
 the Firebase CLI to onboard your project and web app:
 
 ```bash
-npx -y firebase-tools@latest crashlytics:onboard:web <YOUR_FIREBASE_APP_ID> --project <YOUR_FIREBASE_PROJECT_ID>
+npx -y firebase-tools@latest crashlytics:setup <YOUR_FIREBASE_APP_ID> --project <YOUR_FIREBASE_PROJECT_ID>
 ```
 
 This automated command enables the required Telemetry APIs, provisions the
