@@ -156,24 +156,24 @@ Generate spoken audio directly on client devices without a custom speech
 backend. Firebase AI Logic supports speech synthesis using dedicated Gemini TTS
 models:
 
-- **Supported Models**: `gemini-3.1-flash-tts-preview`
+- **Supported Models**: `gemini-3.1-flash-tts-preview` (Preview; Gemini 2.x TTS
+  models also work, without streaming or audio tags)
 - **Capabilities**:
-  - Single-speaker voice persona selection (`voiceName`) and multi-speaker
-    dialogues (up to 2 distinct speakers) via `SpeechConfig` /
-    `MultiSpeakerVoiceConfig`
+  - Single-speaker voice selection (`voiceName`) and multi-speaker dialogues
+    (exactly 2 speakers) via `SpeechConfig` / `MultiSpeakerVoiceConfig`
   - Direct audio responses by setting `responseModalities` to audio
   - Streaming speech responses with `generateContentStream` for low-latency
     playback
-  - Audio directives (`[Audio Profile: ...]`, `[Scene: ...]`,
-    `[Director's Note: ...]`) and emotional tags (`[whispers]`, `[laughs]`,
-    `[slowly]`)
-  - Client-side decoding and playback of 24 kHz 16-bit linear PCM (`audio/l16`)
-    or WAV container format (`audio/x-wav`)
+  - Prompt structure (`[Audio Profile: ...]`, `[Scene: ...]`,
+    `[Director's Notes: ...]`) and inline audio tags (`[whispers]`, `[laughs]`,
+    `[sighs]`)
+  - Raw 24 kHz 16-bit mono PCM output for both unary and streaming calls; play
+    it with a PCM API or prepend a 44-byte WAV header for standard players
 
 See the
 [Text-to-Speech (TTS) Generation Guide](references/sdk/capabilities/text_to_speech.md)
 for full implementation details, streaming patterns, and copy-paste code
-snippets for iOS (Swift), Android (Kotlin), and Web.
+snippets for Android (Kotlin), iOS (Swift), Flutter (Dart), and Web.
 
 ### Generate Images with Nano Banana
 
