@@ -199,6 +199,12 @@ for iOS, JavaScript for web apps, Dart for Flutter, and C Sharp for Unity.
 Enforce a specific JSON schema for the response. See the
 [Structured Output Guide](references/sdk/capabilities/structured_output.md).
 
+### Function Calling (Tools)
+
+Define custom tools (`FunctionDeclaration`) that the model can request your app
+to execute. See the
+[Function Calling Guide](references/sdk/capabilities/function_calling.md).
+
 ### On-Device AI (Hybrid)
 
 Hybrid inference runs prompts with an on-device model when one is available and
@@ -315,4 +321,5 @@ ______________________________________________________________________
 - [Multi-turn chat](references/sdk/capabilities/chat.md)
 - [Streaming responses](references/sdk/capabilities/streaming.md)
 - [Structured output (JSON Schema)](references/sdk/capabilities/structured_output.md)
+- [Function calling (tools)](references/sdk/capabilities/function_calling.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
