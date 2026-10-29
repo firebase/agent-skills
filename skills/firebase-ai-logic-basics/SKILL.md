@@ -196,7 +196,8 @@ for iOS, JavaScript for web apps, Dart for Flutter, and C Sharp for Unity.
 
 ### Structured Output (JSON)
 
-Enforce a specific JSON schema for the response.
+Enforce a specific JSON schema for the response. See the
+[Structured Output Guide](references/sdk/capabilities/structured_output.md).
 
 ### On-Device AI (Hybrid)
 
@@ -313,4 +314,5 @@ ______________________________________________________________________
 - [Multimodal input (images, audio, video, PDF)](references/sdk/capabilities/multimodal_input.md)
 - [Multi-turn chat](references/sdk/capabilities/chat.md)
 - [Streaming responses](references/sdk/capabilities/streaming.md)
+- [Structured output (JSON Schema)](references/sdk/capabilities/structured_output.md)
 - [Client-side Text-to-Speech (TTS) generation](references/sdk/capabilities/text_to_speech.md)
