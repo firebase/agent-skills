@@ -9,16 +9,16 @@ Before adding dependencies in your app, make sure you enable the AI Logic
 service in your Firebase Project using the Firebase CLI:
 
 ```bash
-npx -y firebase-tools@latest init
-# When prompted, select 'AI logic' to enable the Gemini API in your project.
+npx -y firebase-tools@latest init ailogic
 ```
 
 ______________________________________________________________________
 
 ### 1. Add Dependencies
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
-the dependency for Firebase AI:
+In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`, with
+`minSdk = 24` or higher required by `firebase-ai:18.0.0+`), add the dependency
+for Firebase AI:
 
 ```kotlin
 dependencies {
@@ -29,6 +29,14 @@ dependencies {
     implementation("com.google.firebase:firebase-ai")
 }
 ```
+
+> [!NOTE] **Renamed SDK.** Firebase AI Logic was formerly "Vertex AI in
+> Firebase". The current library is `com.google.firebase:firebase-ai` with the
+> `Firebase.ai(backend = GenerativeBackend.googleAI())` entry point. If the app
+> still depends on `com.google.firebase:firebase-vertexai` or calls
+> `Firebase.vertexAI` / `GenerativeBackend.vertexAI()`, migrate it; do not
+> generate new code against the old library. See the
+> [migration guide](https://firebase.google.com/docs/ai-logic/migrate-to-latest-sdk.md.txt).
 
 ______________________________________________________________________
 
@@ -70,19 +78,24 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-#### App Check Replay Protection on Android
+`GenerativeBackend.googleAI()` selects the Gemini Developer API (the default).
+For the Agent Platform Gemini API use `GenerativeBackend.agentPlatform()`
+(optionally `GenerativeBackend.agentPlatform(location = "global")`; `"global"`
+is the default location, and `GenerativeBackend.vertexAI()` was removed in
+`firebase-ai:18.0.0`).
 
-Generative and preview models enforce replay protection using short-lived
-(5-minute) limited-use App Check tokens to prevent replay attacks. If you call a
-model enforcing replay protection without limited-use tokens, the request is
-rejected with:
+#### App Check Enforcement and Replay Protection on Android
+
+Firebase AI Logic requires Firebase App Check for commonly abused models. If App
+Check is not configured in your app and enforced in the Firebase console,
+requests to those models are rejected with:
 
 ```text
 HTTP 403: "To access this model, you must enforce Firebase App Check"
 ```
 
-To resolve this on Android, pass `useLimitedUseAppCheckTokens = true` when
-calling `Firebase.ai`:
+In addition, when **replay protection** is enabled in App Check, pass
+`useLimitedUseAppCheckTokens = true` when calling `Firebase.ai`:
 
 ```kotlin
 val ai = Firebase.ai(
@@ -91,8 +104,9 @@ val ai = Firebase.ai(
 )
 ```
 
-This ensures the SDK requests fresh limited-use tokens (via Play Integrity or
-the debug provider) for each request instead of reusing cached tokens.
+This ensures the SDK requests fresh single-use (5-minute TTL) App Check tokens
+(via Play Integrity or the debug provider) for each request instead of reusing
+cached tokens.
 
 #### Jetpack Compose (Modern)
 
@@ -107,12 +121,16 @@ import androidx.compose.material3.Text
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val ai = Firebase.ai
+        val ai = Firebase.ai(
+            backend = GenerativeBackend.googleAI(),
+            useLimitedUseAppCheckTokens = true
+        )
         // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
         val model = ai.generativeModel("<latest_supported_model>")
         
@@ -130,71 +148,29 @@ class MainActivity : ComponentActivity() {
 
 ______________________________________________________________________
 
-### 3. Multimodal Input (Text and Images)
+### 3. App Check Debug Provider
 
-Pass bitmap data along with text prompts:
-
-```kotlin
-val image1: Bitmap = ... // Load your bitmap
-val image2: Bitmap = ...
-
-val response = model.generateContent(
-    content {
-        image(image1)
-        image(image2)
-        text("Analyze these images for me. Compare these two items.")
-    }
-)
-Log.d(TAG, response.text)
-```
-
-______________________________________________________________________
-
-### 4. Chat Session (Multi-turn)
-
-Maintain chat history automatically:
-
-```kotlin
-val chat = model.startChat(
-    history = listOf(
-        content("user") { text("Hello, I am a software engineer.") },
-        content("model") { text("Hello! How can I help you today?") }
-    )
-)
-
-lifecycleScope.launch {
-    val response = chat.sendMessage("What should I learn next?")
-    Log.d(TAG, response.text)
-}
-```
-
-______________________________________________________________________
-
-### 5. Streaming Responses
-
-For faster display, stream the response:
-
-```kotlin
-lifecycleScope.launch {
-    model.generateContentStream("Tell me a long story.")
-        .collect { chunk ->
-            print(chunk.text) // Update UI incrementally
-        }
-}
-```
-
-______________________________________________________________________
-
-### 6. App Check Debug Provider
-
-For App Check debug tokens during local development and CI/CD, install
+For App Check debug tokens during local development and CI/CD, add the App Check
+dependencies in `app/build.gradle.kts` (`firebase-appcheck-playintegrity`,
+`firebase-appcheck-debug`, and `androidTestImplementation` for
+`firebase-appcheck-debug-testing`), then install
 `DebugAppCheckProviderFactory.getInstance()` as the App Check provider factory
-in debug builds:
+in debug builds (and `PlayIntegrityAppCheckProviderFactory.getInstance()` in
+release builds):
 
 ```kotlin
+import com.google.firebase.Firebase
+import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+
 if (BuildConfig.DEBUG) {
     Firebase.appCheck.installAppCheckProviderFactory(
         DebugAppCheckProviderFactory.getInstance()
+    )
+} else {
+    Firebase.appCheck.installAppCheckProviderFactory(
+        PlayIntegrityAppCheckProviderFactory.getInstance()
     )
 }
 ```
@@ -202,9 +178,11 @@ if (BuildConfig.DEBUG) {
 #### Debug Token Persistence
 
 Emulator resets or clearing app storage erase `SharedPreferences`, causing
-`DebugAppCheckProviderFactory` to print a new debug token in Logcat. To persist
-a stable debug token across emulator resets and fresh installs without
-hardcoding secrets:
+`DebugAppCheckProviderFactory` to print a new debug token in Logcat (on normal
+emulator runs, the Android SDK generates and logs its own token in
+`SharedPreferences` and does not read a manifest placeholder). To persist a
+stable debug token in instrumentation tests and CI across emulator resets and
+fresh installs without hardcoding secrets:
 
 > [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Never hardcode
 > debug token strings in `build.gradle.kts` or Kotlin source files. Store the
@@ -230,12 +208,29 @@ hardcoding secrets:
 
    android {
        defaultConfig {
-           // For normal emulator runs (injects into AndroidManifest)
-           manifestPlaceholders["firebaseAppCheckDebugSecret"] = appCheckDebugToken
-
-           // For instrumentation tests
+           // For instrumentation tests (read by firebase-appcheck-debug-testing)
            if (appCheckDebugToken.isNotEmpty()) {
                testInstrumentationRunnerArguments["firebaseAppCheckDebugSecret"] = appCheckDebugToken
+           }
+       }
+   }
+   ```
+
+1. In your instrumentation test, wrap calls in `DebugAppCheckTestHelper` (and
+   `runTest` from `kotlinx-coroutines-test` since AI Logic APIs are `suspend`
+   functions):
+
+   ```kotlin
+   import com.google.firebase.appcheck.debug.testing.DebugAppCheckTestHelper
+   import kotlinx.coroutines.test.runTest
+
+   private val debugAppCheckTestHelper = DebugAppCheckTestHelper.fromInstrumentationArgs()
+
+   @Test
+   fun generatesContent() {
+       debugAppCheckTestHelper.withDebugProvider<Exception> {
+           runTest {
+               // Test suspend AI Logic calls with the pre-provisioned debug token
            }
        }
    }
