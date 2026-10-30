@@ -5,7 +5,7 @@ SQL Connect. SQL Connect supports three types of search:
 
 1. **Vector Similarity Search (Semantic)**: Best for finding
    conceptually/semantically similar rows (e.g., recommendations, "more like
-   this"). Requires Vertex AI.
+   this"). Requires Gemini Enterprise Agent Platform.
 1. **Full-Text Search (Lexical)**: Best for keyword and phrase search across
    single or multiple columns. Supports lexical stemming.
 1. **String Pattern Filters (Exact/Regex)**: Best for simple prefix, exact
@@ -21,7 +21,7 @@ task:
 | Feature / Capability | Vector Similarity Search                            | Full-Text Search                               | String Pattern Filters                                 |
 | :------------------- | :-------------------------------------------------- | :--------------------------------------------- | :----------------------------------------------------- |
 | **Use Case**         | Semantic search, recommendations, RAG pipelines.    | Keyword search, parsing large text fields.     | Exact matches, regular expressions, simple wildcards.  |
-| **Engine Support**   | Vertex AI Embeddings + `pgvector` extension.        | Native PostgreSQL full-text engine.            | Native PostgreSQL indexing (`LIKE`, `ILIKE`).          |
+| **Engine Support**   | Agent Platform Embeddings + `pgvector` extension.   | Native PostgreSQL full-text engine.            | Native PostgreSQL indexing (`LIKE`, `ILIKE`).          |
 | **Matching Style**   | Semantic/concept proximity.                         | Lexical stemming (tenses, root words).         | Exact character sequence.                              |
 | **Column Support**   | Single column per query.                            | Multiple columns combined.                     | Multiple columns via standard logical filters (`_or`). |
 | **Overhead**         | High (API execution costs & vector column storage). | Medium (generates indices & tsvector columns). | Low (uses standard index / minimal storage).           |
@@ -39,15 +39,15 @@ semantic meaning of text.
   `@col(size: X)` directive — SQL Connect requires an explicit size for Vector
   fields to allocate storage.
 - **Match Model Specifications**: Ensure the column size matches the output
-  dimension of your chosen embedding model (e.g., **768** for Google Vertex AI's
-  `textembedding-gecko` models) to prevent runtime type mismatches.
+  dimension of your chosen embedding model (e.g., **768** for Google's
+  `text-embedding-005` model) to prevent runtime type mismatches.
 
 ```graphql
 type Movie @table {
   id: UUID! @default(expr: "uuidV4()")
   title: String!
   description: String
-  # Vector field for description embeddings (Vertex AI gecko size is 768)
+  # Vector field for description embeddings (text-embedding-005 size is 768)
   descriptionEmbedding: Vector! @col(size: 768)
 }
 ```
@@ -70,7 +70,7 @@ mutation CreateMovieWithEmbedding($title: String!, $description: String!) @auth(
     title: $title,
     description: $description,
     descriptionEmbedding_embed: {
-      model: "textembedding-gecko@003",
+      model: "text-embedding-005",
       text: $description
     }
   })
@@ -87,7 +87,7 @@ mutation UpdateMovieDescription($id: UUID!, $description: String!) @auth(level: 
     data: {
       description: $description,
       descriptionEmbedding_embed: {
-        model: "textembedding-gecko@003",
+        model: "text-embedding-005",
         text: $description
       }
     }
@@ -103,13 +103,13 @@ SQL Connect automatically generates a similarity query function for every
 #### A. Auto-Embedding Search
 
 Use `compare_embed` to automatically convert the search query string into an
-embedding on the fly using Vertex AI.
+embedding on the fly using Agent Platform.
 
 ```graphql
 # connector/queries.gql
 query SearchMoviesByDescription($query: String!) @auth(level: PUBLIC) {
   movies_descriptionEmbedding_similarity(
-    compare_embed: { model: "textembedding-gecko@003", text: $query },
+    compare_embed: { model: "text-embedding-005", text: $query },
     limit: 5
   ) {
     id
@@ -122,7 +122,7 @@ query SearchMoviesByDescription($query: String!) @auth(level: PUBLIC) {
 #### B. Custom Vector Search
 
 Use `compare` to pass raw pre-computed float arrays (cast as a `Vector!`)
-directly to the search without calling Vertex AI.
+directly to the search without calling Agent Platform.
 
 ```graphql
 # connector/queries.gql
@@ -151,7 +151,7 @@ query SearchMoviesByCustomVector($vector: Vector!, $limit: Int!) @auth(level: PU
 # connector/queries.gql
 query SearchMoviesCosineSimilarity($query: String!) @auth(level: PUBLIC) {
   movies_descriptionEmbedding_similarity(
-    compare_embed: { model: "textembedding-gecko@003", text: $query },
+    compare_embed: { model: "text-embedding-005", text: $query },
     method: COSINE,
     within: 0.5, # Maximum distance threshold
     limit: 5
