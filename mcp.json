@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "firebase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "firebase-tools@15.32.1",
+        "mcp",
+        "--dir",
+        "."
+      ],
+      "env": {
+        "IS_FIREBASE_MCP": "true"
+      }
+    }
+  }
+}
