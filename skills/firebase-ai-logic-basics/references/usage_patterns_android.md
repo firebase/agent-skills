@@ -251,6 +251,8 @@ test runner and used through `firebase-appcheck-debug-testing`:
    `DebugAppCheckTestHelper`:
 
    ```kotlin
+   import com.google.firebase.appcheck.debug.testing.DebugAppCheckTestHelper
+
    DebugAppCheckTestHelper.fromInstrumentationArgs().withDebugProvider<Exception> {
        // Firebase AI Logic calls
    }

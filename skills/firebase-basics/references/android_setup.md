@@ -244,6 +244,9 @@ Instrumentation tests can use one stable, registered token through
    provider with that secret and restores the previous provider afterwards:
 
    ```kotlin
+   import com.google.firebase.appcheck.debug.testing.DebugAppCheckTestHelper
+   import org.junit.Test
+
    @Test
    fun readsProtectedData() {
        DebugAppCheckTestHelper.fromInstrumentationArgs().withDebugProvider<Exception> {
