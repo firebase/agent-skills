@@ -1,6 +1,6 @@
 {
   "name": "firebase",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Official Firebase plugin for Codex. Manage projects, add backend services, develop AI features, deploy and host apps, and more.",
   "author": {
     "name": "Firebase",
