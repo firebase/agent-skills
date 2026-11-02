@@ -1,7 +1,7 @@
 ---
 name: firebase-firestore
 description: >-
-  Sets up, manages, queries, and configures Cloud Firestore databases (Standard/Enterprise edition), including data modeling, security rules, indexes, and SDK integrations (Web, Python, iOS, Android, Flutter). Use when creating/listing Firestore databases, defining data models/indexes, writing SDK queries, or integrating Firestore SDKs. For authoring or modifying Firestore Security Rules (firestore.rules), delegate to the firestore-rules-author subagent if subagent delegation is available, or use firestore-rules-creation otherwise. Don't use for Firebase Hosting, Data Connect, Auth, Storage/GCS, Crashlytics, Functions, or BigQuery.
+  Sets up, manages, queries, and configures Cloud Firestore databases (Standard/Enterprise edition), including data modeling, security rules, indexes, and SDK integrations (Web, Admin, Python, iOS, Android, Flutter). Use when adding or migrating app databases, creating/listing Firestore databases, defining data models/indexes, writing SDK queries, or integrating Firestore SDKs. For authoring or modifying Firestore Security Rules (firestore.rules), delegate to the firestore-rules-author subagent if subagent delegation is available, or use firestore-rules-creation otherwise. Don't use for Data Connect, BigQuery, or standalone Hosting, Auth, Storage/GCS, Crashlytics, or Functions tasks.
 compatibility: This skill is best used with the Firebase CLI, but does not require it. Firebase CLI can be accessed through `npx -y firebase-tools@latest`.
 metadata:
   author: Google LLC
@@ -10,8 +10,12 @@ metadata:
 
 # Cloud Firestore Database and Operations
 
-> [!IMPORTANT] **Security Rules Authoring (`firestore.rules`)** Whenever your
-> task requires creating, authoring, or modifying `firestore.rules`:
+> [!IMPORTANT] **Security Rules Authoring (`firestore.rules`)** Whenever setting
+> up a Firestore-backed app or creating/modifying `firestore.rules`, configure
+> `"firestore": { "rules": "firestore.rules" }` in `firebase.json` and deploy
+> `firestore.rules`
+> (`npx -y firebase-tools@latest deploy --only firestore:rules`), even if server
+> routes use the Admin SDK:
 >
 > - **If subagent delegation AND the `firestore-rules-author` subagent are
 >   available**: delegate authoring `firestore.rules` to the
