@@ -37,6 +37,7 @@
     ],
     "websiteURL": "https://firebase.google.com",
     "privacyPolicyURL": "https://policies.google.com/privacy",
+    "supportURL": "https://firebase.google.com/support",
     "termsOfServiceURL": "https://policies.google.com/terms",
     "defaultPrompt": [
       "Set up Firebase in this app.",
