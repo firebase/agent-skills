@@ -3,19 +3,24 @@ import XcodeProj
 import PathKit
 
 func isUserScriptSandboxingEnabled(project: PBXProj) -> Bool {
-    guard let target = project.projects.first else {
-        print("Error: No project targets found")
-        return false
-    }
-
-    for configuration in target.buildConfigurationList?.buildConfigurations ?? [] {
-        if let userSandbox = configuration.buildSettings["ENABLE_USER_SCRIPT_SANDBOXING"] as? String {
-            return userSandbox.uppercased() == "YES"
+    let targetConfigs =
+        project.nativeTargets.first?.buildConfigurationList?.buildConfigurations ?? []
+    let rootConfigs =
+        project.projects.first?.buildConfigurationList?.buildConfigurations ?? []
+    let buildConfigs = targetConfigs + rootConfigs
+    var hasExplicitSetting = false
+    for configuration in buildConfigs {
+        if let userSandbox =
+            configuration.buildSettings["ENABLE_USER_SCRIPT_SANDBOXING"] as? String {
+            hasExplicitSetting = true
+            if userSandbox.uppercased() == "YES" {
+                return true
+            }
         }
     }
 
     // If the value is absent, assume it is the default "YES"
-    return true
+    return !hasExplicitSetting
 }
 
 func hasCrashlyticsRunScriptBuildPhase(project: PBXProj) -> Bool {
@@ -66,13 +71,12 @@ func addCrashlyticsRunScriptBuildPhase(project: PBXProj) {
 }
 
 func setDwarfWithDsymDebugInformationFormat(project: PBXProj) {
-    guard let target = project.projects.first else {
-        print("Error: No project targets found")
-        return
+    let targetConfigs = project.nativeTargets.flatMap {
+        $0.buildConfigurationList?.buildConfigurations ?? []
     }
-
-    for configuration in target.buildConfigurationList?.buildConfigurations ?? [] {
-        // Set debug format for all configs
+    let rootConfigs =
+        project.projects.first?.buildConfigurationList?.buildConfigurations ?? []
+    for configuration in targetConfigs + rootConfigs {
         configuration.buildSettings["DEBUG_INFORMATION_FORMAT"] = "dwarf-with-dsym"
     }
 }

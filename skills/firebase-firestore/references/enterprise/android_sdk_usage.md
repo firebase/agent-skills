@@ -1,25 +1,45 @@
-# Android SDK Usage (Enterprise Native Mode)
+# Cloud Firestore (Enterprise edition) - Android Setup Guide (Kotlin)
 
-This guide covers the Firestore Android SDK (Kotlin) setup and usage patterns
-optimized for Firestore Enterprise edition in Native mode.
+This guide describes the SDK setup and basic usage patterns for Cloud Firestore
+(Enterprise edition in Native mode) in an Android app using Kotlin DSL
+(`build.gradle.kts`) and Kotlin code.
+
+## Prerequisites
+
+IMPORTANT: Before specifically working with Cloud Firestore, make sure to use
+the skill and reference `firebase_basics/references/android_setup` to ensure the
+following is done.
+
+- The Firebase CLI is available and authenticated.
+- An Android project exists and is registered with a Firebase Project.
+- The Android project has a Firebase config file (`google-services.json`) and
+  the Google services Gradle plugin (`google-services`).
 
 ______________________________________________________________________
 
-## 1. Initialization
+## 1. Provision Firestore
 
-### Add Dependencies
+Follow the instructions in
+`firebase_firestore/references/enterprise/provisioning` to do the following:
 
-In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`), add
-the Firebase Kotlin Bill of Materials (BoM) and the dependency for Cloud
-Firestore:
+- Provision a Firestore instance (Enterprise edition in Native mode)
+- Create or append a `firebase.json` file
+- Create a `firestore.rules` file
+- Create a `firestore.indexes.json` file
+- Deploy database, rules, and indexes
+- Run Firestore locally for development and testing
 
-> [!IMPORTANT] **[AGENT] RESOLVING THE RESOLVED SDK VERSION DETERMINISTICALLY**
-> Never guess or hardcode a memorized out-of-date SDK version. Before adding
+______________________________________________________________________
+
+## 2. Add dependencies to Gradle build files
+
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY** Never
+> guess or hardcode a memorized out-of-date SDK or plugin version. Before adding
 > dependencies, you MUST query the latest available versions directly from the
 > Google Maven Repository:
 >
 > ```bash
-> # Find the latest Firebase BoM version
+> # Find the latest Firebase Android BoM version
 > curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
 >
 > # Find the latest firebase-firestore version
@@ -33,20 +53,26 @@ Firestore:
 > ./gradlew -q :app:dependencyInsight --dependency firebase-firestore --configuration releaseRuntimeClasspath
 > ```
 
+In the **module (app-level)** `build.gradle.kts` (usually
+`<project>/<app-module>/build.gradle.kts`), add the dependency for Cloud
+Firestore:
+
 ```kotlin
 dependencies {
     // [AGENT] Fetch the latest resolved version using the Gradle command above
     implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
     // Add the dependency for the Cloud Firestore library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+    // When using the BoM, don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
 }
 ```
 
-### Initialize Firestore
+______________________________________________________________________
 
-Initialize the `FirebaseFirestore` instance in your ComponentActivity (Jetpack
+## 3. Initialize Firestore
+
+Initialize the `FirebaseFirestore` instance in your `ComponentActivity` (Jetpack
 Compose) or standard Activity/Fragment:
 
 ```kotlin
@@ -63,7 +89,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Initialize the Firestore instance
         val db = FirebaseFirestore.getInstance("<database-name>")
-        
+
         setContent {
             MaterialTheme {
                 Text("Firestore initialized!")
@@ -75,7 +101,7 @@ class MainActivity : ComponentActivity() {
 
 ______________________________________________________________________
 
-## 2. Decision Framework: Mandatory Pipeline Architecture
+## 4. Decision framework: Mandatory pipeline architecture
 
 > [!CRITICAL] **MANDATORY PIPELINE ARCHITECTURE (ZERO TOLERANCE)** You are
 > strictly forbidden from using standard collection queries (e.g.,
@@ -85,7 +111,7 @@ ______________________________________________________________________
 > Server-side execution via pipelines is the superior, non-negotiable core
 > architecture for Enterprise instances.
 
-### Strict Rules & Accountability
+### Strict rules & accountability
 
 1. **Mandatory Execution Engine**: Every repository lookup requiring related
    data mapping, textual relevance scoring, or multi-document counting MUST be
@@ -110,9 +136,9 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
-## 3. Pipeline Examples
+## 5. Pipeline examples
 
-### Relational Joins Pattern
+### Relational joins pattern
 
 When querying related data (e.g., articles and their author profiles), perform
 the join at the database level via pipeline stages instead of executing multiple
@@ -135,14 +161,14 @@ val articlesWithAuthProfile = db.pipeline().collection("articles")
     .define(field("authorUid").alias("author_id"))
     .addFields(
         db.pipeline().collection("users")
-            .where(field("__name__").documentId().equalTo(variable("author_id")))
+            .where(field("__name__").documentId().equal(variable("author_id")))
             .select(field("displayName"), field("avatarUrl"), field("handle"))
             .toScalarExpression()
             .alias("author")
     )
 ```
 
-### Full-Text Search
+### Full-text search
 
 Leverage the database-native `.search()` stage within your pipelines to run
 high-performance text query matches on the database level.
@@ -150,20 +176,21 @@ high-performance text query matches on the database level.
 ```kotlin
 import com.google.firebase.firestore.pipeline.Expression.documentMatches
 import com.google.firebase.firestore.pipeline.Expression.score
+import com.google.firebase.firestore.pipeline.SearchStage
 
 // Execute full-text search inside a pipeline, sorted by relevance score descending
 val searchPipeline = db.pipeline()
     .collection("articles")
     .search(
-        query = documentMatches("machine learning"),
-        sort = score().descending()
+        SearchStage.withQuery(documentMatches("machine learning"))
+            .withSort(score().descending())
     )
     .limit(5)
 ```
 
 ______________________________________________________________________
 
-## 4. Real-Time Listener & Document Operations
+## 6. Real-time listener & document operations
 
 When real-time data sync or transaction-based document mutations are strictly
 required by application specifications, write clean operations as shown in this
@@ -175,7 +202,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.firestore
 
-val db = Firebase.firestore
+val db = Firebase.firestore("<database-name>")
 // 1. Add a new document to a collection
 val taskData = hashMapOf(
     "title" to "Refactor Android SDK Usage Guide",

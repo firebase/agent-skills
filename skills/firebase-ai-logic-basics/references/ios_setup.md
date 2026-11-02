@@ -3,16 +3,45 @@
 ## 1. Import and Initialize
 
 Ensure you have installed the `FirebaseAILogic` SDK via Swift Package Manager.
+Use the `xcode-project-setup` skill to automate adding the SPM dependency to the
+Xcode project.
 
 ```swift
 import FirebaseAILogic
 
-// Initialize the Firebase AI service and the generative model.
-let ai = FirebaseAI.firebaseAI()
+// To enable replay protection for generative or preview models, pass
+// useLimitedUseAppCheckTokens: true with your backend:
+let ai = FirebaseAI.firebaseAI(
+    backend: .googleAI(),
+    useLimitedUseAppCheckTokens: true
+)
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt (do NOT use Gemini 1.x or 2.x models)
 let model = ai.generativeModel(modelName: "<latest_supported_model>")
 ```
+
+### App Check Replay Protection
+
+Generative and preview models enforce replay protection with 5-minute
+limited-use App Check tokens. If you call a protected model without enabling
+limited-use tokens, the request fails with:
+
+```text
+HTTP 403: "To access this model, you must enforce Firebase App Check"
+```
+
+To resolve this error, initialize `FirebaseAI` with
+`useLimitedUseAppCheckTokens: true`:
+
+```swift
+let ai = FirebaseAI.firebaseAI(
+    backend: .googleAI(),
+    useLimitedUseAppCheckTokens: true
+)
+```
+
+This ensures the SDK fetches a fresh, short-lived limited-use token for each
+request rather than reusing a standard cached App Check token.
 
 ## 2. SwiftUI Integration (Best Practices)
 
@@ -33,7 +62,10 @@ import FirebaseAILogic
 @Observable
 final class AIViewModel {
     // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-    private lazy var model = FirebaseAI.firebaseAI().generativeModel(modelName: "<latest_supported_model>")
+    private lazy var model = FirebaseAI.firebaseAI(
+        backend: .googleAI(),
+        useLimitedUseAppCheckTokens: true
+    ).generativeModel(modelName: "<latest_supported_model>")
     
     var responseText: String = ""
     var isFetching: Bool = false
@@ -88,14 +120,76 @@ content.
 
 ```swift
 let safetySettings = [
-  SafetySetting(category: .harassment, threshold: .blockLowAndAbove),
-  SafetySetting(category: .hateSpeech, threshold: .blockMediumAndAbove)
+  SafetySetting(harmCategory: .harassment, threshold: .blockLowAndAbove),
+  SafetySetting(harmCategory: .hateSpeech, threshold: .blockMediumAndAbove)
 ]
 
 let model = FirebaseAI.firebaseAI().generativeModel(
   modelName: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
   safetySettings: safetySettings
 )
+```
+
+## 4. App Check Debug Provider
+
+For App Check debug tokens during local development and CI/CD, add the
+`FirebaseAppCheck` product to the app target (with the `xcode-project-setup`
+skill), then set the debug provider factory in debug builds *before*
+`FirebaseApp.configure()`. Otherwise the debug provider isn't used.
+
+```swift
+import FirebaseAppCheck
+import FirebaseCore
+
+// In your app's init(), before configuring Firebase:
+#if DEBUG
+AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+#endif
+FirebaseApp.configure()
+```
+
+For CI/CD, add an `AppCheckDebugToken` environment variable to the Xcode test
+scheme with a value like `$(APP_CHECK_DEBUG_TOKEN)`, then pass the token from
+the CI test command:
+
+```bash
+xcodebuild test -scheme <scheme> -workspace <project>.xcworkspace \
+  APP_CHECK_DEBUG_TOKEN=<token>
+```
+
+### Debug Token Persistence
+
+When running on simulators or during development, the Firebase iOS SDK generates
+a new debug token UUID whenever `NSUserDefaults` is cleared (e.g., simulator
+reset or fresh install). To avoid invalidating tokens registered in the Firebase
+Console and prevent token churn, persist a stable token by setting the
+`AppCheckDebugToken` environment variable, which the SDK reads automatically at
+runtime:
+
+> [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Debug tokens
+> grant access to backend resources without device attestation. Never commit
+> debug tokens to version control or hardcode token strings in source code.
+
+- **In Xcode Scheme (Recommended):** Edit Scheme -> Run -> Arguments ->
+  Environment Variables -> Add `AppCheckDebugToken = <YOUR_DEBUG_TOKEN>`. Keep
+  user schemes (`xcuserdata/`) unshared and gitignored.
+- **In Code (Safe Dynamic Loading Only):** If setting the environment variable
+  in code before configuring `AppCheckDebugProviderFactory`, load the token
+  dynamically from a gitignored local file or environment rather than hardcoding
+  the token literal:
+
+```swift
+#if DEBUG
+// ✅ SAFE: Load from gitignored local file or process environment
+// Note: loadGitIgnoredDebugToken() is a placeholder for your custom helper (e.g., reading from a gitignored plist)
+if let debugToken = loadGitIgnoredDebugToken() {
+  setenv("AppCheckDebugToken", debugToken, 0)
+}
+let providerFactory = AppCheckDebugProviderFactory()
+AppCheck.setAppCheckProviderFactory(providerFactory)
+#endif
+
+FirebaseApp.configure() // Configure Firebase AFTER setting the App Check provider factory
 ```
 
 # Advanced Features
@@ -128,13 +222,12 @@ systems. *Note: Advanced workflows like function calling generally require a
 multi-turn Chat Session to handle the back-and-forth execution.*
 
 ```swift
-let getStockPriceTool = Tool(functionDeclarations: [
+let getStockPriceTool = Tool.functionDeclarations([
   FunctionDeclaration(
     name: "getStockPrice",
     description: "Get the current stock price for a given symbol.",
     parameters: [
-      "symbol": Schema(
-        type: .string,
+      "symbol": .string(
         description: "The stock symbol, e.g. AAPL"
       )
     ]

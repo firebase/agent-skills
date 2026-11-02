@@ -16,7 +16,10 @@ nested objects in addition to basic data types like strings, numbers, and
 booleans. Documents are limited to a maximum size of 1 MiB.
 
 Example document (e.g., in a `users` collection):
-`json { "first": "Ada", "last": "Lovelace", "born": 1815 }`
+
+```json
+{ "first": "Ada", "last": "Lovelace", "born": 1815 }
+```
 
 ### Collections
 
@@ -60,7 +63,13 @@ the `reviews` collection group.
 
 **Standard Query** (Single Collection): Find all 5-star reviews for a specific
 landmark.
-`javascript db.collection('landmarks/golden_gate_bridge/reviews').where('rating', '==', 5)`
+
+```javascript
+db.collection('landmarks/golden_gate_bridge/reviews').where('rating', '==', 5)
+```
 
 **Collection Group Query**: Find all 5-star reviews across *all* landmarks.
-`javascript db.collectionGroup('reviews').where('rating', '==', 5)`
+
+```javascript
+db.collectionGroup('reviews').where('rating', '==', 5)
+```

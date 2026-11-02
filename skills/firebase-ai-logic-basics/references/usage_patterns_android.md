@@ -38,9 +38,9 @@ In your Activity or Fragment, initialize the `FirebaseAI` service and generate
 content using a Gemini model:
 
 ```kotlin
-import com.google.firebase.ai.FirebaseAI
-import com.google.firebase.ai.ktx.ai
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,10 +48,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize Firebase AI
-        val ai = Firebase.ai
+        // Initialize with replay protection using limited-use App Check tokens:
+        val ai = Firebase.ai(
+            backend = GenerativeBackend.googleAI(),
+            useLimitedUseAppCheckTokens = true
+        )
 
-        // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+        // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt (do NOT use Gemini 1.x or 2.x models)
         val model = ai.generativeModel("<latest_supported_model>")
 
         // Generate content
@@ -66,6 +69,30 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+
+#### App Check Replay Protection on Android
+
+Generative and preview models enforce replay protection using short-lived
+(5-minute) limited-use App Check tokens to prevent replay attacks. If you call a
+model enforcing replay protection without limited-use tokens, the request is
+rejected with:
+
+```text
+HTTP 403: "To access this model, you must enforce Firebase App Check"
+```
+
+To resolve this on Android, pass `useLimitedUseAppCheckTokens = true` when
+calling `Firebase.ai`:
+
+```kotlin
+val ai = Firebase.ai(
+    backend = GenerativeBackend.googleAI(),
+    useLimitedUseAppCheckTokens = true
+)
+```
+
+This ensures the SDK requests fresh limited-use tokens (via Play Integrity or
+the debug provider) for each request instead of reusing cached tokens.
 
 #### Jetpack Compose (Modern)
 
@@ -112,10 +139,10 @@ val image1: Bitmap = ... // Load your bitmap
 val image2: Bitmap = ...
 
 val response = model.generateContent(
-    content("Analyze these images for me") {
+    content {
         image(image1)
         image(image2)
-        text("Compare these two items.")
+        text("Analyze these images for me. Compare these two items.")
     }
 )
 Log.d(TAG, response.text)
@@ -155,3 +182,61 @@ lifecycleScope.launch {
         }
 }
 ```
+
+______________________________________________________________________
+
+### 6. App Check Debug Provider
+
+For App Check debug tokens during local development and CI/CD, install
+`DebugAppCheckProviderFactory.getInstance()` as the App Check provider factory
+in debug builds:
+
+```kotlin
+if (BuildConfig.DEBUG) {
+    Firebase.appCheck.installAppCheckProviderFactory(
+        DebugAppCheckProviderFactory.getInstance()
+    )
+}
+```
+
+#### Debug Token Persistence
+
+Emulator resets or clearing app storage erase `SharedPreferences`, causing
+`DebugAppCheckProviderFactory` to print a new debug token in Logcat. To persist
+a stable debug token across emulator resets and fresh installs without
+hardcoding secrets:
+
+> [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Never hardcode
+> debug token strings in `build.gradle.kts` or Kotlin source files. Store the
+> token in gitignored `local.properties` and inject it dynamically.
+
+1. In gitignored `local.properties`:
+
+   ```properties
+   APP_CHECK_DEBUG_TOKEN=<YOUR_DEBUG_TOKEN>
+   ```
+
+1. In `app/build.gradle.kts`:
+
+   ```kotlin
+   val localProperties = java.util.Properties().apply {
+       val localPropertiesFile = rootProject.file("local.properties")
+       if (localPropertiesFile.exists()) {
+           load(localPropertiesFile.inputStream())
+       }
+   }
+   val appCheckDebugToken = localProperties.getProperty("APP_CHECK_DEBUG_TOKEN")
+       ?: System.getenv("APP_CHECK_DEBUG_TOKEN") ?: ""
+
+   android {
+       defaultConfig {
+           // For normal emulator runs (injects into AndroidManifest)
+           manifestPlaceholders["firebaseAppCheckDebugSecret"] = appCheckDebugToken
+
+           // For instrumentation tests
+           if (appCheckDebugToken.isNotEmpty()) {
+               testInstrumentationRunnerArguments["firebaseAppCheckDebugSecret"] = appCheckDebugToken
+           }
+       }
+   }
+   ```

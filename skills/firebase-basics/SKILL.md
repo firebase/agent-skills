@@ -3,7 +3,9 @@ name: firebase-basics
 description: >-
   Provides foundational Firebase CLI setup, CLI installation, version checks (`firebase-tools@latest --version`), CLI login (including --no-localhost), project creation, project selection (`firebase use`), and app config file downloads (`google-services.json`, `GoogleService-Info.plist`). Use ONLY for CLI login, project creation/switching, or downloading app config files. Don't use for Firebase Hosting deploy, Firestore, Auth, App Hosting, Data Connect, Crashlytics, or Remote Config.
 metadata:
+  author: Google LLC
   category: CloudInfrastructureAndServices
+  version: "1.0.0"
 ---
 
 # Prerequisites
@@ -38,7 +40,8 @@ Complete these setup steps before proceeding:
        [references/setup/other_agents.md](references/setup/other_agents.md)
 
 1. **Authentication:** Ensure you are logged in to Firebase so that commands
-   have the correct permissions. Run `npx -y firebase-tools@latest login`. For
+   have the correct permissions. Run `npx -y firebase-tools@latest login:list`
+   first; if not logged in, run `npx -y firebase-tools@latest login`. For
    environments without a browser (e.g., remote shells), use
    `npx -y firebase-tools@latest login --no-localhost`.
 
@@ -48,20 +51,23 @@ Complete these setup steps before proceeding:
 
 1. **Active Project:** Most Firebase tasks require an active project context.
 
-   > [!IMPORTANT] **For Agents:** Before proceeding with project configuration,
-   > you MUST pause and ask the developer if they prefer to:
+   > [!IMPORTANT] **For Agents:** If no Project ID was provided, you MUST pause
+   > and ask the developer if they prefer to:
    >
    > 1. **Provide an existing Firebase Project ID**, or
    > 1. **Create a new Firebase project**.
 
    - **If using an existing Project ID:**
 
-     1. Check the current project by running `npx -y firebase-tools@latest use`.
+     1. Check the current project with `npx -y firebase-tools@latest use` (if
+        `firebase.json` is missing at the project root, create `{}` first).
+
      1. If the command outputs `Active Project: <project-id>`, confirm with the
         user if this is the intended project.
+
      1. If not, or if no project is active, set the project provided by the
         user:
-        
+
         ```bash
         npx -y firebase-tools@latest use <PROJECT_ID>
         ```
@@ -141,8 +147,9 @@ Adhere to these principles:
 
 - **Login Issues:** If the browser fails to open during the login step, use
   `npx -y firebase-tools@latest login --no-localhost` instead.
+
 - **Genkit:** If using Genkit, install the skills:
-  
+
   ```bash
   npx skills add genkit-ai/skills
   ```
