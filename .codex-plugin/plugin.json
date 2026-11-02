@@ -1,6 +1,6 @@
 {
   "name": "firebase",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Official Firebase plugin for Codex. Manage projects, add backend services, develop AI features, deploy and host apps, and more.",
   "author": {
     "name": "Firebase",
@@ -37,6 +37,7 @@
     ],
     "websiteURL": "https://firebase.google.com",
     "privacyPolicyURL": "https://policies.google.com/privacy",
+    "supportURL": "https://firebase.google.com/support",
     "termsOfServiceURL": "https://policies.google.com/terms",
     "defaultPrompt": [
       "Set up Firebase in this app.",
