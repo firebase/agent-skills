@@ -76,43 +76,48 @@ match on the expected case; the function result is also a `JSONObject`:
 import FirebaseAILogic
 
 // Step 1: the app-side function the model can ask you to run.
-func getStockPrice(symbol: String) -> JSONObject {
-  // TODO(developer): Call a real stock price API. Hardcoded for demo purposes.
-  return ["symbol": .string(symbol), "price": .number(189.84)]
+func fetchWeather(city: String) -> JSONObject {
+  // TODO(developer): Call a real weather API. Hardcoded for demo purposes.
+  return [
+    "city": .string(city),
+    "tempC": .number(22),
+    "conditions": .string("Sunny")
+  ]
 }
 
 // Step 2: describe the function to the model.
-let getStockPriceDeclaration = FunctionDeclaration(
-  name: "getStockPrice",
-  description: "Get the current stock price for a given symbol.",
+let fetchWeatherDeclaration = FunctionDeclaration(
+  name: "fetchWeather",
+  description: "Get the current weather conditions for a given city.",
   parameters: [
-    "symbol": .string(
-      description: "The stock symbol, e.g. AAPL"
+    "city": .string(
+      description: "The city and state/country, e.g. New York, NY"
     )
   ]
 )
 
 // Step 3: provide the declaration when creating the model.
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
-  modelName: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-  tools: [.functionDeclarations([getStockPriceDeclaration])]
+  modelName: "<latest_supported_model>",
+  tools: [.functionDeclarations([fetchWeatherDeclaration])]
 )
 
 // Step 4: in your task, send the prompt in a chat session and run any requested call.
 let chat = model.startChat()
-let response = try await chat.sendMessage("What is the stock price of Apple?")
+let response = try await chat.sendMessage("What is the weather in New York?")
 
 var functionResponses = [FunctionResponsePart]()
 for functionCall in response.functionCalls {
   print("Model requested function: \(functionCall.name) with args: \(functionCall.args)")
-  if functionCall.name == "getStockPrice" {
+  if functionCall.name == "fetchWeather" {
     // TODO(developer): Handle invalid arguments.
-    guard case let .string(symbol) = functionCall.args["symbol"] else {
-      fatalError("Missing or invalid 'symbol' argument in function call.")
+    guard case let .string(city) = functionCall.args["city"] else {
+      fatalError("Missing or invalid 'city' argument in function call.")
     }
     functionResponses.append(FunctionResponsePart(
       name: functionCall.name,
-      response: getStockPrice(symbol: symbol)
+      response: fetchWeather(city: city)
     ))
   }
   // TODO(developer): Handle other potential function calls, if any.
