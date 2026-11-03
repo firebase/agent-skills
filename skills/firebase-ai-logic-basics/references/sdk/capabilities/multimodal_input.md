@@ -136,7 +136,7 @@ Firebase AI Logic accepts Base64 encoded data or specific file references.
 import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 
 const ai = getAI(app, { backend: new GoogleAIBackend() });
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
 
 // Helper to convert file to base64 generic object
@@ -179,4 +179,6 @@ console.log(result.response.text());
 
 Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): pass
 `{ type: "fileData", fileData: { mimeType: "image/jpeg", fileUri: "gs://bucket-name/path/image.jpg" } }`
-in place of the `inlineData` part.
+in place of the `inlineData` part (see
+[Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt)
+for required setup and permissions).
