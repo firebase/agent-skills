@@ -199,6 +199,30 @@ which links to each platform's guide.
 
 ______________________________________________________________________
 
+## Model Configuration & Safety Settings
+
+### Generation Configuration & System Instructions
+
+`GenerationConfig` and `systemInstruction` apply across text, multimodal, chat,
+streaming, and structured output requests—consult
+[Control output with model parameters](https://firebase.google.com/docs/ai-logic/model-parameters.md.txt)
+and
+[Use system instructions](https://firebase.google.com/docs/ai-logic/system-instructions.md.txt)
+for currently supported options.
+
+> [!WARNING] **Do NOT set unsupported sampling parameters:** Do **not** set
+> `temperature`, `topP`, `topK`, `candidateCount`, `presencePenalty`, or
+> `frequencyPenalty` in `GenerationConfig`. These parameters are unsupported and
+> cause unexpected behavior or `HTTP 400` errors.
+
+### Safety Settings
+
+Do **not** configure custom `safetySettings` unless the app has an exceptional
+requirement. For those exceptional cases, consult
+[Adjust safety settings](https://firebase.google.com/docs/ai-logic/safety-settings.md.txt).
+
+______________________________________________________________________
+
 ## Security & Production
 
 ### Firebase App Check
