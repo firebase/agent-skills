@@ -59,15 +59,12 @@ location, and `VertexAIBackend` was removed in `firebase@13.0.0`).
 
 ### App Check Enforcement and Replay Protection
 
-Firebase AI Logic requires Firebase App Check for commonly abused models. If App
-Check is not configured in your app and enforced in the Firebase console,
-requests to those models fail with:
+Firebase AI Logic requires Firebase App Check to be enforced (see
+[App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt)).
+If App Check is not configured in your app and enforced in the Firebase console,
+requests fail with `HTTP 403`.
 
-```text
-HTTP 403: "To access this model, you must enforce Firebase App Check"
-```
-
-In addition, when **replay protection** is enabled in App Check, initialize
+In addition, when **replay protection** is enforced in App Check, initialize
 `getAI` with `useLimitedUseAppCheckTokens: true`:
 
 ```javascript
@@ -77,8 +74,7 @@ const ai = getAI(app, {
 });
 ```
 
-This instructs the SDK to fetch fresh, single-use (5-minute TTL) App Check
-tokens (such as via reCAPTCHA Enterprise or the debug provider) for requests
+This instructs the SDK to fetch fresh limited-use App Check tokens for requests
 rather than reusing standard cached App Check tokens.
 
 ## Core Capabilities
@@ -95,11 +91,11 @@ async function generateText(prompt) {
 }
 ```
 
-## App Check
+## App Check Debug Provider
 
-See
-[App Check with reCAPTCHA Enterprise](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider.md.txt)
-for setup instructions.
+For production builds, configure the official reCAPTCHA Enterprise attestation
+provider by consulting
+[App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt).
 
 App Check debug tokens for local development and CI/CD:
 
