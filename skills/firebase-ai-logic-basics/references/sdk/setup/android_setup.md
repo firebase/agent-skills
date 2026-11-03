@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             useLimitedUseAppCheckTokens = true
         )
 
-        // [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+        // [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
         val model = ai.generativeModel("<latest_supported_model>")
 
         // Generate content
@@ -101,9 +101,11 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-`GenerativeBackend.googleAI()` selects the Gemini Developer API (the default).
-For the Agent Platform Gemini API use `GenerativeBackend.agentPlatform()`
-(optionally `GenerativeBackend.agentPlatform(location = "global")`; `"global"`
+`GenerativeBackend.googleAI()` sends requests via the Gemini Developer API (the
+default). To send requests via the Agent Platform Gemini API instead, use
+`GenerativeBackend.agentPlatform()` (optionally pass a
+[supported location](https://firebase.google.com/docs/ai-logic/locations?api=vertex)
+such as `GenerativeBackend.agentPlatform(location = "us-central1")`; `"global"`
 is the default location, and `GenerativeBackend.vertexAI()` was removed in
 `firebase-ai:18.0.0`).
 
@@ -154,7 +156,7 @@ class MainActivity : ComponentActivity() {
             backend = GenerativeBackend.googleAI(),
             useLimitedUseAppCheckTokens = true
         )
-        // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+        // [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
         val model = ai.generativeModel("<latest_supported_model>")
         
         lifecycleScope.launch {
