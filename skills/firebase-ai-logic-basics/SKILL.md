@@ -2,7 +2,6 @@
 name: firebase-ai-logic-basics
 description: >-
   Integrates Firebase AI Logic (formerly Vertex AI for Firebase) into mobile and web apps (Android, iOS, Web, and Flutter) to call Gemini models from client code. Use when provisioning or initializing Firebase AI Logic, or adding Gemini features to an app: text generation, multimodal input, chat, streaming, structured output, function calling, Google Search grounding, image generation (Nano Banana), text-to-speech, hybrid on-device inference, App Check protection, or switching models with Remote Config.
-version: 1.1.0
 metadata:
   author: Google LLC
   category: AiAndMachineLearning
