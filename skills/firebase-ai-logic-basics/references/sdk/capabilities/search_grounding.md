@@ -53,7 +53,7 @@ import FirebaseAILogic
 
 let ai = FirebaseAI.firebaseAI(backend: .googleAI())
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 let model = ai.generativeModel(
   modelName: "<latest_supported_model>",
   // Provide Google Search as a tool that the model can use to generate its response.
