@@ -121,6 +121,8 @@ guard let uiImage = UIImage(data: inlineDataPart.data) else {
 
 ## Flutter (Dart)
 
+### Generate an image from text
+
 Create the model with `ResponseModalities.image` and read the bytes from
 `response.inlineDataParts` (for example to show them with `Image.memory`):
 
@@ -128,14 +130,15 @@ Create the model with `ResponseModalities.image` and read the bytes from
 import 'package:firebase_ai/firebase_ai.dart';
 
 // Create a `GenerativeModel` instance with a Gemini model that supports image output.
-// [AGENT] Replace '<latest_supported_image_model>' with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace '<latest_supported_image_model>' with the latest Nano Banana model from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 final model = FirebaseAI.googleAI().generativeModel(
   model: '<latest_supported_image_model>',
   generationConfig: GenerationConfig(
     // Configure the model to respond with images only.
     responseModalities: [ResponseModalities.image],
     // Specify aspect ratio and image size (both optional) in an image config.
-    // The default is a square (1:1) image at 1024x1024.
+    // For supported values, see
+    // https://firebase.google.com/docs/ai-logic/generate-images-gemini#configure-image-generation
     imageConfig: ImageConfig(
       aspectRatio: ImageAspectRatio.landscape16x9,
       imageSize: ImageSize.size2K,
@@ -160,7 +163,8 @@ if (response.inlineDataParts.isNotEmpty) {
 ### Edit an image
 
 Wrap the image bytes in an `InlineDataPart` with their MIME type and send them
-with a `TextPart` in a single `Content.multi` to the same image-capable `model`:
+with a `TextPart` in a single `Content.multi` to the same
+image-generation-capable `model`:
 
 ```dart
 import 'dart:io';
