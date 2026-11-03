@@ -48,17 +48,12 @@ location, and `.vertexAI()` was removed in v13.0.0).
 
 ### App Check Enforcement and Replay Protection
 
-Firebase AI Logic requires Firebase App Check for commonly abused models, and
-starting November 2, 2026, App Check is automatically enforced for all of
-Firebase AI Logic (it can't be unenforced, so app versions without App Check are
-blocked). If App Check is not configured in your app and enforced in the
-Firebase console, requests to commonly abused models fail with:
+Firebase AI Logic requires Firebase App Check to be enforced (see
+[App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt)).
+If App Check is not configured in your app and enforced in the Firebase console,
+requests fail with `HTTP 403`.
 
-```text
-HTTP 403: "To access this model, you must enforce Firebase App Check"
-```
-
-In addition, when **replay protection** is enabled in App Check, initialize
+In addition, when **replay protection** is enforced in App Check, initialize
 `FirebaseAI` with `useLimitedUseAppCheckTokens: true`:
 
 ```swift
@@ -68,8 +63,8 @@ let ai = FirebaseAI.firebaseAI(
 )
 ```
 
-This ensures the SDK fetches a fresh, single-use (5-minute TTL) App Check token
-for each request rather than reusing a standard cached App Check token.
+This ensures the SDK fetches a fresh limited-use App Check token for each
+request rather than reusing a standard cached App Check token.
 
 ## 2. SwiftUI Integration (Best Practices)
 
@@ -144,6 +139,10 @@ struct AIView: View {
 
 ## 3. App Check Debug Provider
 
+For production builds, configure an official Apple attestation provider (App
+Attest or DeviceCheck) by consulting
+[App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt).
+
 For App Check debug tokens during local development and CI/CD, add the
 `FirebaseAppCheck` product to the app target (with the `xcode-project-setup`
 skill), then set the debug provider factory in debug builds *before*
@@ -156,20 +155,9 @@ import FirebaseCore
 // In your app's init(), before configuring Firebase:
 #if DEBUG
 AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
-#else
-AppCheck.setAppCheckProviderFactory(AppAttestProviderFactory()) // or DeviceCheckProviderFactory() fallback
 #endif
 FirebaseApp.configure()
 ```
-
-> [!IMPORTANT] `AppAttestProviderFactory` requires the **App Attest** capability
-> on the app target (Xcode -> Signing & Capabilities -> + Capability -> App
-> Attest), which adds the
-> `com.apple.developer.devicecheck.appattest-environment` entitlement; set its
-> value to `production` in the `.entitlements` file, as the Firebase App Attest
-> setup guide requires. Without the capability, App Attest token requests fail
-> at runtime. Use `DeviceCheckProviderFactory()` if App Attest is unavailable
-> for the target.
 
 For CI/CD, add an `AppCheckDebugToken` environment variable to the Xcode test
 scheme with a value like `$(APP_CHECK_DEBUG_TOKEN)`, then pass the token from
@@ -209,11 +197,8 @@ if let debugToken = loadGitIgnoredDebugToken() {
   // overwrite = 0 so a token set in the Xcode scheme (recommended) takes precedence
   _ = setenv("AppCheckDebugToken", debugToken, 0)
 }
-let providerFactory = AppCheckDebugProviderFactory()
-#else
-let providerFactory = AppAttestProviderFactory() // Requires the App Attest capability (see above)
+AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
 #endif
-AppCheck.setAppCheckProviderFactory(providerFactory)
 
 FirebaseApp.configure() // Configure Firebase AFTER setting the App Check provider factory
 ```
