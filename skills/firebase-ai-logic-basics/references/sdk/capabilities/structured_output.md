@@ -30,7 +30,7 @@ val jsonSchema = Schema.obj(
     ))
 )
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
     modelName = "<latest_supported_model>",
     // In the generation config, set the `responseMimeType` to `application/json`
