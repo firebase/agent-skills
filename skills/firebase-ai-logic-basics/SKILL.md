@@ -114,9 +114,7 @@ ______________________________________________________________________
 > `curl -sL https://firebase.google.com/docs/ai-logic/models.md.txt` or a web
 > fetch tool) to determine the latest supported Gemini model IDs for your task.
 > Never guess a model name from memory, and do **NOT** use retired or deprecated
-> Gemini 1.x or Gemini 2.x models (such as `gemini-1.5-flash`, `gemini-1.5-pro`,
-> `gemini-2.0-flash`, `gemini-2.0-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`, or
-> `gemini-2.5-flash-lite`).
+> models—always consult the official models documentation above.
 
 ### Text-Only Generation
 
@@ -289,9 +287,7 @@ ______________________________________________________________________
 > `curl -sL https://firebase.google.com/docs/ai-logic/models.md.txt` or a web
 > fetch tool) to determine the latest supported Gemini model IDs for your task.
 > Never guess a model name from memory, and do **NOT** use retired or deprecated
-> Gemini 1.x or Gemini 2.x models (such as `gemini-1.5-flash`, `gemini-1.5-pro`,
-> `gemini-2.0-flash`, `gemini-2.0-pro`, `gemini-2.5-flash`, `gemini-2.5-pro`, or
-> `gemini-2.5-flash-lite`).
+> models—always consult the official models documentation above.
 
 ## References
 
