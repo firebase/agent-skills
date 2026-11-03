@@ -146,39 +146,39 @@ wraps your results for the follow-up turn:
 import 'package:firebase_ai/firebase_ai.dart';
 
 // Step 1: the app-side function the model can ask you to run.
-Future<Map<String, Object?>> getStockPrice(String symbol) async {
-  // TODO(developer): Call a real stock price API. Hardcoded for demo purposes.
-  return {'symbol': symbol, 'price': 189.84};
+Future<Map<String, Object?>> fetchWeather(String city) async {
+  // TODO(developer): Call a real weather API. Hardcoded for demo purposes.
+  return {'city': city, 'tempC': 22, 'conditions': 'Sunny'};
 }
 
 // Step 2: describe the function to the model.
-final getStockPriceTool = FunctionDeclaration(
-  'getStockPrice',
-  'Get the current stock price for a given symbol.',
+final fetchWeatherTool = FunctionDeclaration(
+  'fetchWeather',
+  'Get the current weather conditions for a given city.',
   parameters: {
-    'symbol': Schema.string(description: 'The stock symbol, e.g. AAPL'),
+    'city': Schema.string(description: 'The city and state/country, e.g. New York, NY'),
   },
 );
 
 // Step 3: provide the declaration when creating the model.
-// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace '<latest_supported_model>' with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 final model = FirebaseAI.googleAI().generativeModel(
   model: '<latest_supported_model>',
-  tools: [Tool.functionDeclarations([getStockPriceTool])],
+  tools: [Tool.functionDeclarations([fetchWeatherTool])],
 );
 
-Future<String> askStockPrice() async {
+Future<String> askWeather() async {
   // Step 4: send the prompt in a chat session and run any requested call(s).
   final chat = model.startChat();
   var response = await chat.sendMessage(
-    Content.text('What is the stock price of Apple?'),
+    Content.text('What is the weather in New York?'),
   );
 
   final functionResponses = <FunctionResponse>[];
   for (final functionCall in response.functionCalls) {
-    if (functionCall.name == 'getStockPrice') {
-      final symbol = functionCall.args['symbol']! as String;
-      final functionResult = await getStockPrice(symbol);
+    if (functionCall.name == 'fetchWeather') {
+      final city = functionCall.args['city']! as String;
+      final functionResult = await fetchWeather(city);
       functionResponses.add(
         FunctionResponse(functionCall.name, functionResult, id: functionCall.id),
       );
