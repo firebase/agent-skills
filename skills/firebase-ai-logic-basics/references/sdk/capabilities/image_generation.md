@@ -2,6 +2,8 @@
 
 ## Android (Kotlin)
 
+### Generate an image from text
+
 Create the model with `ResponseModality.IMAGE`, call `generateContent` from a
 coroutine (for example `lifecycleScope.launch`), and pick the `ImagePart` out of
 the first candidate:
@@ -16,7 +18,7 @@ import com.google.firebase.ai.type.ResponseModality
 import com.google.firebase.ai.type.generationConfig
 
 // Create a `GenerativeModel` instance with a Gemini model that supports image output.
-// [AGENT] Replace "<latest_supported_image_model>" with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_image_model>" with the latest Nano Banana model from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
     modelName = "<latest_supported_image_model>",
     // Configure the model to respond with images only.
@@ -37,7 +39,7 @@ val generatedImageAsBitmap: Bitmap? = model.generateContent(prompt)
 ### Edit an image
 
 Send the source bitmap and the instruction in one `content { }` block, using the
-same image-capable `model`:
+same image-generation-capable `model`:
 
 ```kotlin
 import android.graphics.BitmapFactory
