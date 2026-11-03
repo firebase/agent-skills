@@ -60,7 +60,7 @@ images:
 import FirebaseAILogic
 import UIKit
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(modelName: "<latest_supported_model>")
 
 guard let image = UIImage(named: "scones") else { fatalError("Image file not found.") }
@@ -84,4 +84,6 @@ print(response.text ?? "No text in response.")
 
 Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): pass
 `FileDataPart(uri: "gs://bucket-name/path/image.jpg", mimeType: "image/jpeg")`
-in place of the `InlineDataPart`.
+in place of the `InlineDataPart` (see
+[Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt)
+for required setup and permissions).
