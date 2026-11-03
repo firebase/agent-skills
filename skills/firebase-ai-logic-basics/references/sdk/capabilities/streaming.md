@@ -66,13 +66,12 @@ for try await chunk in contentStream {
 ## Flutter (Dart)
 
 `generateContentStream` returns a Dart `Stream<GenerateContentResponse>`;
-consume it with `await for`. For a chat session call
-`chat.sendMessageStream(Content.text('...'))` and consume it the same way.
+consume it with `await for`:
 
 ```dart
 import 'package:firebase_ai/firebase_ai.dart';
 
-// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace '<latest_supported_model>' with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 final model = FirebaseAI.googleAI().generativeModel(model: '<latest_supported_model>');
 
 // Provide a prompt that contains text
@@ -81,6 +80,17 @@ final prompt = [Content.text('Write a story about a magic backpack.')];
 final response = model.generateContentStream(prompt);
 await for (final chunk in response) {
   // `text` is null for non-text chunks, so guard before appending.
+  final text = chunk.text;
+  if (text != null) print(text); // Update UI incrementally
+}
+```
+
+For a multi-turn chat session, call `chat.sendMessageStream(...)`:
+
+```dart
+final chat = model.startChat();
+final chatStream = chat.sendMessageStream(Content.text('Tell me a long story.'));
+await for (final chunk in chatStream) {
   final text = chunk.text;
   if (text != null) print(text); // Update UI incrementally
 }
