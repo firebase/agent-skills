@@ -12,7 +12,7 @@ import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.ai.type.content
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel("<latest_supported_model>")
 
 val image1: Bitmap = ... // Load your bitmap
@@ -46,4 +46,6 @@ Log.d(TAG, response.text ?: "")
 
 Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): use
 `fileData(uri = "gs://bucket-name/path/image.jpg", mimeType = "image/jpeg")` in
-place of `inlineData(...)` inside the same `content { }` block.
+place of `inlineData(...)` inside the same `content { }` block (see
+[Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt)
+for required setup and permissions).
