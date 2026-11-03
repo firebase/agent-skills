@@ -31,9 +31,9 @@ the Firebase CLI to onboard your project and web app:
 npx -y firebase-tools@latest crashlytics:setup <YOUR_FIREBASE_APP_ID> --project <YOUR_FIREBASE_PROJECT_ID>
 ```
 
-This automated command enables the required Telemetry APIs, provisions the
-Cloud Logging bucket with Log Analytics enabled, configures
-routing sinks, and sets up alerts.
+This automated command enables the required Telemetry APIs, provisions the Cloud
+Logging bucket with Log Analytics enabled, configures routing sinks, and sets up
+alerts.
 
 ______________________________________________________________________
 
