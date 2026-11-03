@@ -62,6 +62,8 @@ val generatedImageAsBitmap = model.generateContent(prompt)
 
 ## iOS (Swift)
 
+### Generate an image from text
+
 Create the model with the `.image` response modality and read the first
 `InlineDataPart` from the response. Replace the `fatalError` calls with real
 error handling in production code:
@@ -71,7 +73,7 @@ import FirebaseAILogic
 import UIKit
 
 // Create a `GenerativeModel` instance with a Gemini model that supports image output.
-// [AGENT] Replace "<latest_supported_image_model>" with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_image_model>" with the latest Nano Banana model from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
   modelName: "<latest_supported_image_model>",
   // Configure the model to respond with images only.
@@ -95,8 +97,8 @@ guard let uiImage = UIImage(data: inlineDataPart.data) else {
 
 ### Edit an image
 
-Pass a `UIImage` together with the text prompt to the same image-capable
-`model`:
+Pass a `UIImage` together with the text prompt to the same
+image-generation-capable `model`:
 
 ```swift
 // Provide an image for the model to edit
