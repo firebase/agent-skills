@@ -32,7 +32,7 @@ npx -y firebase-tools@latest crashlytics:setup <YOUR_FIREBASE_APP_ID> --project 
 ```
 
 This automated command enables the required Telemetry APIs, provisions the
-`firebase-telemetry` Cloud Logging bucket with Log Analytics enabled, configures
+Cloud Logging bucket with Log Analytics enabled, configures
 routing sinks, and sets up alerts.
 
 ______________________________________________________________________
