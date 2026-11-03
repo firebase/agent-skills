@@ -111,6 +111,10 @@ default location, and `FirebaseAI.vertexAI()` was deprecated in `v3.15.0` /
 
 ## App Check Debug Provider
 
+For production builds, configure the official attestation providers (Play
+Integrity, App Attest or DeviceCheck, and reCAPTCHA Enterprise) by consulting
+[App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt).
+
 For App Check debug tokens during local development and CI/CD, activate the
 debug providers right after `Firebase.initializeApp()` (the `firebase_app_check`
 plugin is already added in [Installation](#installation)):
@@ -137,16 +141,13 @@ await FirebaseAppCheck.instance.activate(
   `androidProvider` and `appleProvider` parameters (`AndroidProvider.debug`,
   `AppleProvider.debug`) still appear in many examples but are deprecated.
 - Only use the debug providers in debug builds, as gated by `kDebugMode` above.
-  Release builds must activate the production providers (Play Integrity, App
-  Attest or DeviceCheck, and reCAPTCHA Enterprise) instead; see
-  [App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt).
 - **App Check enforcement and replay protection**: Firebase AI Logic requires
-  App Check for commonly abused models (returning
-  `HTTP 403: "To access this model, you must enforce Firebase App Check"` if App
-  Check is not configured and enforced). When **replay protection** is enabled,
-  pass `useLimitedUseAppCheckTokens: true` on the very first
+  Firebase App Check to be enforced; if App Check is not configured in your app
+  and enforced in the Firebase console, requests fail with `HTTP 403`. In
+  addition, when **replay protection** is enforced, pass
+  `useLimitedUseAppCheckTokens: true` on the very first
   `FirebaseAI.googleAI(...)` (or `FirebaseAI.agentPlatform(...)`) call for a
-  `FirebaseApp` so the SDK fetches single-use (5-minute TTL) tokens.
+  `FirebaseApp` so the SDK fetches limited-use tokens.
 - **CI/CD**: Pass the pre-provisioned token to all three debug providers, e.g.
   `debugToken: const String.fromEnvironment('APP_CHECK_DEBUG_TOKEN')`, and build
   with `--dart-define=APP_CHECK_DEBUG_TOKEN=<token>`.
