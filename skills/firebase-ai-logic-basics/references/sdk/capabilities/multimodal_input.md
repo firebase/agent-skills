@@ -97,7 +97,7 @@ single `Content.multi` message:
 import 'dart:io';
 import 'package:firebase_ai/firebase_ai.dart';
 
-// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace '<latest_supported_model>' with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 final model = FirebaseAI.googleAI().generativeModel(model: '<latest_supported_model>');
 
 // Provide a text prompt to include with the image
@@ -124,4 +124,6 @@ final response = await model.generateContent([
 
 Cloud Storage for Firebase URL (Agent Platform Gemini API provider only): use
 `FileData('image/jpeg', 'gs://bucket-name/path/image.jpg')` in place of the
-`InlineDataPart` inside `Content.multi`.
+`InlineDataPart` inside `Content.multi` (see
+[Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt)
+for required setup and permissions).
