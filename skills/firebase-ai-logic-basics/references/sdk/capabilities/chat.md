@@ -72,7 +72,7 @@ then send new user messages:
 ```dart
 import 'package:firebase_ai/firebase_ai.dart';
 
-// [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace '<latest_supported_model>' with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 final model = FirebaseAI.googleAI().generativeModel(model: '<latest_supported_model>');
 
 final chat = model.startChat(history: [
