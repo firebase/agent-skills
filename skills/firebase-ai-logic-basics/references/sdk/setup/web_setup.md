@@ -1,5 +1,8 @@
 # Firebase AI Logic on Web (JavaScript)
 
+Official documentation:
+[Get started with Firebase AI Logic on Web](https://firebase.google.com/docs/ai-logic/get-started.md.txt?platform=web)
+
 ## Installation
 
 The library is part of the standard Firebase Web SDK (`firebase@13.0.0+`
@@ -43,14 +46,16 @@ const ai = getAI(app, {
   useLimitedUseAppCheckTokens: true,
 });
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
 ```
 
-`new GoogleAIBackend()` selects the Gemini Developer API (the default). For the
-Agent Platform Gemini API use `backend: new AgentPlatformBackend()` (optionally
-`new AgentPlatformBackend("us-central1")`; the default location is `global`, and
-`VertexAIBackend` was removed in `firebase@13.0.0`).
+`new GoogleAIBackend()` sends requests via the Gemini Developer API (the
+default). To send requests via the Agent Platform Gemini API instead, use
+`backend: new AgentPlatformBackend()` (optionally pass a
+[supported location](https://firebase.google.com/docs/ai-logic/locations?api=vertex)
+such as `new AgentPlatformBackend("us-central1")`; `"global"` is the default
+location, and `VertexAIBackend` was removed in `firebase@13.0.0`).
 
 ### App Check Enforcement and Replay Protection
 
