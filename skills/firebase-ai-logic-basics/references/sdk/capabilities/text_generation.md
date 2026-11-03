@@ -36,8 +36,9 @@ for that pattern).
 ```swift
 import FirebaseAILogic
 
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
-  modelName: "<latest_supported_model>" // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  modelName: "<latest_supported_model>"
 )
 
 // Provide a prompt that contains text
@@ -49,32 +50,4 @@ do {
 } catch {
   print("Error generating content: \(error.localizedDescription)")
 }
-```
-
-### Optional: Custom Generation Config & Safety Settings
-
-Create an optional `GenerationConfig` struct and an array of `SafetySetting`s,
-and pass both to `generativeModel(modelName:generationConfig:safetySettings:)`:
-
-```swift
-import FirebaseAILogic
-
-// Set optional parameter values in a `GenerationConfig`.
-// IMPORTANT: Example values shown here. Make sure to update for your use case.
-let config = GenerationConfig(
-  maxOutputTokens: 200,
-  stopSequences: ["red"]
-)
-
-// You can configure safety thresholds to prevent the model from generating harmful content.
-let safetySettings = [
-  SafetySetting(harmCategory: .harassment, threshold: .blockLowAndAbove),
-  SafetySetting(harmCategory: .hateSpeech, threshold: .blockMediumAndAbove)
-]
-
-let configuredModel = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
-  modelName: "<latest_supported_model>",
-  generationConfig: config,
-  safetySettings: safetySettings
-)
 ```
