@@ -194,6 +194,8 @@ if (response.inlineDataParts.isNotEmpty) {
 
 ## Web (JavaScript)
 
+### Generate an image from text
+
 `ai` is the AI Logic service instance created during setup with
 `getAI(app, { backend: new GoogleAIBackend() })`. This sample requests both
 `TEXT` and `IMAGE`, so the model may return text parts alongside the image;
@@ -204,9 +206,10 @@ for image-only output. To display the result, build a data URL from the part:
 ```javascript
 import { getGenerativeModel, ResponseModality } from "firebase/ai";
 
-// Create a `GenerativeModel` instance with a model that supports your use case
+// Create a `GenerativeModel` instance with a Gemini model that supports image output.
+// [AGENT] Replace "<latest_supported_image_model>" with the latest Nano Banana model from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const model = getGenerativeModel(ai, {
-  model: "<latest_supported_image_model>", // [AGENT] Replace with the latest image model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  model: "<latest_supported_image_model>",
   // Configure the model to respond with text and images (required)
   generationConfig: {
     responseModalities: [ResponseModality.TEXT, ResponseModality.IMAGE],
@@ -234,7 +237,7 @@ try {
 ### Edit an image
 
 Convert the user's file to an inline data part and pass it with the prompt to
-the same image-capable `model`:
+the same image-generation-capable `model`:
 
 ```javascript
 // Prepare an image for the model to edit
