@@ -70,8 +70,8 @@ This is the recommended flow for most users.
    npx -y firebase-tools@latest apphosting:backends:create --backend my-app-id --primary-region us-central1 --root-dir /
    ```
 
-1. If the app needs safe access to sensitive keys, set and grant access after
-   creating the backend:
+1. For sensitive keys/secrets (e.g., from `.env*`), set and grant access after
+   creating the backend and reference via `secret:` (never `value:`):
 
    ```bash
    printf '%s' '<value>' | npx -y firebase-tools@latest apphosting:secrets:set <secret-name> --data-file - --force
