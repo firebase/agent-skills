@@ -9,6 +9,9 @@ metadata:
 
 # Firebase AI Logic Basics
 
+Official documentation:
+[Firebase AI Logic](https://firebase.google.com/docs/ai-logic.md.txt)
+
 ## Overview
 
 Firebase AI Logic is a product of Firebase that allows developers to add gen AI
