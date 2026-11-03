@@ -1,0 +1,14 @@
+{
+  "name": "agent-skills",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:js && npm run test:shell",
+    "test:js": "npm test --prefix scripts/skill-token-counter",
+    "test:shell": "bash .github/scripts/tests/run_tests.sh",
+    "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore scripts/skill-token-counter/node_modules"
+  },
+  "devDependencies": {
+    "markdownlint-cli": "^0.43.0"
+  }
+}
