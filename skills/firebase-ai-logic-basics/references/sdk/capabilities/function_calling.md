@@ -205,20 +205,20 @@ and send the `functionResponse` part(s) back in a single turn:
 import { getAI, getGenerativeModel, GoogleAIBackend, Schema } from "firebase/ai";
 
 // Step 1: the app-side function the model can ask you to run.
-async function getStockPrice({ symbol }) {
-  // TODO(developer): Call a real stock price API. Hardcoded for demo purposes.
-  return { symbol, price: 189.84 };
+async function fetchWeather({ city }) {
+  // TODO(developer): Call a real weather API. Hardcoded for demo purposes.
+  return { city, tempC: 22, conditions: "Sunny" };
 }
 
 // Step 2: describe the function to the model.
-const getStockPriceTool = {
+const fetchWeatherTool = {
   functionDeclarations: [
     {
-      name: "getStockPrice",
-      description: "Get the current stock price for a given symbol.",
+      name: "fetchWeather",
+      description: "Get the current weather conditions for a given city.",
       parameters: Schema.object({
         properties: {
-          symbol: Schema.string({ description: "The stock symbol, e.g. AAPL" }),
+          city: Schema.string({ description: "The city and state/country, e.g. New York, NY" }),
         },
       }),
     },
@@ -227,20 +227,21 @@ const getStockPriceTool = {
 
 // Step 3: provide the declaration when creating the model.
 const ai = getAI(app, { backend: new GoogleAIBackend() });
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const model = getGenerativeModel(ai, {
-  model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
-  tools: [getStockPriceTool],
+  model: "<latest_supported_model>",
+  tools: [fetchWeatherTool],
 });
 
-async function askStockPrice() {
+async function askWeather() {
   // Step 4: send the prompt in a chat session and run any requested call(s).
   const chat = model.startChat();
-  let result = await chat.sendMessage("What is the stock price of Apple?");
+  let result = await chat.sendMessage("What is the weather in New York?");
 
   const functionResponses = [];
   for (const call of result.response.functionCalls() ?? []) {
-    if (call.name === "getStockPrice") {
-      const functionResult = await getStockPrice(call.args);
+    if (call.name === "fetchWeather") {
+      const functionResult = await fetchWeather(call.args);
       functionResponses.push({
         type: "functionResponse",
         functionResponse: { id: call.id, name: call.name, response: functionResult },
