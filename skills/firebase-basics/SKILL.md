@@ -91,8 +91,13 @@ Adhere to these principles:
    `npx -y firebase-tools@latest --version`. NEVER suggest the naked `firebase`
    command as an alternative.
 1. **Prioritize official knowledge:** For any Firebase-related knowledge,
-   consult the `developerknowledge_search_documents` MCP tool before falling
-   back to Google Search or your internal knowledge base. Including "Firebase"
+   consult the `developerknowledge_search_documents` MCP tool first. When the
+   MCP tool is unavailable, use your web-fetching or web-search tooling to read
+   the Firebase documentation index at `https://firebase.google.com/docs/llms.txt`
+   (or a product-specific index at
+   `https://firebase.google.com/docs/{product}/llms.txt`) and append `.md.txt`
+   to any documentation page URL to retrieve clean Markdown before falling back
+   to general web search or your internal knowledge base. Including "Firebase"
    in your search query significantly improves relevance.
 1. **Follow Agent Skills for implementation guidance:** Skills provide
    opinionated workflows (CUJs), security rules, and best practices. Always
@@ -142,6 +147,7 @@ Adhere to these principles:
   - **Web**: See [references/web_setup.md](references/web_setup.md)
   - **Android**: See [references/android_setup.md](references/android_setup.md)
   - **iOS**: See [references/ios_setup.md](references/ios_setup.md)
+- **Documentation Index (`llms.txt`):** Browse the machine-readable Firebase documentation index at [https://firebase.google.com/docs/llms.txt](https://firebase.google.com/docs/llms.txt) (or product-specific indexes at `https://firebase.google.com/docs/{product}/llms.txt`), and append `.md.txt` to any Firebase documentation URL to fetch raw Markdown.
 
 # Common Issues
 

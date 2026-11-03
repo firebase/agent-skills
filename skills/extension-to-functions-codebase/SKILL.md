@@ -128,3 +128,7 @@ Generate `README.md` containing:
 1. What Changed (Extension vs Package) comparison table.
 
 _Reminder: NEVER execute `npm publish`._
+
+## References
+
+- **Cloud Functions for Firebase Documentation Index (`llms.txt`)**: Use your web-fetching tooling to read [https://firebase.google.com/docs/functions/llms.txt](https://firebase.google.com/docs/functions/llms.txt) and append `.md.txt` to any documentation page URL to retrieve clean Markdown.

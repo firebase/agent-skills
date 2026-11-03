@@ -55,7 +55,8 @@ properties; you can also define custom events and properties.
 To learn how to customize event logging and configure advanced behaviors,
 consult the documentation for your platform.
 
-*   **Android**:
-    [Get started with Google Analytics for Android](https://firebase.google.com/docs/analytics/android/get-started)
-*   **iOS**:
-    [Get started with Google Analytics for iOS+](https://firebase.google.com/docs/analytics/ios/get-started)
+- **Android**:
+  [Get started with Google Analytics for Android](https://firebase.google.com/docs/analytics/android/get-started)
+- **iOS**:
+  [Get started with Google Analytics for iOS+](https://firebase.google.com/docs/analytics/ios/get-started)
+- **Documentation Index (`llms.txt`)**: Browse the full Analytics documentation index at [https://firebase.google.com/docs/analytics/llms.txt](https://firebase.google.com/docs/analytics/llms.txt) (append `.md.txt` to any documentation URL to fetch clean Markdown).

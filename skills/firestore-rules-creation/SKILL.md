@@ -598,3 +598,7 @@ Once devil's advocate testing passes, repeat until rules pass validation.
    prototype, and tell users that before they launch their app to a large
    audience, they should work with you to harden and validate the rules file. Be
    clear that users should carefully review rules to ensure security.
+
+### Official Documentation Index (`llms.txt`)
+
+- **Security Rules Documentation Index**: Use your web-fetching tooling to read [https://firebase.google.com/docs/rules/llms.txt](https://firebase.google.com/docs/rules/llms.txt) (and [https://firebase.google.com/docs/firestore/llms.txt](https://firebase.google.com/docs/firestore/llms.txt)) and append `.md.txt` to any documentation URL to retrieve clean Markdown.

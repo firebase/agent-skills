@@ -110,3 +110,7 @@ corresponding reference guides:
   [flutter_setup.md](references/enterprise/flutter_setup.md)
 
 - **Indexes**: Read [indexes.md](references/enterprise/indexes.md)
+
+### Official Documentation Index (`llms.txt`)
+
+- **Firestore Documentation Index**: Use your web-fetching tooling to read [https://firebase.google.com/docs/firestore/llms.txt](https://firebase.google.com/docs/firestore/llms.txt) for a complete index of Firestore guides, and append `.md.txt` to any documentation URL to retrieve clean Markdown.

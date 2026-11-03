@@ -128,3 +128,7 @@ Enable other providers in the Firebase Console.
 Secure your data using `request.auth` in Firestore/Storage rules.
 
 See [references/security_rules.md](references/security_rules.md).
+
+### 4. Documentation Index (`llms.txt`)
+
+For additional Firebase Authentication guides, use your web-fetching tooling to read [https://firebase.google.com/docs/auth/llms.txt](https://firebase.google.com/docs/auth/llms.txt) and append `.md.txt` to any documentation page URL to retrieve clean Markdown.
