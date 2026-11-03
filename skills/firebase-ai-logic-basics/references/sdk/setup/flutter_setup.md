@@ -1,5 +1,8 @@
 # Flutter Setup for Firebase AI Logic
 
+Official documentation:
+[Get started with Firebase AI Logic on Flutter](https://firebase.google.com/docs/ai-logic/get-started.md.txt?platform=flutter)
+
 This guide covers how to integrate Firebase AI Logic (Gemini API) into your
 Flutter applications.
 
@@ -26,24 +29,17 @@ Flutter applications.
 
 ## Installation
 
-Add the necessary Firebase dependencies to your `pubspec.yaml` (or run
-`flutter pub add firebase_core firebase_auth firebase_app_check firebase_ai`):
+Add the necessary Firebase packages with `flutter pub add` so `pub` resolves the
+latest compatible versions:
 
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  firebase_core: ^4.0.0
-  firebase_auth: ^6.0.0
-  firebase_app_check: ^0.4.0
-  firebase_ai: ^4.0.0
+```bash
+flutter pub add firebase_core firebase_auth firebase_app_check firebase_ai
 ```
 
-Run `flutter pub get` to install the packages. Always add `firebase_auth` and
-`firebase_app_check` alongside `firebase_ai`: the SDK picks up
-`FirebaseAuth.instance` and `FirebaseAppCheck.instance` automatically from the
-`FirebaseApp`, and App Check is required for commonly abused models (see
-[App Check Debug Provider](#app-check-debug-provider) below).
+Always add `firebase_auth` and `firebase_app_check` alongside `firebase_ai`: the
+SDK picks up `FirebaseAuth.instance` and `FirebaseAppCheck.instance`
+automatically from the `FirebaseApp`, and Firebase AI Logic requires App Check
+when enforced (see [App Check Debug Provider](#app-check-debug-provider) below).
 
 ## Initialization
 
@@ -70,10 +66,9 @@ Use `FirebaseAI.googleAI` for the **Gemini Developer API**.
 
 > [!IMPORTANT] **Model Selection:** Always actively fetch or read
 > [Firebase AI Logic Models](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> to determine the latest supported Gemini model ID before writing code. Do NOT
-> guess model names from memory or use retired/deprecated Gemini 1.x or 2.x
-> models (such as `gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-2.0-pro`, or
-> `gemini-2.5-flash`).
+> to determine a currently supported model ID before writing code. Never guess a
+> model name from memory, and do **NOT** use retired or deprecated models—always
+> consult the official models documentation above.
 
 > [!IMPORTANT] **Choose the Right API Provider:** Always use
 > `FirebaseAI.googleAI` (Gemini Developer API) as the default for prototyping
@@ -98,7 +93,7 @@ Future<String> generateText(String prompt) async {
     useLimitedUseAppCheckTokens: true,
   );
   
-  // [AGENT] Replace '<latest_supported_model>' with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  // [AGENT] Replace '<latest_supported_model>' with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
   final model = googleAI.generativeModel(model: '<latest_supported_model>');
 
   final response = await model.generateContent([Content.text(prompt)]);
@@ -106,11 +101,13 @@ Future<String> generateText(String prompt) async {
 }
 ```
 
-`FirebaseAI.googleAI()` selects the Gemini Developer API (the default). For the
-Agent Platform Gemini API use `FirebaseAI.agentPlatform()` (optionally
-`FirebaseAI.agentPlatform(location: 'global')`; 'global' is the default
-location, and `FirebaseAI.vertexAI()` was deprecated in `v3.15.0` / `v4.0.0` and
-removed on `main`).
+`FirebaseAI.googleAI()` sends requests via the Gemini Developer API (the
+default). To send requests via the Agent Platform Gemini API instead, use
+`FirebaseAI.agentPlatform()` (optionally pass a
+[supported location](https://firebase.google.com/docs/ai-logic/locations?api=vertex)
+such as `FirebaseAI.agentPlatform(location: 'us-central1')`; `'global'` is the
+default location, and `FirebaseAI.vertexAI()` was deprecated in `v3.15.0` /
+`v4.0.0` and removed on `main`).
 
 ## App Check Debug Provider
 
