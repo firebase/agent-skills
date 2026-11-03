@@ -1,5 +1,8 @@
 # Firebase AI Logic on Android (Kotlin)
 
+Official documentation:
+[Get started with Firebase AI Logic on Android](https://firebase.google.com/docs/ai-logic/get-started.md.txt?platform=android)
+
 First, ensure you have initialized the Firebase App (see `firebase-basics`
 skill). Then, initialize the AI Logic service as below
 
@@ -16,13 +19,33 @@ ______________________________________________________________________
 
 ### 1. Add Dependencies
 
+> [!IMPORTANT] **[AGENT] RESOLVING THE SDK VERSION DETERMINISTICALLY** Never
+> guess or hardcode a memorized out-of-date SDK or plugin version. Before adding
+> dependencies, you MUST query the latest available versions directly from the
+> Google Maven Repository:
+>
+> ```bash
+> # Find the latest Firebase Android BoM version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+>
+> # Find the latest firebase-ai version
+> curl -s https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-ai/maven-metadata.xml | grep -oE '<latest>[^<]+' | cut -d'>' -f2
+> ```
+>
+> If the dependency is already declared, fetch the exact resolved version
+> currently active in the workspace's build graph:
+>
+> ```bash
+> ./gradlew -q :app:dependencyInsight --dependency firebase-ai --configuration releaseRuntimeClasspath
+> ```
+
 In your module-level `build.gradle.kts` (usually `app/build.gradle.kts`, with
 `minSdk = 24` or higher required by `firebase-ai:18.0.0+`), add the dependency
 for Firebase AI:
 
 ```kotlin
 dependencies {
-    // [AGENT] Fetch the latest available BoM version from https://firebase.google.com/support/release-notes/android before adding this
+    // [AGENT] Fetch the latest resolved version using the commands above
     implementation(platform("com.google.firebase:firebase-bom:<latest_bom_version>"))
 
     // Add the dependency for the Firebase AI library
