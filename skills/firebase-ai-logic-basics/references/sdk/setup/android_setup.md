@@ -111,15 +111,12 @@ is the default location, and `GenerativeBackend.vertexAI()` was removed in
 
 #### App Check Enforcement and Replay Protection on Android
 
-Firebase AI Logic requires Firebase App Check for commonly abused models. If App
-Check is not configured in your app and enforced in the Firebase console,
-requests to those models are rejected with:
+Firebase AI Logic requires Firebase App Check to be enforced (see
+[App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt)).
+If App Check is not configured in your app and enforced in the Firebase console,
+requests are rejected with `HTTP 403`.
 
-```text
-HTTP 403: "To access this model, you must enforce Firebase App Check"
-```
-
-In addition, when **replay protection** is enabled in App Check, pass
+In addition, when **replay protection** is enforced in App Check, pass
 `useLimitedUseAppCheckTokens = true` when calling `Firebase.ai`:
 
 ```kotlin
@@ -129,9 +126,9 @@ val ai = Firebase.ai(
 )
 ```
 
-This ensures the SDK requests fresh single-use (5-minute TTL) App Check tokens
-(via Play Integrity or the debug provider) for each request instead of reusing
-cached tokens.
+This ensures the SDK requests fresh limited-use App Check tokens (via Play
+Integrity, reCAPTCHA Enterprise, or the debug provider) for each request instead
+of reusing cached tokens.
 
 #### Jetpack Compose (Modern)
 
@@ -175,27 +172,24 @@ ______________________________________________________________________
 
 ### 3. App Check Debug Provider
 
+For production builds, configure an official Android attestation provider (Play
+Integrity or reCAPTCHA Enterprise) by consulting
+[App Check for Firebase AI Logic](https://firebase.google.com/docs/ai-logic/app-check.md.txt).
+
 For App Check debug tokens during local development and CI/CD, add the App Check
-dependencies in `app/build.gradle.kts` (`firebase-appcheck-playintegrity`,
+debug dependencies in `app/build.gradle.kts` (`debugImplementation` for
 `firebase-appcheck-debug`, and `androidTestImplementation` for
 `firebase-appcheck-debug-testing`), then install
-`DebugAppCheckProviderFactory.getInstance()` as the App Check provider factory
-in debug builds (and `PlayIntegrityAppCheckProviderFactory.getInstance()` in
-release builds):
+`DebugAppCheckProviderFactory.getInstance()` in debug builds:
 
 ```kotlin
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
-import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 
 if (BuildConfig.DEBUG) {
     Firebase.appCheck.installAppCheckProviderFactory(
         DebugAppCheckProviderFactory.getInstance()
-    )
-} else {
-    Firebase.appCheck.installAppCheckProviderFactory(
-        PlayIntegrityAppCheckProviderFactory.getInstance()
     )
 }
 ```
