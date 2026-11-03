@@ -32,19 +32,30 @@ lifecycleScope.launch {
 
 `generateContentStream` returns an `AsyncThrowingStream`; iterate it with
 `for try await`. The call itself is marked `throws` but is not `async`, so the
-`try` sits before `model.generateContentStream` and the `await` on the loop. For
-a chat session call `chat.sendMessageStream("...")` and iterate the same way.
+`try` sits before `model.generateContentStream` and the `await` on the loop:
 
 ```swift
 import FirebaseAILogic
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 let model = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(modelName: "<latest_supported_model>")
 
 // Provide a prompt that contains text
 let prompt = "Write a story about a magic backpack."
 // To stream generated text output, call generateContentStream with the text input
 let contentStream = try model.generateContentStream(prompt)
+for try await chunk in contentStream {
+  if let text = chunk.text {
+    print(text) // Update UI incrementally
+  }
+}
+```
+
+For a multi-turn chat session, call `chat.sendMessageStream(...)`:
+
+```swift
+let chat = model.startChat()
+let contentStream = try chat.sendMessageStream("Tell me a long story.")
 for try await chunk in contentStream {
   if let text = chunk.text {
     print(text) // Update UI incrementally
