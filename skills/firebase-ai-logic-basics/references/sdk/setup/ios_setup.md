@@ -1,5 +1,8 @@
 # Firebase AI Logic iOS Setup Guide
 
+Official documentation:
+[Get started with Firebase AI Logic on Apple platforms](https://firebase.google.com/docs/ai-logic/get-started.md.txt?platform=ios)
+
 First, ensure you have initialized the Firebase App and added
 `GoogleService-Info.plist` (see `firebase-basics` skill).
 
@@ -32,14 +35,16 @@ let ai = FirebaseAI.firebaseAI(
     useLimitedUseAppCheckTokens: true
 )
 
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 let model = ai.generativeModel(modelName: "<latest_supported_model>")
 ```
 
-`.googleAI()` selects the Gemini Developer API (the default). For the Agent
-Platform Gemini API use `backend: .agentPlatform()` (optionally
-`.agentPlatform(location: "global")`; `"global"` is the default location, and
-`.vertexAI()` was removed in v13.0.0).
+`.googleAI()` sends requests via the Gemini Developer API (the default). To send
+requests via the Agent Platform Gemini API instead, use
+`backend: .agentPlatform()` (optionally pass a
+[supported location](https://firebase.google.com/docs/ai-logic/locations?api=vertex)
+such as `.agentPlatform(location: "us-central1")`; `"global"` is the default
+location, and `.vertexAI()` was removed in v13.0.0).
 
 ### App Check Enforcement and Replay Protection
 
@@ -84,7 +89,7 @@ import FirebaseAILogic
 @MainActor
 @Observable
 final class AIViewModel {
-    // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+    // [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
     @ObservationIgnored
     private lazy var model = FirebaseAI.firebaseAI(
         backend: .googleAI(),
