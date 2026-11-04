@@ -135,14 +135,15 @@ Gemini API. See https://firebase.google.com/docs/ai-logic/hybrid.md.txt.
 
 ## Web (JavaScript)
 
+Official documentation:
+[Get started with hybrid inference on Web](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started.md.txt)
+
 On Web, on-device inference uses Chrome's built-in
 [Prompt API](https://developer.chrome.com/docs/extensions/ai/prompt-api) on
-Chrome Desktop (v139+, with at least 22 GB free storage and >4 GB VRAM or 16 GB
-RAM). For local development, enable
+Chrome on Desktop (see the official guide above for current Chrome version and
+hardware requirements). For local development, enable
 `chrome://flags/#prompt-api-for-gemini-nano-multimodal-input` and restart
-Chrome; for end users, serve the
-[Prompt API Chrome Origin Trial](https://developer.chrome.com/origintrials/#/view_trial/2533837740349325313)
-token.
+Chrome.
 
 Create the hybrid model with `mode: InferenceMode.PREFER_ON_DEVICE`, call
 `await hybridModel.initializeDeviceModel()` on a user gesture to ensure Gemini
@@ -172,10 +173,10 @@ document.querySelector("#generate").addEventListener("click", async () => {
 });
 ```
 
-To override the default cloud model (`gemini-3.5-flash-lite` in
-`firebase@13.0.0+`; `gemini-2.5-flash-lite` in `firebase@12.x`) or request
-structured output from both paths, configure `inCloudParams` and
-`onDeviceParams` together:
+To override the SDK's default cloud-hosted fallback model or request structured
+output from both paths, configure `inCloudParams` and `onDeviceParams` together
+(when you pass `inCloudParams`, you must also set its `model`; otherwise the SDK
+throws a `NO_MODEL` error):
 
 ```javascript
 import { getGenerativeModel, InferenceMode, Schema } from "firebase/ai";
@@ -184,11 +185,12 @@ const jsonSchema = Schema.object({
   properties: { name: Schema.string(), species: Schema.string() },
 });
 
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const hybridModel = getGenerativeModel(ai, {
   mode: InferenceMode.PREFER_ON_DEVICE,
   // Cloud-hosted model settings (overrides the SDK's default cloud model)
   inCloudParams: {
-    model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+    model: "<latest_supported_model>",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: jsonSchema,
