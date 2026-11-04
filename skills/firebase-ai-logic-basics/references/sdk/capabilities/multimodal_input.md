@@ -230,22 +230,14 @@ for required setup and permissions).
 
 ## Troubleshooting
 
-- **HTTP 413 (request too large)**: the total request exceeded 20 MB after
-  base64 encoding. Compress or downscale images (anything above 3072 x 3072 is
-  scaled down server-side anyway), trim audio/video, split long PDFs, or upload
-  the file to Cloud Storage for Firebase and pass its `gs://` URL. The URL route
-  requires the Agent Platform Gemini API provider; see
-  [Cloud Storage for Firebase with AI Logic](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt).
-- **Unsupported MIME type / file format errors**: only the MIME types listed on
-  the per-media page are accepted (for example images must be PNG, JPEG, or
-  WebP, so convert HEIC or GIF before sending), and audio is limited to one file
-  per request. Check the matching page in the table above, or the full
-  [supported input files and requirements](https://firebase.google.com/docs/ai-logic/input-file-requirements.md.txt).
-  On Web, `file.type` can be an empty string for files the browser does not
-  recognize; set `mimeType` explicitly in that case.
-
-See the official guides:
-[Analyze images](https://firebase.google.com/docs/ai-logic/analyze-images.md.txt),
-[Analyze audio](https://firebase.google.com/docs/ai-logic/analyze-audio.md.txt),
-[Analyze video](https://firebase.google.com/docs/ai-logic/analyze-video.md.txt),
-[Analyze documents](https://firebase.google.com/docs/ai-logic/analyze-documents.md.txt).
+- **HTTP 413 (request too large)**: the inline request exceeded the size limit.
+  Compress or downscale images, trim audio/video, split long PDFs, or upload the
+  file to Cloud Storage for Firebase and pass its `gs://` URL (Agent Platform
+  Gemini API provider only; see
+  [Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt)).
+- **Unsupported MIME type / file format errors**: check the supported MIME types
+  and per-request limits in
+  [Supported input files and requirements](https://firebase.google.com/docs/ai-logic/input-file-requirements.md.txt)
+  (for example, convert HEIC or GIF images to a supported format before
+  sending). On Web, `file.type` can be an empty string for files the browser
+  does not recognize; set `mimeType` explicitly in that case.
