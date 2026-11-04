@@ -1,51 +1,45 @@
 # Multimodal Input
 
+Official documentation:
+[Supported input files and requirements](https://firebase.google.com/docs/ai-logic/input-file-requirements.md.txt)
+
 Multimodal input lets you send images, audio, video, and documents (PDF or plain
-text) together with a text prompt in a single `generateContent` call, so the
-model can caption, classify, answer questions about, transcribe, or summarize
-them. Reach for it whenever the user's request involves *understanding* a file
-rather than producing one (generating images is a separate capability). It works
-with the general-purpose Gemini models listed in the
-[models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-and has no billing requirement beyond your API provider's.
+text) together with a text prompt in a single request, so the model can caption,
+classify, answer questions about, transcribe, or summarize them. Multimodal
+input works with both `generateContent` and `generateContentStream`. Reach for
+it whenever the user's request involves *understanding* a file rather than
+producing one (generating images is a separate capability). It works with the
+general-purpose Gemini models listed in the
+[models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt).
 
 ## Configuration
 
-Every non-text part of a request is passed as **inline data** (the raw file
-bytes, which the SDK base64-encodes in transit) **together with its MIME type**.
-The Android and Apple SDKs additionally accept platform-native image types
-(`Bitmap`; `UIImage`, `NSImage`, `CIImage`, `CGImage`) without a MIME type;
-those are converted client-side to JPEG at 80% quality (except `CIImage` on
-Apple platforms, which is encoded via `jpegRepresentation` with default
-quality). Pass an explicit inline-data part with a MIME type instead when you
-need PNG transparency or exact control over the encoding.
+- **Inline data with a MIME type**: pass every non-text part as inline data (the
+  raw file bytes, which the SDK base64-encodes in transit) together with its
+  MIME type.
+- **Platform-native images**: the Android and Apple SDKs also accept
+  platform-native image types (`Bitmap`; `UIImage`, `NSImage`, `CIImage`,
+  `CGImage`) without a MIME type and convert them to JPEG client-side. Pass an
+  explicit inline-data part with a MIME type instead when you need PNG
+  transparency or exact control over the encoding.
 
-> [!WARNING] **The total request size limit is 20 MB.** Inline data is
-> base64-encoded in transit (which grows it by about a third), and an oversized
-> request fails with **HTTP 413**. For files larger than that, store them in
-> Cloud Storage for Firebase and pass their `gs://` URLs instead. Note that
-> Cloud Storage URLs (`fileData` / file parts) are **only accepted when the app
-> uses the Agent Platform Gemini API (formerly branded Vertex AI) as its
-> provider**, which requires the Blaze plan. With the Gemini Developer API (this
-> skill's default) the only URL input is a public or unlisted YouTube video URL
-> (one per request). See
-> [Cloud Storage for Firebase with AI Logic](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt)
-> and
-> [options for providing files](https://firebase.google.com/docs/ai-logic/input-file-requirements.md.txt).
+> [!WARNING] **File size and URL limits:**
+>
+> - Large inline requests can fail with **HTTP 413**. For large files, use Cloud
+>   Storage for Firebase `gs://` URLs instead.
+> - Cloud Storage URLs are only accepted by the Agent Platform Gemini API
+>   provider (requires the Blaze plan); see
+>   [Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt).
+> - The Gemini Developer API (this skill's default) only accepts YouTube video
+>   URLs as URL input.
 
-Supported input types (each page lists the full MIME types, per-request limits,
-tokenization, and best practices):
-
-| Input    | Common MIME types                                             | Limits per request                                  | Official page                                                                           |
-| :------- | :------------------------------------------------------------ | :-------------------------------------------------- | :-------------------------------------------------------------------------------------- |
-| Image    | `image/png`, `image/jpeg`, `image/webp`                       | 3,000 images; scaled down to fit 3072 x 3072        | [Analyze images](https://firebase.google.com/docs/ai-logic/analyze-images.md.txt)       |
-| Audio    | `audio/mpeg`, `audio/mp3`, `audio/wav`, `audio/aac`, and more | 1 audio file                                        | [Analyze audio](https://firebase.google.com/docs/ai-logic/analyze-audio.md.txt)         |
-| Video    | `video/mp4`, `video/quicktime`, `video/webm`, and more        | 10 video files                                      | [Analyze video](https://firebase.google.com/docs/ai-logic/analyze-video.md.txt)         |
-| Document | `application/pdf`, `text/plain`                               | 1,000 pages and 50 MB per file; each page = 1 image | [Analyze documents](https://firebase.google.com/docs/ai-logic/analyze-documents.md.txt) |
-
-These are general maximums; current models can have lower per-model limits (see
-"Specifications and limitations" on the
-[models page](https://firebase.google.com/docs/ai-logic/models.md.txt)).
+For supported MIME types, size and count limits, and best practices, always
+consult the official guides:
+[Analyze images](https://firebase.google.com/docs/ai-logic/analyze-images.md.txt),
+[Analyze audio](https://firebase.google.com/docs/ai-logic/analyze-audio.md.txt),
+[Analyze video](https://firebase.google.com/docs/ai-logic/analyze-video.md.txt),
+and
+[Analyze documents](https://firebase.google.com/docs/ai-logic/analyze-documents.md.txt).
 
 Prompting tips from the official guides: place a single file *before* the text
 prompt, and when sending several images give each an index in the prompt
