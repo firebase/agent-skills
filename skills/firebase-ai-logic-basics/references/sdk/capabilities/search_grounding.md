@@ -137,8 +137,9 @@ Pass `{ googleSearch: {} }` in `tools`. `ai` is the instance returned by
 ```javascript
 import { getGenerativeModel } from "firebase/ai";
 
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const model = getGenerativeModel(ai, {
-  model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  model: "<latest_supported_model>",
   // Provide Google Search as a tool that the model can use to generate its response
   tools: [{ googleSearch: {} }]
 });

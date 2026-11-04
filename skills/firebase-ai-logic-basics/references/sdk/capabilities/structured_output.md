@@ -173,8 +173,9 @@ const jsonSchema = Schema.object({
   },
 });
 
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const jsonModel = getGenerativeModel(ai, {
-  model: "<latest_supported_model>", // [AGENT] Replace with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+  model: "<latest_supported_model>",
   generationConfig: {
     responseMimeType: "application/json",
     // Optional: Define a schema

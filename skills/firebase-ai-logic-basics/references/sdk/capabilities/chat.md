@@ -92,7 +92,7 @@ Maintain history automatically using `startChat`.
 import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 
 const ai = getAI(app, { backend: new GoogleAIBackend() });
-// [AGENT] Replace "<latest_supported_model>" with the latest model from https://firebase.google.com/docs/ai-logic/models.md.txt
+// [AGENT] Replace "<latest_supported_model>" with the latest model applicable for the use case from https://firebase.google.com/docs/ai-logic/models.md.txt (do not use deprecated models)
 const model = getGenerativeModel(ai, { model: "<latest_supported_model>" });
 
 const chat = model.startChat({
