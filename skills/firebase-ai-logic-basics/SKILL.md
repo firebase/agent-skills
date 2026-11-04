@@ -122,8 +122,9 @@ ______________________________________________________________________
 ### Text-Only Generation
 
 See the [Text Generation Guide](references/sdk/capabilities/text_generation.md)
-for single-turn `generateContent`, generation config, and safety settings across
-Android, iOS, Flutter, and Web.
+for single-turn `generateContent` across Android, iOS, Flutter, and Web. For
+generation config and safety settings, see
+[Model Configuration & Safety Settings](#model-configuration--safety-settings).
 
 ### Multimodal (Text + Images/Audio/Video/PDF input)
 
