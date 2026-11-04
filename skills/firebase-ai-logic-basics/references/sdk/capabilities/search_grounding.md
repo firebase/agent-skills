@@ -1,5 +1,9 @@
 # Grounding with Google Search
 
+See the
+[Grounding with Google Search](https://firebase.google.com/docs/ai-logic/grounding-google-search.md.txt)
+guide for full details.
+
 Grounding with Google Search connects a Gemini model to real-time, publicly
 available web content, so it can answer questions about recent events, reduce
 hallucinations by basing responses on real-world information, and cite
@@ -12,14 +16,11 @@ queries, and returns a "grounded result" whose Search Suggestions and sources
 
 ## Configuration
 
-- **Provider and models**: available with the Gemini Developer API (and the
-  Agent Platform Gemini API, formerly branded Vertex AI) on the current
-  general-use Gemini models (Flash, Flash-Lite and Pro), on the Pro and Flash
-  Gemini Image models (not Flash-Lite Image), and on the Live API models. Check
-  the "Supported models" list on the
-  [official grounding page](https://firebase.google.com/docs/ai-logic/grounding-google-search.md.txt)
-  and pick the model from
-  [the models list](https://firebase.google.com/docs/ai-logic/models.md.txt).
+- **Provider and models**: available with the Gemini Developer API and the Agent
+  Platform Gemini API (formerly branded Vertex AI). Check the
+  [supported models list](https://firebase.google.com/docs/ai-logic/grounding-google-search?api=dev#supported-models)
+  and [the models list](https://firebase.google.com/docs/ai-logic/models.md.txt)
+  to pick a supported model (do not use deprecated models).
 - **Enabling it**: pass the Google Search tool in the model's `tools` when you
   create the `GenerativeModel` — `Tool.googleSearch()` on Android and Flutter,
   `.googleSearch()` (`GenerativeModel.Tool.googleSearch()`) on iOS, and
@@ -37,22 +38,16 @@ queries, and returns a "grounded result" whose Search Suggestions and sources
   - `groundingChunks` — the web sources (`web.uri`, `web.title`).
   - `groundingSupports` — links text `segment`s (`startIndex`/`endIndex`) to
     `groundingChunkIndices`, for building inline citations.
-- **Pricing and limits**: Grounding with Google Search has its own pricing,
-  model availability and limits — review the pricing page for your provider
-  before enabling it:
-  [Gemini Developer API](https://ai.google.dev/gemini-api/docs/pricing) or
-  [Agent Platform Gemini API](https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing).
 
 > [!WARNING] **Display requirements** If a response contains Google Search
-> Suggestions (`searchEntryPoint` is present) it is a grounded result and you
-> must comply with the "Grounding with Google Search" usage requirements of the
-> [Gemini Developer API terms](https://ai.google.dev/gemini-api/terms#grounding-with-google-search):
-> it is *required* to display the Google Search Suggestions from
-> `renderedContent` and *required* to display the sources from
-> `groundingChunks`/`groundingSupports`. Follow the
-> [display and behavior requirements](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/grounding-with-google-search#requirements)
-> (written for the Agent Platform Gemini API, but applicable to the Gemini
-> Developer API too).
+> Suggestions (`searchEntryPoint` is present), it is a grounded result and you
+> are **required** to display the Google Search Suggestions from
+> `renderedContent` and the sources from `groundingChunks` / `groundingSupports`
+> in your UI. Follow the Firebase AI Logic display and usage requirements for
+> your backend provider:
+>
+> - [Gemini Developer API display requirements](https://firebase.google.com/docs/ai-logic/grounding-google-search?api=dev#use-and-display-grounded-result)
+> - [Agent Platform Gemini API display requirements](https://firebase.google.com/docs/ai-logic/grounding-google-search?api=vertex#use-and-display-grounded-result)
 
 A trimmed grounded result looks like this:
 
@@ -270,10 +265,3 @@ if (groundingChunks) {
 - **The Search Suggestions widget looks wrong.** Render `renderedContent`
   unmodified (its HTML and CSS are the compliant styling) in a WebView or the
   DOM; do not restyle it or extract only the text.
-- **Source URIs point at `vertexaisearch.cloud.google.com`.** That is expected
-  (the example response in the official guide shows the same hosts); show the
-  `title`, which is the source domain, as the label and open the `uri` when
-  tapped.
-
-See the official Grounding with Google Search guide:
-https://firebase.google.com/docs/ai-logic/grounding-google-search.md.txt
