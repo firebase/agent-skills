@@ -1,5 +1,9 @@
 # Streaming Responses
 
+See the
+[Stream the response](https://firebase.google.com/docs/ai-logic/generate-text.md.txt)
+guide for full details.
+
 Streaming returns the model's output as a sequence of partial responses instead
 of one complete response, so the UI can start rendering text while the model is
 still generating (the familiar "typing" effect). Reach for it whenever a user is
@@ -157,9 +161,4 @@ for await (const chunk of result.stream) {
   Swift and Dart; use `chunk.text ?: ""` / `if let text = chunk.text` / `?? ''`
   before concatenating.
 - **Request fails after adding `candidateCount`.** `candidateCount` is not
-  applicable to `generateContentStream` and is unsupported on Gemini 3.x and
-  later models (some reject it with HTTP 400); remove it from the
-  `GenerationConfig`.
-
-See the official text generation guide (section "Stream the response"):
-https://firebase.google.com/docs/ai-logic/generate-text.md.txt
+  applicable to `generateContentStream`; remove it from the `GenerationConfig`.
