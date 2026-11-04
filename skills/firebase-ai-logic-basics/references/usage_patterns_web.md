@@ -264,6 +264,10 @@ if (typeof self !== "undefined") {
     // ✅ SAFE: Load dynamically from Vite environment variable; fallback to true to auto-generate
     self.FIREBASE_APPCHECK_DEBUG_TOKEN =
       import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
+  } else if (typeof ngDevMode !== "undefined" && ngDevMode) {
+    // ✅ SAFE: Load dynamically from Angular (@ngx-env/builder) environment variable; fallback to true to auto-generate
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN =
+      import.meta.env?.NG_APP_APP_CHECK_DEBUG_TOKEN || true;
   }
 }
 
@@ -272,3 +276,8 @@ const appCheck = initializeAppCheck(app, {
   isTokenAutoRefreshEnabled: true,
 });
 ```
+
+- **Angular**: Angular CLI does not load `.env` files natively. Use
+  `@ngx-env/builder` with a gitignored `.env` / `.env.local` file
+  (`NG_APP_APP_CHECK_DEBUG_TOKEN=...`), and never hardcode debug tokens in
+  committed `src/environments/` files.
