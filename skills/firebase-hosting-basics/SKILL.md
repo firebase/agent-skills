@@ -66,3 +66,7 @@ npx -y firebase-tools@latest emulators:start --only hosting
 ```
 
 This serves your app at `http://localhost:5000` by default.
+
+### 4. Documentation Index (`llms.txt`)
+
+For additional Firebase Hosting guides, use your web-fetching tooling to read [https://firebase.google.com/docs/hosting/llms.txt](https://firebase.google.com/docs/hosting/llms.txt) and append `.md.txt` to any documentation page URL to retrieve clean Markdown.

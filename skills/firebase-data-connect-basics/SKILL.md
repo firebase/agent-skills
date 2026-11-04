@@ -193,3 +193,5 @@ For complete, working code examples of schemas and operations, see
 
 For ready-to-use starter templates (CRUD, user-owned resources, many-to-many,
 YAML configs, SDK init), see **[templates.md](templates.md)**.
+
+For the complete SQL Connect documentation index, use your web-fetching tooling to read [https://firebase.google.com/docs/sql-connect/llms.txt](https://firebase.google.com/docs/sql-connect/llms.txt) and append `.md.txt` to any documentation page URL to retrieve clean Markdown.

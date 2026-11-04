@@ -293,3 +293,4 @@ ______________________________________________________________________
 
 [Flutter SDK code examples and usage patterns](references/flutter_setup.md)
 [Client-side Text-to-Speech (TTS) generation](references/tts_generation.md)
+[Firebase AI Logic documentation index (llms.txt)](https://firebase.google.com/docs/ai-logic/llms.txt)

@@ -141,3 +141,7 @@ swift run --package-path /Users/foo/.agents/skills/xcode-project-setup/scripts/x
 
 *Note: The script is idempotent. It will automatically skip linking files or
 packages that are already present in the project.*
+
+## References
+
+- **Firebase iOS Documentation Index (`llms.txt`)**: Use your web-fetching tooling to read [https://firebase.google.com/docs/ios/llms.txt](https://firebase.google.com/docs/ios/llms.txt) and append `.md.txt` to any documentation page URL to retrieve clean Markdown.

@@ -122,3 +122,4 @@ responsive to user segments.
   them to the local UI/Logic.
 - **Template Management**: Use the Firebase CLI to version-control, get, and
   deploy your config JSON files.
+- **Documentation Index (`llms.txt`)**: For additional Remote Config guides, use your web-fetching tooling to read [https://firebase.google.com/docs/remote-config/llms.txt](https://firebase.google.com/docs/remote-config/llms.txt) and append `.md.txt` to any documentation page URL to retrieve clean Markdown.

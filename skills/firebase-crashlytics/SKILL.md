@@ -43,3 +43,4 @@ consult the documentation for your platform.
   [Customize Crash Reports for Android](https://firebase.google.com/docs/crashlytics/android/customize-crash-reports.md)
 - **iOS**:
   [Customize Crash Reports for Apple Platforms](https://firebase.google.com/docs/crashlytics/ios/customize-crash-reports.md)
+- **Documentation Index (`llms.txt`)**: Browse the full Crashlytics documentation index at [https://firebase.google.com/docs/crashlytics/llms.txt](https://firebase.google.com/docs/crashlytics/llms.txt) (append `.md.txt` to any documentation URL to fetch clean Markdown).

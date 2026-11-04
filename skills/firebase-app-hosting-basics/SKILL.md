@@ -94,3 +94,7 @@ For other backend or secret flags (`backends:get`, `backends:delete`, etc.), run
 
 See [Emulation](references/emulation.md) for more information on how to test
 your app locally using the Firebase Local Emulator Suite.
+
+## Documentation Index (`llms.txt`)
+
+For additional Firebase App Hosting guides, use your web-fetching tooling to read [https://firebase.google.com/docs/app-hosting/llms.txt](https://firebase.google.com/docs/app-hosting/llms.txt) and append `.md.txt` to any documentation page URL to retrieve clean Markdown.
