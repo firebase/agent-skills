@@ -1,5 +1,9 @@
 # Function Calling (Tools)
 
+See the
+[Call functions using the Gemini API](https://firebase.google.com/docs/ai-logic/function-calling.md.txt)
+guide for full details.
+
 Define functions that the model can request to execute to interact with external
 systems. Function calling (also called *tool use*) lets a Gemini model overcome
 stale training data and its inability to query or modify external data: you
@@ -19,8 +23,7 @@ The round trip is the same on every platform:
 1. **Declare it** with a `FunctionDeclaration` (name, description, parameter
    schema). Put as much detail as possible in the descriptions; the model uses
    them to decide which function to call and how to fill the arguments.
-1. **Pass the declaration as a tool** when creating the model. You can provide
-   up to 128 function declarations.
+1. **Pass the declaration as a tool** when creating the model.
 1. **Send the prompt in a chat session** and inspect the response's
    `functionCalls`. *The model never calls your function directly* — it returns
    the function name plus structured arguments, and your app runs it.
@@ -30,9 +33,9 @@ The round trip is the same on every platform:
 
 Schema rules for the parameter declaration:
 
-- Schemas follow a subset of OpenAPI. Supported attributes: `type`, `nullable`,
-  `required`, `format`, `description`, `properties`, `items`, `enum`. Not
-  supported: `default`, `optional`, `maximum`, `oneOf`.
+- Schemas follow a subset of OpenAPI; see the
+  [official function calling guide](https://firebase.google.com/docs/ai-logic/function-calling.md.txt)
+  for the supported and unsupported schema attributes.
 - **All parameters are required by default.** Mark optional ones in the
   declaration's `optionalParameters` list on Android, iOS, and Flutter, or in
   `optionalProperties` on
@@ -56,8 +59,8 @@ Behavior your app must accommodate:
   https://firebase.google.com/docs/ai-logic/function-calling.md.txt for the
   current model list and the details of `toolConfig`.
 
-This file uses one `getStockPrice(symbol)` example on every platform so the flow
-is identical across Android, iOS, Flutter and Web.
+This file uses one `fetchWeather(city)` example on every platform so the flow is
+identical across Android, iOS, Flutter and Web.
 
 ## Android (Kotlin)
 
@@ -335,10 +338,7 @@ async function askWeather() {
   `Tool`), so you'll see `Cannot find 'Tool' in scope` (or a type error if
   `FoundationModels` is imported). Use `tools: [.functionDeclarations([...])]`
   or `GenerativeModel.Tool`.
-- **Schema rejected by the API.** Remove unsupported attributes (`default`,
-  `optional`, `maximum`, `oneOf`) and declare optional fields through
-  `optionalParameters` (Android, iOS, Flutter) or
-  `Schema.object({ properties, optionalProperties })` (Web) instead.
-
-See the official function calling guide:
-https://firebase.google.com/docs/ai-logic/function-calling.md.txt
+- **Schema rejected by the API.** Remove unsupported schema attributes (see the
+  [official function calling guide](https://firebase.google.com/docs/ai-logic/function-calling.md.txt))
+  and declare optional fields through `optionalParameters` (Android, iOS,
+  Flutter) or `Schema.object({ properties, optionalProperties })` (Web) instead.
