@@ -132,11 +132,14 @@ Firebase AI Logic allows Gemini models to analyze image files directly from your
 app. This enables features like creating captions, answering questions about
 images, detecting objects, and categorizing images. Beyond images, Gemini can
 analyze other media types like audio, video, and PDFs by passing them as inline
-data with their MIME type. For files larger than 20 megabytes (which can cause
-HTTP 413 errors as inline data), store them in Cloud Storage for Firebase and
+data with their MIME type, with both `generateContent` and
+`generateContentStream`. For large files that exceed inline request size limits
+(which can cause HTTP 413 errors), store them in Cloud Storage for Firebase and
 pass their `gs://` URLs via file data parts
 (`FileDataPart`/`FileData`/`fileData`) using the Agent Platform Gemini API
-(formerly branded Vertex AI, which requires the Blaze plan). See the
+(formerly branded Vertex AI, which requires the Blaze plan); see
+[Include large files using Cloud Storage](https://firebase.google.com/docs/ai-logic/solutions/cloud-storage.md.txt).
+See the
 [Multimodal Input Guide](references/sdk/capabilities/multimodal_input.md).
 
 ### Chat Session (Multi-turn)
