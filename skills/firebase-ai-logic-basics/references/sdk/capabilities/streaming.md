@@ -101,8 +101,7 @@ await for (final chunk in chatStream) {
 For real-time UI updates (like a typing effect), `generateContentStream`
 resolves to a result whose `stream` is an async iterable of chunks; read each
 chunk's `text()`. After the loop, `await result.response` gives the aggregated
-final response if you also need the complete text. For a chat session call
-`chat.sendMessageStream(msg)` and iterate `result.stream` the same way.
+final response if you also need the complete text:
 
 ```javascript
 async function streamResponse(prompt) {
@@ -112,5 +111,16 @@ async function streamResponse(prompt) {
     console.log("Stream chunk:", chunkText);
     // Update UI here
   }
+}
+```
+
+For a multi-turn chat session, call `chat.sendMessageStream(...)`:
+
+```javascript
+const chat = model.startChat();
+const result = await chat.sendMessageStream("Tell me a long story.");
+for await (const chunk of result.stream) {
+  const chunkText = chunk.text();
+  console.log("Stream chunk:", chunkText); // Update UI incrementally
 }
 ```
