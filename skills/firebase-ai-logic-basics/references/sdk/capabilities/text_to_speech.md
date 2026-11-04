@@ -28,10 +28,14 @@ ______________________________________________________________________
 To instruct Gemini to synthesize and return audio, configure
 `responseModalities` in the generation configuration to include audio:
 
-- **Swift**: `generationConfig = GenerationConfig(responseModalities: [.audio])`
-- **Kotlin**:
+- **Android (Kotlin)**:
   `generationConfig { responseModalities = listOf(ResponseModality.AUDIO) }`
-- **Web (JS/TS)**: `generationConfig: { responseModalities: ["AUDIO"] }`
+- **iOS (Swift)**:
+  `GenerationConfig(responseModalities: [.audio], speechConfig: ...)`
+- **Flutter (Dart)**:
+  `GenerationConfig(responseModalities: [ResponseModalities.audio], speechConfig: ...)`
+- **Web (JS/TS)**:
+  `generationConfig: { responseModalities: [ResponseModality.AUDIO], speechConfig: ... }`
 
 ### 2. Single-Speaker `SpeechConfig`
 
@@ -40,36 +44,40 @@ Configure voice persona and optional language code (`languageCode`, e.g.
 prebuilt neural voices (for example: `Puck`, `Charon`, `Kore`, `Fenrir`,
 `Aoede`):
 
-- **Swift**:
+- **Android (Kotlin)**:
+  ```kotlin
+  @OptIn(PublicPreviewAPI::class)
+  val config = generationConfig {
+      responseModalities = listOf(ResponseModality.AUDIO)
+      speechConfig = SpeechConfig(
+          voice = Voice("Kore"),
+          languageCode = "en-US"
+      )
+  }
+  ```
+- **iOS (Swift)**:
   ```swift
-  let speechConfig = SpeechConfig(
-      voiceConfig: VoiceConfig(
-          prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-      ),
-      languageCode: "en-US"
+  let config = GenerationConfig(
+      responseModalities: [.audio],
+      speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
   )
   ```
-- **Kotlin**:
-  ```kotlin
-  val speechConfig = speechConfig {
-      voiceConfig = voiceConfig {
-          prebuiltVoiceConfig = prebuiltVoiceConfig {
-              voiceName = "Puck"
-          }
-      }
-      languageCode = "en-US"
-  }
+- **Flutter (Dart)**:
+  ```dart
+  final config = GenerationConfig(
+    responseModalities: [ResponseModalities.audio],
+    speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+  );
   ```
-- **Web**:
+- **Web (JavaScript)**:
   ```javascript
-  speechConfig: {
-    voiceConfig: {
-      prebuiltVoiceConfig: {
-        voiceName: "Puck"
-      }
+  const generationConfig = {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+      languageCode: "en-US",
     },
-    languageCode: "en-US"
-  }
+  };
   ```
 
 ### 3. Multi-Speaker `MultiSpeakerVoiceConfig` (2-Speaker Dialogues)
@@ -78,64 +86,70 @@ For scripts with two distinct characters or roles (e.g., host and guest,
 narrator and character), configure `MultiSpeakerVoiceConfig` with
 `speakerVoiceConfigs` linking speaker names to specific voices:
 
-- **Swift**:
-  ```swift
-  let multiSpeakerConfig = SpeechConfig(
-      multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
-          speakerVoiceConfigs: [
-              SpeakerVoiceConfig(
-                  speaker: "Host",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
-                  )
-              ),
-              SpeakerVoiceConfig(
-                  speaker: "Guest",
-                  voiceConfig: VoiceConfig(
-                      prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Aoede")
-                  )
-              )
-          ]
-      )
+- **Android (Kotlin)**:
+
+  ```kotlin
+  @OptIn(PublicPreviewAPI::class)
+  val multiSpeechConfig = SpeechConfig(
+      multiSpeakerVoiceConfig = MultiSpeakerVoiceConfig(
+          speakerVoiceConfigs = listOf(
+              SpeakerVoiceConfig(speaker = "Joe", voice = Voice("Puck")),
+              SpeakerVoiceConfig(speaker = "Jane", voice = Voice("Kore"))
+          )
+      ),
+      languageCode = "en-US"
   )
   ```
-- **Kotlin**:
-  ```kotlin
-  val multiSpeakerConfig = speechConfig {
-      multiSpeakerVoiceConfig = multiSpeakerVoiceConfig {
-          speakerVoiceConfigs = listOf(
-              speakerVoiceConfig {
-                  speaker = "Host"
-                  voiceConfig = voiceConfig {
-                      prebuiltVoiceConfig = prebuiltVoiceConfig { voiceName = "Puck" }
-                  }
-              },
-              speakerVoiceConfig {
-                  speaker = "Guest"
-                  voiceConfig = voiceConfig {
-                      prebuiltVoiceConfig = prebuiltVoiceConfig { voiceName = "Aoede" }
-                  }
-              }
-          )
-      }
-  }
+
+- **iOS (Swift)**:
+
+  ```swift
+  let multiSpeechConfig = SpeechConfig(
+      multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+          speakerVoiceConfigs: [
+              SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+              SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
+          ]
+      ),
+      languageCode: "en-US"
+  )
   ```
-- **Web**:
-  ```javascript
-  speechConfig: {
-    multiSpeakerVoiceConfig: {
+
+- **Flutter (Dart)** (use the `SpeechConfig.multiSpeaker` named constructor):
+
+  ```dart
+  final multiSpeechConfig = SpeechConfig.multiSpeaker(
+    multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
       speakerVoiceConfigs: [
-        {
-          speaker: "Host",
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } }
-        },
-        {
-          speaker: "Guest",
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } }
-        }
-      ]
-    }
-  }
+        SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+        SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+      ],
+    ),
+    languageCode: 'en-US',
+  );
+  ```
+
+- **Web (JavaScript)**:
+
+  ```javascript
+  const generationConfig = {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      multiSpeakerVoiceConfig: {
+        speakerVoiceConfigs: [
+          {
+            speaker: "Joe",
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } },
+          },
+          {
+            speaker: "Jane",
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+          },
+        ],
+      },
+      languageCode: "en-US",
+    },
+  };
   ```
 
 ______________________________________________________________________
@@ -243,148 +257,89 @@ Offset  Size  Field              Value
 
 ______________________________________________________________________
 
-## Platform Code Snippets
+## Android (Kotlin)
 
-### Swift (iOS)
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
 
-#### 1. Streaming Playback with `AVAudioEngine`
+```kotlin
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.MultiSpeakerVoiceConfig
+import com.google.firebase.ai.type.PublicPreviewAPI
+import com.google.firebase.ai.type.ResponseModality
+import com.google.firebase.ai.type.SpeakerVoiceConfig
+import com.google.firebase.ai.type.SpeechConfig
+import com.google.firebase.ai.type.Voice
+import com.google.firebase.ai.type.generationConfig
 
-```swift
-import AVFoundation
-import FirebaseAILogic
-
-@MainActor
-final class SpeechStreamingManager {
-    private let audioEngine = AVAudioEngine()
-    private let playerNode = AVAudioPlayerNode()
-    
-    // 24 kHz, 16-bit Mono PCM
-    private let audioFormat = AVAudioFormat(
-        commonFormat: .pcmFormatInt16,
-        sampleRate: 24000,
-        channels: 1,
-        interleaved: false
-    )!
-
-    init() {
-        audioEngine.attach(playerNode)
-        audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: audioFormat)
+@OptIn(PublicPreviewAPI::class)
+suspend fun generateSingleSpeakerSpeech(): ByteArray? {
+    val config = generationConfig {
+        responseModalities = listOf(ResponseModality.AUDIO)
+        speechConfig = SpeechConfig(
+            voice = Voice("Kore"),
+            languageCode = "en-US"
+        )
     }
 
-    func streamSpeech(prompt: String) async throws {
-        let ai = FirebaseAI.firebaseAI()
-        
-        let speechConfig = SpeechConfig(
-            voiceConfig: VoiceConfig(
-                prebuiltVoiceConfig: PrebuiltVoiceConfig(voiceName: "Puck")
+    val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.1-flash-tts-preview",
+        generationConfig = config
+    )
+
+    val response = model.generateContent("Say cheerfully: Have a wonderful day!")
+    return response.inlineDataParts.firstOrNull()?.inlineData // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+}
+
+@OptIn(PublicPreviewAPI::class)
+suspend fun generateMultiSpeakerSpeech(): ByteArray? {
+    val multiSpeechConfig = SpeechConfig(
+        multiSpeakerVoiceConfig = MultiSpeakerVoiceConfig(
+            speakerVoiceConfigs = listOf(
+                SpeakerVoiceConfig(speaker = "Joe", voice = Voice("Puck")),
+                SpeakerVoiceConfig(speaker = "Jane", voice = Voice("Kore"))
             )
-        )
-        
-        let genConfig = GenerationConfig(
-            responseModalities: [.audio],
-            speechConfig: speechConfig
-        )
-        
-        let model = ai.generativeModel(
-            modelName: "gemini-3.1-flash-tts-preview",
-            generationConfig: genConfig
-        )
-        
-        if !audioEngine.isRunning {
-            try audioEngine.start()
-        }
-        playerNode.play()
+        ),
+        languageCode = "en-US"
+    )
 
-        let stream = model.generateContentStream(prompt)
-        for try await chunk in stream {
-            for part in chunk.candidates.first?.content.parts ?? [] {
-                if let inlineData = part as? InlineDataPart,
-                   inlineData.mimeType.contains("audio/pcm") || inlineData.mimeType.contains("audio/l16") {
-                    schedulePCMBuffer(data: inlineData.data)
-                }
-            }
+    val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.1-flash-tts-preview",
+        generationConfig = generationConfig {
+            responseModalities = listOf(ResponseModality.AUDIO)
+            speechConfig = multiSpeechConfig
         }
-    }
+    )
 
-    private func schedulePCMBuffer(data: Data) {
-        let frameCount = UInt32(data.count) / audioFormat.streamDescription.pointee.mBytesPerFrame
-        guard frameCount > 0,
-              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount) else {
-            return
-        }
-        buffer.frameLength = frameCount
-        
-        data.withUnsafeBytes { rawBufferPointer in
-            guard let src = rawBufferPointer.baseAddress else { return }
-            if let dest = buffer.int16ChannelData?[0] {
-                UnsafeMutableRawPointer(dest).copyMemory(from: src, byteCount: data.count)
-            }
-        }
-        
-        playerNode.scheduleBuffer(buffer)
-    }
+    val prompt = """
+        Joe: How's it going today Jane?
+        Jane: [excited] Not too bad, how about you?
+    """.trimIndent()
 
-    func stop() {
-        playerNode.stop()
-        audioEngine.stop()
-    }
+    val response = model.generateContent(prompt)
+    return response.inlineDataParts.firstOrNull()?.inlineData
 }
 ```
 
-#### 2. WAV Converter for `AVAudioPlayer`
-
-```swift
-func addWavHeader(to pcmData: Data, sampleRate: Int = 24000, channels: Int = 1, bitDepth: Int = 16) -> Data {
-    var header = Data()
-    let byteRate = sampleRate * channels * bitDepth / 8
-    let blockAlign = channels * bitDepth / 8
-    let totalDataLen = Int32(pcmData.count)
-    let totalLength = totalDataLen + 36
-
-    header.append(contentsOf: "RIFF".utf8)
-    header.append(Data(from: totalLength.littleEndian))
-    header.append(contentsOf: "WAVE".utf8)
-    header.append(contentsOf: "fmt ".utf8)
-    header.append(Data(from: Int32(16).littleEndian))       // Subchunk1Size for PCM
-    header.append(Data(from: Int16(1).littleEndian))        // AudioFormat 1 = PCM
-    header.append(Data(from: Int16(channels).littleEndian))
-    header.append(Data(from: Int32(sampleRate).littleEndian))
-    header.append(Data(from: Int32(byteRate).littleEndian))
-    header.append(Data(from: Int16(blockAlign).littleEndian))
-    header.append(Data(from: Int16(bitDepth).littleEndian))
-    header.append(contentsOf: "data".utf8)
-    header.append(Data(from: totalDataLen.littleEndian))
-
-    return header + pcmData
-}
-
-private extension Data {
-    init<T>(from value: T) {
-        var val = value
-        self = Swift.withUnsafeBytes(of: &val) { Data($0) }
-    }
-}
-```
-
-______________________________________________________________________
-
-### Kotlin (Android)
-
-#### Streaming Playback with `AudioTrack`
+### 2. Streaming Playback with `AudioTrack` (`generateContentStream`)
 
 ```kotlin
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
-import com.google.firebase.ai.FirebaseAI
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.PublicPreviewAPI
 import com.google.firebase.ai.type.ResponseModality
+import com.google.firebase.ai.type.SpeechConfig
+import com.google.firebase.ai.type.Voice
 import com.google.firebase.ai.type.generationConfig
-import com.google.firebase.ai.type.prebuiltVoiceConfig
-import com.google.firebase.ai.type.speechConfig
-import com.google.firebase.ai.type.voiceConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@OptIn(PublicPreviewAPI::class)
 class SpeechStreamingManager {
     private val sampleRate = 24000
     private val minBufferSize = AudioTrack.getMinBufferSize(
@@ -414,29 +369,20 @@ class SpeechStreamingManager {
     suspend fun streamSpeech(prompt: String) = withContext(Dispatchers.IO) {
         val config = generationConfig {
             responseModalities = listOf(ResponseModality.AUDIO)
-            speechConfig = speechConfig {
-                voiceConfig = voiceConfig {
-                    prebuiltVoiceConfig = prebuiltVoiceConfig {
-                        voiceName = "Puck"
-                    }
-                }
-            }
+            speechConfig = SpeechConfig(voice = Voice("Kore"))
         }
 
-        val generativeModel = FirebaseAI.getInstance().getGenerativeModel(
+        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
             modelName = "gemini-3.1-flash-tts-preview",
             generationConfig = config
         )
 
         audioTrack.play()
         try {
-            val responseStream = generativeModel.generateContentStream(prompt)
-            responseStream.collect { chunk ->
-                chunk.candidates.firstOrNull()?.content?.parts?.forEach { part ->
-                    if (part is com.google.firebase.ai.type.InlineDataPart) {
-                        val audioBytes = part.data
-                        audioTrack.write(audioBytes, 0, audioBytes.size)
-                    }
+            model.generateContentStream(prompt).collect { chunk ->
+                chunk.inlineDataParts.firstOrNull()?.inlineData?.let { pcmChunk ->
+                    // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+                    audioTrack.write(pcmChunk, 0, pcmChunk.size)
                 }
             }
         } finally {
@@ -450,7 +396,7 @@ class SpeechStreamingManager {
 }
 ```
 
-#### 2. Convert PCM to WAV for `MediaPlayer`
+### 3. Convert Raw PCM to WAV for `MediaPlayer`
 
 ```kotlin
 import android.content.Context
@@ -490,7 +436,8 @@ fun addWavHeader(
     return header + pcmBytes
 }
 
-fun playWavAudio(context: Context, wavBytes: ByteArray) {
+fun playWavAudio(context: Context, pcmBytes: ByteArray) {
+    val wavBytes = addWavHeader(pcmBytes)
     val tempFile = File.createTempFile("tts_", ".wav", context.cacheDir).apply {
         deleteOnExit()
         FileOutputStream(this).use { it.write(wavBytes) }
@@ -515,17 +462,428 @@ fun playWavAudio(context: Context, wavBytes: ByteArray) {
 
 ______________________________________________________________________
 
-### Web (JavaScript/TypeScript)
+## iOS (Swift)
 
-#### 1. Streaming Playback with Web Audio API
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```swift
+import FirebaseAILogic
+
+// @MainActor so these can call the @MainActor playRawPcm(data:) helper below.
+@MainActor
+func generateSingleSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let config = GenerationConfig(
+        responseModalities: [.audio],
+        speechConfig: SpeechConfig(voiceName: "Kore", languageCode: "en-US")
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: config
+    )
+
+    let response = try await model.generateContent("Say cheerfully: Have a wonderful day!")
+    // Join all audio parts before playing; playing per-part would replace the
+    // player on each pass so only the last part is heard.
+    let pcmData = response.inlineDataParts.reduce(Data()) { $0 + $1.data }
+    playRawPcm(data: pcmData) // Raw PCM audio bytes (24kHz, 1 channel, 16-bit)
+}
+
+@MainActor
+func generateMultiSpeakerSpeech() async throws {
+    let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+    let multiSpeechConfig = SpeechConfig(
+        multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+            speakerVoiceConfigs: [
+                SpeakerVoiceConfig(speaker: "Joe", voiceName: "Puck"),
+                SpeakerVoiceConfig(speaker: "Jane", voiceName: "Kore")
+            ]
+        ),
+        languageCode: "en-US"
+    )
+
+    let model = ai.generativeModel(
+        modelName: "gemini-3.1-flash-tts-preview",
+        generationConfig: GenerationConfig(
+            responseModalities: [.audio],
+            speechConfig: multiSpeechConfig
+        )
+    )
+
+    let prompt = """
+    Joe: How's it going today Jane?
+    Jane: [excited] Not too bad, how about you?
+    """
+
+    let response = try await model.generateContent(prompt)
+    let pcmData = response.inlineDataParts.reduce(Data()) { $0 + $1.data }
+    playRawPcm(data: pcmData)
+}
+```
+
+### 2. Streaming Playback with `AVAudioEngine` (`generateContentStream`)
+
+```swift
+import AVFoundation
+import FirebaseAILogic
+
+@MainActor
+final class SpeechStreamingManager {
+    private let audioEngine = AVAudioEngine()
+    private let playerNode = AVAudioPlayerNode()
+
+    // AVAudioEngine requires 32-bit float non-interleaved PCM for node connections;
+    // convert incoming 24 kHz 16-bit signed integer PCM samples to Float32 [-1.0, 1.0].
+    private let audioFormat = AVAudioFormat(
+        commonFormat: .pcmFormatFloat32,
+        sampleRate: 24000,
+        channels: 1,
+        interleaved: false
+    )!
+
+    init() {
+        audioEngine.attach(playerNode)
+        audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: audioFormat)
+    }
+
+    func streamSpeech(prompt: String) async throws {
+        let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+
+        let config = GenerationConfig(
+            responseModalities: [.audio],
+            speechConfig: SpeechConfig(voiceName: "Kore")
+        )
+
+        let model = ai.generativeModel(
+            modelName: "gemini-3.1-flash-tts-preview",
+            generationConfig: config
+        )
+
+        #if os(iOS)
+        // Without the .playback category, audio is muted when the silent switch is on.
+        try AVAudioSession.sharedInstance().setCategory(.playback)
+        try AVAudioSession.sharedInstance().setActive(true)
+        #endif
+        if !audioEngine.isRunning {
+            try audioEngine.start()
+        }
+        playerNode.play()
+
+        let responseStream = try model.generateContentStream(prompt)
+        for try await chunk in responseStream {
+            for part in chunk.inlineDataParts {
+                // Raw PCM audio bytes (24kHz, 1 channel, 16-bit signed little-endian)
+                schedulePCMBuffer(data: part.data)
+            }
+        }
+    }
+
+    private func schedulePCMBuffer(data: Data) {
+        let sampleCount = data.count / MemoryLayout<Int16>.size
+        let frameCount = AVAudioFrameCount(sampleCount)
+        guard frameCount > 0,
+              let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount),
+              let floatChannel = buffer.floatChannelData?[0] else {
+            return
+        }
+        buffer.frameLength = frameCount
+
+        data.withUnsafeBytes { rawBufferPointer in
+            // loadUnaligned reads Int16 samples without re-binding Data's memory
+            // and works even if the chunk's bytes aren't 2-byte aligned in memory.
+            // (If a chunk ever has an odd byte count, carry the last byte over.)
+            for i in 0..<sampleCount {
+                let sample = rawBufferPointer.loadUnaligned(fromByteOffset: i * 2, as: Int16.self)
+                floatChannel[i] = Float(Int16(littleEndian: sample)) / 32768.0
+            }
+        }
+
+        playerNode.scheduleBuffer(buffer)
+    }
+
+    func stop() {
+        playerNode.stop()
+        audioEngine.stop()
+    }
+}
+```
+
+### 3. Prepend WAV Header for `AVAudioPlayer`
+
+```swift
+import AVFoundation
+
+// @MainActor: a global mutable var is an error under Swift 6 strict concurrency
+// unless it is isolated to an actor.
+@MainActor var audioPlayer: AVAudioPlayer?
+
+@MainActor
+func playRawPcm(data: Data) {
+    let wavData = addWavHeader(to: data)
+    do {
+        #if os(iOS)
+        // Without the .playback category, audio is muted when the silent switch is on.
+        try AVAudioSession.sharedInstance().setCategory(.playback)
+        try AVAudioSession.sharedInstance().setActive(true)
+        #endif
+        audioPlayer = try AVAudioPlayer(data: wavData)
+        audioPlayer?.prepareToPlay()
+        audioPlayer?.play()
+    } catch {
+        print("Error playing audio: \(error)")
+    }
+}
+
+func addWavHeader(to pcmData: Data, sampleRate: Int = 24000, channels: Int = 1, bitDepth: Int = 16) -> Data {
+    var header = Data()
+    let byteRate = sampleRate * channels * bitDepth / 8
+    let blockAlign = channels * bitDepth / 8
+    let totalDataLen = Int32(pcmData.count)
+    let totalLength = totalDataLen + 36
+
+    header.append(contentsOf: "RIFF".utf8)
+    header.append(Data(from: totalLength.littleEndian))
+    header.append(contentsOf: "WAVE".utf8)
+    header.append(contentsOf: "fmt ".utf8)
+    header.append(Data(from: Int32(16).littleEndian))       // Subchunk1Size for PCM
+    header.append(Data(from: Int16(1).littleEndian))        // AudioFormat 1 = PCM
+    header.append(Data(from: Int16(channels).littleEndian))
+    header.append(Data(from: Int32(sampleRate).littleEndian))
+    header.append(Data(from: Int32(byteRate).littleEndian))
+    header.append(Data(from: Int16(blockAlign).littleEndian))
+    header.append(Data(from: Int16(bitDepth).littleEndian))
+    header.append(contentsOf: "data".utf8)
+    header.append(Data(from: totalDataLen.littleEndian))
+
+    return header + pcmData
+}
+
+private extension Data {
+    init<T>(from value: T) {
+        var val = value
+        self = Swift.withUnsafeBytes(of: &val) { Data($0) }
+    }
+}
+```
+
+______________________________________________________________________
+
+## Flutter (Dart)
+
+These snippets follow the official
+[Generate speech](https://firebase.google.com/docs/ai-logic/generate-speech.md.txt)
+guide. The model returns raw PCM bytes (24 kHz, 1 channel, 16-bit); playback is
+app-specific, so `playAudio` / `appendAudioChunk` are placeholders for your own
+player code (the
+[`firebase_ai` example app](https://github.com/firebase/flutterfire/blob/main/packages/firebase_ai/firebase_ai/example/lib/pages/tts_page.dart)
+feeds chunks into a `flutter_soloud` PCM buffer stream).
+
+### 1. Single-Speaker Generation (`generateContent`)
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Set `responseModalities` to include `audio`.
+// Configure a `SpeechConfig` with your chosen voice name (and optionally a language code).
+final config = GenerationConfig(
+  responseModalities: [ResponseModalities.audio],
+  speechConfig: SpeechConfig(voiceName: 'Kore', languageCode: 'en-US'),
+);
+
+// Create a `GenerativeModel` instance with a model that supports speech generation.
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: config,
+);
+
+// Provide a text prompt.
+final prompt = 'Say cheerfully: Have a wonderful day!';
+
+// Call `generateContent` to generate the speech output based on your text prompt.
+final response = await model.generateContent([Content.text(prompt)]);
+
+// Extract the audio data and handle it for downstream use. For example:
+final part = response.candidates.first.content.parts.first;
+if (part is InlineDataPart && part.mimeType.startsWith('audio/')) {
+  final Uint8List pcmData = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+
+  // To play back PCM audio data, you'll need to write your own `playAudio` function.
+  await playAudio(pcmData);
+}
+```
+
+### 2. Multi-Speaker Dialogue
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Configure a `SpeechConfig` for multiple speakers, assigning a voice to each speaker.
+final multiSpeechConfig = SpeechConfig.multiSpeaker(
+  multiSpeakerVoiceConfig: MultiSpeakerVoiceConfig(
+    speakerVoiceConfigs: [
+      SpeakerVoiceConfig(speaker: 'Joe', voiceName: 'Puck'),
+      SpeakerVoiceConfig(speaker: 'Jane', voiceName: 'Kore'),
+    ],
+  ),
+  languageCode: 'en-US',
+);
+
+// Set `responseModalities` to include `audio`.
+final config = GenerationConfig(
+  responseModalities: [ResponseModalities.audio],
+  speechConfig: multiSpeechConfig,
+);
+
+// Create a `GenerativeModel` instance with a model that supports speech generation.
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: config,
+);
+
+// Provide a text prompt that includes the names of the speakers.
+final prompt = '''
+Joe: How's it going today Jane?
+Jane: [excited] Not too bad, how about you?
+''';
+
+// Call `generateContent` to generate the speech output based on your text prompt.
+final response = await model.generateContent([Content.text(prompt)]);
+
+// Extract the audio data and handle it for downstream use. For example:
+final part = response.candidates.first.content.parts.first;
+if (part is InlineDataPart && part.mimeType.startsWith('audio/')) {
+  final Uint8List pcmData = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+
+  // To play back PCM audio data, you'll need to write your own `playAudio` function.
+  await playAudio(pcmData);
+}
+```
+
+### 3. Streaming with `generateContentStream`
+
+```dart
+import 'dart:typed_data';
+import 'package:firebase_ai/firebase_ai.dart';
+
+// Set `responseModalities` to include `audio`.
+// Configure a `SpeechConfig` with your chosen voice name (and optionally a language code).
+final config = GenerationConfig(
+  responseModalities: [ResponseModalities.audio],
+  speechConfig: SpeechConfig(voiceName: 'Kore'),
+);
+
+// Create a `GenerativeModel` instance with a model that supports speech generation.
+final model = FirebaseAI.googleAI().generativeModel(
+  model: 'gemini-3.1-flash-tts-preview',
+  generationConfig: config,
+);
+
+// Provide a text prompt.
+final prompt = 'Tell me a story about a brave knight.';
+
+// Call `generateContentStream` to generate the speech output stream based on your text prompt.
+final responseStream = model.generateContentStream([Content.text(prompt)]);
+
+// Extract the audio data and handle it for downstream use. For example:
+await for (final chunk in responseStream) {
+  final part = chunk.candidates.first.content.parts.first;
+  if (part is InlineDataPart && part.mimeType.startsWith('audio/')) {
+    final Uint8List pcmChunk = part.bytes; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+
+    // Append the audio chunk to your audio queue/buffer for playback as it arrives.
+    appendAudioChunk(pcmChunk);
+  }
+}
+```
+
+______________________________________________________________________
+
+## Web (JavaScript)
+
+### 1. Single-Speaker & Multi-Speaker Generation (`generateContent`)
+
+```javascript
+import { initializeApp } from "firebase/app";
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  ResponseModality,
+} from "firebase/ai";
+
+const firebaseApp = initializeApp(firebaseConfig);
+const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() });
+
+const model = getGenerativeModel(ai, {
+  model: "gemini-3.1-flash-tts-preview",
+  generationConfig: {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
+      languageCode: "en-US",
+    },
+  },
+});
+
+const result = await model.generateContent(
+  "Say cheerfully: Have a wonderful day!"
+);
+const inlineDataParts = result.response.inlineDataParts();
+if (inlineDataParts?.[0]) {
+  const pcmBase64 = inlineDataParts[0].inlineData.data; // Raw PCM bytes (24kHz, 1 channel, 16-bit)
+  const pcmBytes = Uint8Array.from(atob(pcmBase64), (c) => c.charCodeAt(0));
+  // Raw PCM has no container header, so standard players can't decode it directly.
+  // Wrap it in a WAV Blob with `pcmToWavBlob` (section 3 below) and play it:
+  const audio = new Audio(URL.createObjectURL(pcmToWavBlob(pcmBytes)));
+  await audio.play();
+}
+```
+
+For **multi-speaker** dialogue, replace `speechConfig` with a
+`multiSpeakerVoiceConfig` that assigns a voice to each speaker name, and name
+the speakers in the prompt:
+
+```javascript
+const model = getGenerativeModel(ai, {
+  model: "gemini-3.1-flash-tts-preview",
+  generationConfig: {
+    responseModalities: [ResponseModality.AUDIO],
+    speechConfig: {
+      multiSpeakerVoiceConfig: {
+        speakerVoiceConfigs: [
+          { speaker: "Joe", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } },
+          { speaker: "Jane", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } },
+        ],
+      },
+      languageCode: "en-US",
+    },
+  },
+});
+
+const prompt = `
+Joe: How's it going today Jane?
+Jane: [excited] Not too bad, how about you?
+`;
+
+const result = await model.generateContent(prompt);
+// Decode and play `result.response.inlineDataParts()` exactly as in the single-speaker example.
+```
+
+### 2. Streaming Playback with Web Audio API (`generateContentStream`)
 
 ```typescript
 import { initializeApp } from "firebase/app";
-import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
-
-const firebaseConfig = {
-  // your firebase configuration
-};
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  ResponseModality,
+} from "firebase/ai";
 
 const app = initializeApp(firebaseConfig);
 const ai = getAI(app, { backend: new GoogleAIBackend() });
@@ -533,11 +891,11 @@ const ai = getAI(app, { backend: new GoogleAIBackend() });
 const model = getGenerativeModel(ai, {
   model: "gemini-3.1-flash-tts-preview",
   generationConfig: {
-    responseModalities: ["AUDIO"],
+    responseModalities: [ResponseModality.AUDIO],
     speechConfig: {
       voiceConfig: {
         prebuiltVoiceConfig: {
-          voiceName: "Puck",
+          voiceName: "Kore",
         },
       },
     },
@@ -551,7 +909,9 @@ export class WebSpeechPlayer {
   private getAudioContext(): AudioContext {
     if (!this.audioCtx) {
       if (typeof window === "undefined") {
-        throw new Error("AudioContext is only available in browser environments.");
+        throw new Error(
+          "AudioContext is only available in browser environments."
+        );
       }
       const AudioContextClass =
         window.AudioContext ||
@@ -572,14 +932,12 @@ export class WebSpeechPlayer {
     const responseStream = await model.generateContentStream(prompt);
 
     for await (const chunk of responseStream.stream) {
-      const candidates = chunk.candidates || [];
-      for (const candidate of candidates) {
-        for (const part of candidate.content?.parts || []) {
-          if ("inlineData" in part && part.inlineData?.data) {
-            const rawPcm = this.base64ToArrayBuffer(part.inlineData.data);
-            this.queuePcmChunk(rawPcm, ctx);
-          }
-        }
+      const inlineDataParts = chunk.inlineDataParts();
+      if (inlineDataParts?.[0]) {
+        const rawPcm = this.base64ToArrayBuffer(
+          inlineDataParts[0].inlineData.data
+        );
+        this.queuePcmChunk(rawPcm, ctx);
       }
     }
   }
@@ -617,7 +975,7 @@ export class WebSpeechPlayer {
 }
 ```
 
-#### 2. Convert PCM Base64 to Playable WAV Blob for `<audio>` Elements
+### 3. Convert Raw PCM to Playable WAV `Blob` for `<audio>` Elements
 
 ```typescript
 export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
@@ -637,8 +995,8 @@ export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
 
   // fmt subchunk
   writeString(view, 12, "fmt ");
-  view.setUint32(16, 16, true);             // Subchunk1Size
-  view.setUint16(20, 1, true);              // AudioFormat (PCM = 1)
+  view.setUint32(16, 16, true); // Subchunk1Size
+  view.setUint16(20, 1, true); // AudioFormat (PCM = 1)
   view.setUint16(22, numChannels, true);
   view.setUint32(24, sampleRate, true);
   view.setUint32(28, byteRate, true);
@@ -649,7 +1007,7 @@ export function pcmToWavBlob(pcmBytes: Uint8Array, sampleRate = 24000): Blob {
   writeString(view, 36, "data");
   view.setUint32(40, dataSize, true);
 
-  return new Blob([header, pcmBytes], { type: "audio/wav" });
+  return new Blob([header, new Uint8Array(pcmBytes)], { type: "audio/wav" });
 }
 
 function writeString(view: DataView, offset: number, string: string) {
