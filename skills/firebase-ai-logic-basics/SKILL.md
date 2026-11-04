@@ -185,7 +185,7 @@ snippets for iOS (Swift), Android (Kotlin), and Web.
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
 > for the currently supported image generation (Nano Banana) model names.
 
-- Requires an upgraded Blaze pay-as-you-go billing plan.
+- Requires the Firebase project to be on the pay-as-you-go Blaze pricing plan.
 - See the
   [Image Generation Guide](references/sdk/capabilities/image_generation.md).
 
