@@ -1,28 +1,31 @@
 # Image Generation (Nano Banana)
 
-Gemini Image models ("Nano Banana") generate and edit images directly from the
-client. Use this capability when an app needs to create a picture from a text
-prompt, render text inside an image, produce interleaved text-and-image output
-(for example an illustrated recipe), edit a user-supplied image, or refine an
-image over several chat turns. Image generation is a Preview feature, works only
-with dedicated Gemini Image models (never the general-purpose text models), and
-requires the Blaze pay-as-you-go billing plan regardless of the Gemini API
-provider.
+See the
+[Generate and edit images using Gemini](https://firebase.google.com/docs/ai-logic/generate-images-gemini.md.txt)
+guide for full details.
+
+Gemini Nano Banana (image-generation) models generate and edit images directly
+from the client. Use this capability when an app needs to create a picture from
+a text prompt, render text inside an image, produce interleaved text-and-image
+output (for example an illustrated recipe), edit a user-supplied image, or
+refine an image over several chat turns. Image generation works only with
+dedicated Gemini Nano Banana models (never the general-purpose text models), and
+requires the Firebase project to be on the pay-as-you-go Blaze pricing plan
+regardless of the Gemini API provider.
 
 ## Configuration
 
-> [!WARNING] **Blaze plan required.** Image generation requires an upgraded
-> Blaze pay-as-you-go billing plan regardless of your Gemini API provider.
-> Always check the
+> [!WARNING] **Blaze plan required.** Image generation requires the Firebase
+> project to be on the pay-as-you-go Blaze pricing plan regardless of your
+> Gemini API provider. Always check the
 > [Firebase AI Logic Models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)
-> for the currently supported image generation (Nano Banana) model names.
+> for the currently supported Gemini Nano Banana model names.
 
-- **Model**: Use a dedicated Gemini Image model. General-use Gemini models do
-  not generate images, and legacy Imagen models (`ImagenModel` / `imagen-*`) are
-  shut down and removed in the latest SDKs (see the
-  [Imagen to Gemini migration guide](https://firebase.google.com/docs/ai-logic/imagen-models-migration.md.txt)).
+- **Model**: Use a dedicated Gemini Nano Banana model. General-use Gemini models
+  do not generate images. Do NOT use Imagen models. They are shut down.
+  [Migrate any Imagen code to use Gemini Nano Banana models.](https://firebase.google.com/docs/ai-logic/imagen-models-migration.md.txt)
   Every snippet below uses the placeholder `<latest_supported_image_model>`;
-  replace it with the current image model from the models page.
+  replace it with an applicable Gemini Nano Banana model from the models page.
 - **Response modality (required)**: The model must be configured with
   `responseModalities` in `generationConfig` that include `IMAGE`. Add `TEXT`
   only when you want interleaved text and images in the same response (the model
@@ -33,26 +36,14 @@ provider.
   `candidates.first().content.parts`; Swift as `response.inlineDataParts`
   (`Data`); Dart as `response.inlineDataParts` (`bytes`); Web as
   `result.response.inlineDataParts()` (base64 `data` plus `mimeType`).
-- **Output size**: By default images are square (1:1) at 1024x1024. Set
-  `imageConfig` inside `generationConfig` to choose an aspect ratio and image
-  size (supported sizes depend on the model):
-  - **Android**:
-    `imageConfig = imageConfig { aspectRatio = AspectRatio.LANDSCAPE_16x9; imageSize = ImageSize.SIZE_2K }`
-  - **iOS**:
-    `imageConfig: ImageConfig(aspectRatio: .landscape16x9, imageSize: .size2K)`
-  - **Flutter**:
-    `imageConfig: ImageConfig(aspectRatio: ImageAspectRatio.landscape16x9, imageSize: ImageSize.size2K)`
-  - **Web**:
-    `imageConfig: { aspectRatio: ImageConfigAspectRatio.LANDSCAPE_16x9, imageSize: ImageConfigImageSize.SIZE_2K }`
-    (or the underlying string literals: aspect ratios `1:1`, `1:4`, `1:8`,
-    `2:3`, `3:2`, `3:4`, `4:1`, `4:3`, `4:5`, `5:4`, `8:1`, `9:16`, `16:9`,
-    `21:9`; sizes `512`, `1K`, `2K`, `4K` with uppercase `K`).
-- **Input**: All Gemini Image models accept image input (for editing, and as
-  reference images for objects, characters, or style; per-model limits are in
-  the official guide); some accept video input; none accept audio. Inline
-  request data is limited to 20 MB per request, with at most 14 input images and
-  7 MB per base64-encoded image (see the
-  [models page](https://firebase.google.com/docs/ai-logic/models.md.txt)).
+- **Output size**: Set `imageConfig` inside `generationConfig` to choose an
+  aspect ratio and image size. See
+  [Configure image generation](https://firebase.google.com/docs/ai-logic/generate-images-gemini#configure-image-generation)
+  for supported options and SDK syntax.
+- **Input**: All Gemini Nano Banana models accept image input (for editing, and
+  as reference images for objects, characters, or style). See
+  [Use reference images](https://firebase.google.com/docs/ai-logic/generate-images-gemini#reference-images)
+  for supported input options and limits.
 - **Editing and iteration**: Pass the source image together with the text
   prompt. For iterative edits, use a chat session (`startChat()` /
   `sendMessage()`) with the same model configuration; follow-up turns do not
@@ -64,8 +55,10 @@ provider.
   Web (`AIError` from `inlineDataParts()`), `NO_IMAGE` throws an error; Flutter
   returns empty `inlineDataParts`. Ask for images explicitly ("generate an
   image", "update the image") and handle the no-image case in the UI.
-- Grounding with Google Search and structured output are supported on some image
-  models only; check the official guide for the current model matrix.
+- Grounding with Google Search and structured output are supported on some
+  Gemini Nano Banana models; check the
+  [official image generation guide](https://firebase.google.com/docs/ai-logic/generate-images-gemini.md.txt)
+  for feature support.
 
 ## Android (Kotlin)
 
@@ -353,21 +346,19 @@ try {
 - **Model refuses and returns only text** (`FinishReason` is `STOP`): the prompt
   was judged potentially unsafe; the model will not create the image.
 - **No image parts and the model is a general-use Gemini model**: image
-  generation is only supported by Gemini Image models. Pick an image model from
-  the models page.
-- **Billing or permission errors**: the project must be on the Blaze plan for
-  image generation, even with the Gemini Developer API.
+  generation is only supported by Gemini Nano Banana (image-generation) models.
+  Pick an image model from the models page.
+- **Billing or permission errors**: the Firebase project must be on the
+  pay-as-you-go Blaze pricing plan for image generation, even with the Gemini
+  Developer API.
 - **`imageConfig` rejected or fails to compile**: Android (`AspectRatio`,
   `ImageSize`), iOS (`ImageConfig.AspectRatio`, `ImageConfig.ImageSize`), and
   Flutter (`ImageAspectRatio`, `ImageSize`) use strongly-typed constants rather
   than raw strings; on Web, use `ImageConfigAspectRatio` /
-  `ImageConfigImageSize` or string literals with an uppercase `K` suffix (`1K`,
-  `2K`, `4K`; `512` has no suffix).
-- **HTTP 413 when editing**: inline request data is limited to 20 MB; resize or
-  compress the input image before sending it.
+  `ImageConfigImageSize` or valid string literals (see
+  [Configure image generation](https://firebase.google.com/docs/ai-logic/generate-images-gemini#configure-image-generation)).
+- **HTTP 413 when editing**: inline request data exceeded the request size
+  limit; resize or compress the input image before sending it.
 - **Generated text appears inside the image instead of as text**: ask for text
   output explicitly ("generate narrative text along with illustrations"). When
   an image must contain text, generate the text first, then the image.
-
-See the official image generation guide:
-https://firebase.google.com/docs/ai-logic/generate-images-gemini.md.txt
