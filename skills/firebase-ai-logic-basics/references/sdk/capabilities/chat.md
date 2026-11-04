@@ -1,5 +1,8 @@
 # Chat (Multi-turn Conversations)
 
+Official documentation:
+[Build multi-turn conversations (chat)](https://firebase.google.com/docs/ai-logic/chat.md.txt)
+
 Use a chat session when the user and the model exchange more than one message
 and later turns depend on earlier ones. The SDK manages the conversation state
 for you: `startChat()` creates a session (optionally seeded with prior history)
@@ -22,13 +25,13 @@ function calling, which need a back-and-forth between the model and your app.
   `startChat()` to resume a stored conversation or to give the model examples.
   To steer overall behavior instead, prefer system instructions; see
   https://firebase.google.com/docs/ai-logic/system-instructions.md.txt.
-- **Do not end a request with a `model` turn.** On `gemini-4-argon`, the
-  `gemini-3.x-flash` models (except `gemini-3.5-flash`), and
-  `gemini-3.5-flash-lite`, prefilling model turns is not supported: if the last
-  non-empty turn in the request is a `model` turn, the request fails with an
-  HTTP 400 error. Seeded `startChat()` history is fine because `sendMessage()`
-  appends the `user` turn after it; the trap is hand-built `contents` arrays
-  passed to `generateContent()`.
+- **Do not end a request with a `model` turn.** Prefilling model turns is not
+  supported: if the last non-empty turn in the request is a `model` turn, the
+  request fails with an HTTP 400 error. Seeded `startChat()` history is fine
+  because `sendMessage()` appends the `user` turn after it; the trap is
+  hand-built `contents` arrays passed to `generateContent()`. Do not use
+  deprecated models (see the
+  [models documentation](https://firebase.google.com/docs/ai-logic/models.md.txt)).
 - **Streaming replies.** Call `sendMessageStream()` on the chat instead of
   `sendMessage()` to receive the reply chunk by chunk; see the
   [Streaming capability](streaming.md) for full examples.
@@ -165,6 +168,3 @@ async function sendMessage(msg) {
   session that contains only the `history` you pass in. Keep a single chat
   object for the lifetime of the conversation and reuse it for every
   `sendMessage()`; do not create one per message.
-
-See the official chat guide:
-https://firebase.google.com/docs/ai-logic/chat.md.txt
