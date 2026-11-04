@@ -122,11 +122,9 @@ async function generateText(prompt) {
 
 ## Troubleshooting
 
-- **HTTP 400 after a model upgrade.** `frequencyPenalty`, `presencePenalty`, and
-  `candidateCount` are unsupported on general-use Gemini 3.x and later models,
-  and newer models (`gemini-3.7-flash`, `gemini-3.8-flash`, `gemini-4-argon`)
-  reject them with HTTP 400. Remove them from the `GenerationConfig`;
-  `temperature`, `topP`, and `topK` are also ignored by these models.
+- **HTTP 400 or unexpected behavior from `GenerationConfig`.** Remove any
+  unsupported sampling parameters (`temperature`, `topP`, `topK`,
+  `candidateCount`, `presencePenalty`, `frequencyPenalty`); do not set them.
 - **Blocked or truncated response (thrown exception).** Android
   (`PromptBlockedException` / `ResponseStoppedException`) and iOS
   (`GenerateContentError.promptBlocked` / `.responseStoppedEarly`) throw from
@@ -135,15 +133,4 @@ async function generateText(prompt) {
   you read `.text` / `.text()` on a blocked response. A `??` / `?:` fallback on
   `text` therefore never handles a block; wrap the call in `try` / `catch` (`do`
   / `catch` in Swift). Inspect `promptFeedback.blockReason` on the response and
-  `finishReason` on the first candidate, then relax the threshold for that
-  category or rewrite the prompt.
-- **Deprecation warnings on `GenerationConfig`.** iOS `13.0.0+`, Web
-  `@firebase/ai@3.0.0+`, and the Android `firebase-ai:18.0.0+` builder setters
-  mark `temperature`, `topP`, `topK`, `candidateCount`, `presencePenalty`, and
-  `frequencyPenalty` as deprecated. The Kotlin `generationConfig { }` DSL and
-  Flutter `firebase_ai` 4.0.0 don't warn yet, so don't rely on the compiler: use
-  only `maxOutputTokens` and `stopSequences` (plus capability-specific configs)
-  as shown above.
-
-See the official text generation guide:
-https://firebase.google.com/docs/ai-logic/generate-text.md.txt
+  `finishReason` on the first candidate, then rewrite the prompt.
