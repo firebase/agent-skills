@@ -51,7 +51,8 @@ Defines environment variables available during build and/or runtime (local
 `.env*` files are not uploaded, so declare required variables or secrets here).
 
 - `variable`: The name of the env var (e.g., `NEXT_PUBLIC_API_URL`).
-- `value`: A literal string value.
+- `value`: A literal string value for non-sensitive config only (use `secret:`
+  for sensitive keys).
 - `secret`: The name of a secret in Cloud Secret Manager. use
   `npx -y firebase-tools@latest apphosting:secrets:set` to create these.
 - `availability`: Where the variable is needed.
