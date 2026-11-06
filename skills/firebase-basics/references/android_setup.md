@@ -167,13 +167,20 @@ plugins {
 
 ______________________________________________________________________
 
-## 6. App Check (Debug Token Persistence)
+## 6. App Check (Debug Tokens)
 
-When using App Check on Android emulators or local development,
-`DebugAppCheckProviderFactory.getInstance()` generates a UUID token and stores
-it in `SharedPreferences`. Wiping emulator data, clearing app storage, or fresh
-installs generate a new UUID in Logcat, causing debug token churn in the
-Firebase Console.
+`DebugAppCheckProviderFactory.getInstance()` generates a random UUID debug
+secret the first time it runs, stores it in `SharedPreferences`, and prints it
+to Logcat (`DebugAppCheckProvider: Firebase App Check debug token: ...`). The
+secret survives app updates, but uninstalling the app, clearing its storage or
+wiping the emulator produces a new one.
+
+There is no build setting that pins this secret for normal debug runs. The
+provider only reads a fixed secret from instrumentation arguments, so **manifest
+placeholders and `BuildConfig` fields have no effect on it.** For normal debug
+runs, register each device's or emulator's token in the Firebase Console under
+**Security > App Check > Apps > Manage debug tokens**, and register the new one
+after a fresh install.
 
 > [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** App Check debug
 > tokens allow clients to bypass attestation and access backend resources
@@ -182,20 +189,33 @@ Firebase Console.
 > control.** If a token is compromised, revoke it immediately in the Firebase
 > Console.
 
-To persist a stable debug token across emulator resets and testing without
-committing secrets:
+Install the debug provider for debug builds in your application or activity:
 
-1. Obtain or generate a stable UUID debug token and register it in the Firebase
-   Console under **Security > App Check > Apps > Manage debug tokens**.
+```kotlin
+if (BuildConfig.DEBUG) {
+    Firebase.appCheck.installAppCheckProviderFactory(
+        DebugAppCheckProviderFactory.getInstance()
+    )
+}
+```
 
-1. Store the token in your project's gitignored `local.properties`:
+### Fixed debug token for instrumentation tests (CI)
+
+Instrumentation tests can use one stable, registered token through
+`firebase-appcheck-debug-testing`, which reads the secret from the
+`firebaseAppCheckDebugSecret` instrumentation argument.
+
+1. Register a UUID as a debug token in the Firebase Console, then store it in
+   your project's gitignored `local.properties` (or a CI secret exposed as the
+   `APP_CHECK_DEBUG_TOKEN` environment variable):
 
    ```properties
    # In local.properties (ensure this file is in your .gitignore!)
    APP_CHECK_DEBUG_TOKEN=<YOUR_DEBUG_TOKEN>
    ```
 
-1. Inject the secret in `app/build.gradle.kts` for instrumentation/testing:
+1. Pass it to the test runner and add the testing artifact in
+   `app/build.gradle.kts`:
 
    ```kotlin
    val localProperties = java.util.Properties().apply {
@@ -209,24 +229,29 @@ committing secrets:
 
    android {
        defaultConfig {
-           // For normal emulator runs (injects into AndroidManifest)
-           manifestPlaceholders["firebaseAppCheckDebugSecret"] = appCheckDebugToken
-
-           // For instrumentation tests
            if (appCheckDebugToken.isNotEmpty()) {
                testInstrumentationRunnerArguments["firebaseAppCheckDebugSecret"] = appCheckDebugToken
            }
        }
    }
+
+   dependencies {
+       androidTestImplementation("com.google.firebase:firebase-appcheck-debug-testing")
+   }
    ```
 
-1. In your application or activity, install the debug provider for debug builds:
+1. Run the test code inside `DebugAppCheckTestHelper`, which installs the debug
+   provider with that secret and restores the previous provider afterwards:
 
    ```kotlin
-   if (BuildConfig.DEBUG) {
-       Firebase.appCheck.installAppCheckProviderFactory(
-           DebugAppCheckProviderFactory.getInstance()
-       )
+   import com.google.firebase.appcheck.debug.testing.DebugAppCheckTestHelper
+   import org.junit.Test
+
+   @Test
+   fun readsProtectedData() {
+       DebugAppCheckTestHelper.fromInstrumentationArgs().withDebugProvider<Exception> {
+           // Calls to App Check-protected Firebase services
+       }
    }
    ```
 

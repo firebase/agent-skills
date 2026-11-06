@@ -199,16 +199,22 @@ if (BuildConfig.DEBUG) {
 }
 ```
 
-#### Debug Token Persistence
+#### Debug Tokens
 
-Emulator resets or clearing app storage erase `SharedPreferences`, causing
-`DebugAppCheckProviderFactory` to print a new debug token in Logcat. To persist
-a stable debug token across emulator resets and fresh installs without
-hardcoding secrets:
+`DebugAppCheckProviderFactory` generates a debug token per install, stores it in
+`SharedPreferences` and prints it to Logcat. Uninstalling the app, clearing its
+storage or wiping the emulator produces a new token, which must be registered in
+the Firebase Console before requests from that device pass App Check. No build
+setting pins the token for normal debug runs: the provider only reads a fixed
+secret from instrumentation arguments, so manifest placeholders and
+`BuildConfig` fields have no effect on it.
 
 > [!WARNING] **CRITICAL: Never Hardcode or Commit Debug Tokens** Never hardcode
 > debug token strings in `build.gradle.kts` or Kotlin source files. Store the
 > token in gitignored `local.properties` and inject it dynamically.
+
+For instrumentation tests (CI), a fixed registered token can be passed to the
+test runner and used through `firebase-appcheck-debug-testing`:
 
 1. In gitignored `local.properties`:
 
@@ -230,13 +236,24 @@ hardcoding secrets:
 
    android {
        defaultConfig {
-           // For normal emulator runs (injects into AndroidManifest)
-           manifestPlaceholders["firebaseAppCheckDebugSecret"] = appCheckDebugToken
-
-           // For instrumentation tests
            if (appCheckDebugToken.isNotEmpty()) {
                testInstrumentationRunnerArguments["firebaseAppCheckDebugSecret"] = appCheckDebugToken
            }
        }
+   }
+
+   dependencies {
+       androidTestImplementation("com.google.firebase:firebase-appcheck-debug-testing")
+   }
+   ```
+
+1. In the test, run the code that calls Firebase AI Logic inside
+   `DebugAppCheckTestHelper`:
+
+   ```kotlin
+   import com.google.firebase.appcheck.debug.testing.DebugAppCheckTestHelper
+
+   DebugAppCheckTestHelper.fromInstrumentationArgs().withDebugProvider<Exception> {
+       // Firebase AI Logic calls
    }
    ```
