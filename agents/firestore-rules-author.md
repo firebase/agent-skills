@@ -9,6 +9,12 @@ tools:
   - find_by_name
   - list_dir
   - run_command
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
 mainAgent: true
 subagent: true
 commandExecutionPolicy: auto
