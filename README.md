@@ -17,7 +17,7 @@ For most popular AI-assistive tools, you can use the `skills` CLI to install
 Firebase agent skills:
 
 ```bash
-npx skills add firebase/skills
+npx skills add firebase/agent-skills
 ```
 
 ### Option 2: Gemini CLI Extension
