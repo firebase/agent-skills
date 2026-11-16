@@ -26,7 +26,7 @@ This repository is configured as a Gemini CLI extension. You can add it using
 the Gemini CLI:
 
 ```bash
-gemini extensions install https://github.com/firebase/skills
+gemini extensions install https://github.com/firebase/agent-skills
 ```
 
 ### Option 3: Claude Plugin
@@ -34,7 +34,7 @@ gemini extensions install https://github.com/firebase/skills
 1. Add the Firebase marketplace for Claude plugins:
 
 ```bash
-claude plugin marketplace add firebase/skills
+claude plugin marketplace add firebase/agent-skills
 ```
 
 Install the Claude plugin for Firebase:
@@ -54,7 +54,7 @@ claude plugin marketplace list
 Add the Firebase marketplace for Codex plugins:
 
 ```bash
-codex plugin marketplace add firebase/skills
+codex plugin marketplace add firebase/agent-skills
 ```
 
 Install the Firebase plugin:
@@ -68,7 +68,7 @@ codex plugin add firebase@firebase
 Install the Firebase plugin in Kimi Code CLI:
 
 ```bash
-/plugins install https://github.com/firebase/skills
+/plugins install https://github.com/firebase/agent-skills
 ```
 
 Verify the installation:
@@ -82,7 +82,7 @@ Verify the installation:
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/firebase/skills.git
+git clone https://github.com/firebase/agent-skills.git
 ```
 
 2. Copy the contents of the `skills` directory to the appropriate location for

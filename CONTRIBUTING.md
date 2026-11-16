@@ -43,7 +43,7 @@ To test out your skill, you can install it from a branch using the 'skills' CLI
 tool:
 
 ```bash
-npx skills add  https://github.com/firebase/skills/tree/<branch-name>
+npx skills add https://github.com/firebase/agent-skills/tree/<branch-name>
 ```
 
 We also have an automated eval pipeline set up in
