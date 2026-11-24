@@ -112,132 +112,14 @@ This means the first firestore.rules file you generate must never have any
 
 1. **Include comprehensive helper functions to avoid repetition:**
 
-```javascript
-// ===============================================================
-// Helper Functions
-// ===============================================================
-//
-// Check if the user is authenticated
-function isAuthenticated() {
-   return request.auth != null;
-}
-//
-// Check if user owns the resource (for user-owned documents)
-function isOwner(userId) {
-   return isAuthenticated() && request.auth.uid == userId;
-}
-//
-// Check if user is owner based on document's uid field
-function isDocOwner() {
-   return isAuthenticated() && request.auth.uid == resource.data.uid;
-}
-//
-// Verify UID hasn't been tampered with on create
-function uidUnchanged() {
-   return !('uid' in request.resource.data) ||
-     request.resource.data.uid == request.auth.uid;
-}
-//
-// Ensure uid field is not modified on update
-function uidNotModified() {
-   return !('uid' in request.resource.data) ||
-     request.resource.data.uid == resource.data.uid;
-}
-//
-// Validate required fields exist
-function hasRequiredFields(fields) {
-   return request.resource.data.keys().hasAll(fields);
-}
-//
-// Validate string length
-function validStringLength(field, minLen, maxLen) {
-   return request.resource.data[field] is string &&
-     request.resource.data[field].size() >= minLen &&
-     request.resource.data[field].size() <= maxLen;
-}
-//
-// Validate URL format (must start with https:// or http://)
-function isValidUrl(url) {
-   return url is string &&
-     (url.matches("^https://.*") || url.matches("^http://.*"));
-}
-//
-// Validate email format
-function isValidEmail(email) {
-   return email is string &&
-     email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-}
-
-//
-// Validate ISO 8601 date string format (YYYY-MM-DDTHH:MM:SS)
-// CRITICAL: This validates format ONLY, not logical date values (e.g., month 13).
-// Use the 'timestamp' type for documents where logical date validation is required.
-function isValidDateString(dateStr) {
-  return dateStr is string &&
-    dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
-}
-
-//
-// Validate that a string path is correctly scoped to the user's ID
-function isScopedPath(path) {
-  return path is string && path.matches("^users/" + request.auth.uid + "/.*");
-}
-//
-// Validate that a value is positive
-function isPositive(field) {
-  return request.resource.data[field] is number && request.resource.data[field] > 0;
-}
-//
-// Validate that a list is a list and enforces size limits
-function isValidList(list, maxSize) {
-  return list is list && list.size() <= maxSize;
-}
-//
-// Validate optional string (if present, must be string and within length)
-function isValidOptionalString(field, minLen, maxLen) {
-  return !(field in request.resource.data) ||
-         (request.resource.data[field] is string &&
-          request.resource.data[field].size() >= minLen &&
-          request.resource.data[field].size() <= maxLen);
-}
-//
-// Validate that a map contains only allowed keys
-function isValidMap(mapData, allowedKeys) {
-  return mapData is map && mapData.keys().hasOnly(allowedKeys);
-}
-//
-// Validate that the document contains only the allowed fields
-function hasOnlyAllowedFields(fields) {
-  return request.resource.data.keys().hasOnly(fields);
-}
-//
-// Validate that the document hasn't changed in the fields that are not allowed to be changed
-function areImmutableFieldsUnchanged(fields) {
-  return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
-}
-//
-// Validate that a timestamp is recent (within the last 5 minutes)
-function isRecent(time) {
-  return time is timestamp &&
-         time > request.time - duration.value(5, 'm') &&
-         time <= request.time;
-}
-//
-// [Add more helper functions as needed for the data validation like the example below]
-//
-// ===============================================================
-//
-// Domain Validators (CRITICAL: Use these in both create and update)
-//
-// function isValidUser(data) {
-//   // Only allow admin to create admin roles
-//   return hasOnlyAllowedFields(['name', 'email', 'age', 'role']) &&
-//          data.name is string && data.name.size() > 0 && data.name.size() < 50 &&
-//          data.email is string && isValidEmail(data.email) &&
-//          data.age is number && data.age >= 18 &&
-//          data.role in ['admin', 'user', 'guest'];
-// }
-```
+**MUST read [references/helper-functions.md](references/helper-functions.md)
+before writing `firestore.rules`.** Copy the helper functions it defines into the
+rules file (`isAuthenticated`, `isOwner`, `isDocOwner`, `uidUnchanged`,
+`uidNotModified`, `hasRequiredFields`, `validStringLength`, `isValidUrl`,
+`isValidEmail`, `isValidDateString`, `isScopedPath`, `isPositive`,
+`isValidList`, `isValidOptionalString`, `isValidMap`, `hasOnlyAllowedFields`,
+`areImmutableFieldsUnchanged`, `isRecent`), and add a domain validator such as
+`isValidUser(data)` for each collection, used in both `create` and `update`.
 
 #### Mandatory: User Data Separation (The "No Mixed Content" Rule)
 
@@ -380,94 +262,18 @@ Secure rules must enforce the application's business logic. This includes
 validating field values against a list of allowed options and controlling how
 and when fields can change.
 
-#### 1. Enforce Enum Values
+**MUST read [references/advanced-validation.md](references/advanced-validation.md)
+before writing `update` rules or counter logic.** It has the full requirements
+and examples for each pattern:
 
-If a field should only contain specific values (e.g., a status), validate
-against a list.
-
-**Example:**
-
-```javascript
- // A 'task' document's status can only be one of three values
- function isValidStatus() {
-   let validStatuses = ['pending', 'in-progress', 'completed'];
-   return request.resource.data.status in validStatuses;
- }
-
- allow create: if isValidStatus() && ...
-```
-
-#### 2. Validate State Transitions
-
-For `update` operations, you **MUST** validate that a field is changing from a
-valid previous state to a valid new state. This prevents users from bypassing
-workflows (e.g., marking a task as 'completed' from 'archived').
-
-**Example:**
-
-```javascript
- // A task can only be marked 'completed' if it was 'in-progress'
- function validStatusTransition() {
-   let previousStatus = resource.data.status;
-   let newStatus = request.resource.data.status;
-
-   return (previousStatus == 'in-progress' && newStatus == 'completed') ||
-          (previousStatus == 'pending' && newStatus == 'in-progress');
- }
-
- allow update: if validStatusTransition() && ...
-```
-
-#### 3. Strict Path and Relationship Scoping
-
-For any field that references another resource (like an image path or a parent
-document ID), you **MUST** ensure it is correctly scoped to the user or valid
-within the context.
-
-**Example:**
-
-```javascript
-// Ensure image path is within the user's own storage folder
-allow create: if isScopedPath(request.resource.data.imageBucket) && ...
-```
-
-#### 4. Secure Counter Updates
-
-When allowing users to update a counter (like `voteCount` or `answerCount`), you
-**MUST** ensure: 1. **Atomic Increments:** The field is only changing by exactly
-+1 or -1. 2. **Isolation:** **NO OTHER FIELDS** are being modified. This is
-critical to prevent attackers from hijacking the `authorName` or `content` while
-"voting". 3. **Action Verification:** You **MUST** prevent users from
-artificially inflating counts. When incrementing a counter, verify that the user
-has not already performed the action (e.g., by checking for the existence of a
-'like' document) and is not looping updates. * **CRITICAL:** Relying solely on
-`!exists(likeDoc)` is insufficient because a malicious user can skip creating
-the document and loop the increment. * **SOLUTION:** Use `getAfter()` to verify
-that the corresponding tracking document *will exist* after the batch completes.
-
-**Example:**
-
-```javascript
-function isValidCounterUpdate(docId) {
-  // Allow update only if 'voteCount' is the ONLY field changing
-  return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voteCount']) &&
-         // And the change is exactly +1 or -1
-         math.abs(request.resource.data.voteCount - resource.data.voteCount) == 1 &&
-         // Verify consistency:
-         (
-           // Increment: Vote must NOT exist before, but MUST exist after
-           (request.resource.data.voteCount > resource.data.voteCount &&
-            !exists(/databases/$(database)/documents/votes/$(request.auth.uid + '_' + docId)) &&
-            getAfter(/databases/$(database)/documents/votes/$(request.auth.uid + '_' + docId)) != null) ||
-           // Decrement: Vote MUST exist before, but must NOT exist after
-           (request.resource.data.voteCount < resource.data.voteCount &&
-            exists(/databases/$(database)/documents/votes/$(request.auth.uid + '_' + docId)) &&
-            getAfter(/databases/$(database)/documents/votes/$(request.auth.uid + '_' + docId)) == null)
-         );
-}
-
-allow update: if isValidCounterUpdate(docId) && ...
-```
+1. **Enforce Enum Values:** validate fields like `status` against a list of
+   allowed values.
+2. **Validate State Transitions:** on `update`, check the previous state and the
+   new state so users cannot bypass workflows.
+3. **Strict Path and Relationship Scoping:** fields that reference another
+   resource must be scoped to the user or valid in context.
+4. **Secure Counter Updates:** counters change by exactly +1 or -1, no other
+   field changes, and the tracking document is verified with `getAfter()`.
 
 #### 5. **CRITICAL** Ensure Application Validity
 
